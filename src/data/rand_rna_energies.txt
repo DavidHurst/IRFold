@@ -1,0 +1,69 @@
+=====Energies for seq: GGAAUAACCCAUCCCGUUAA
+
+=====Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+(  (  .  .  .  .  .  .  .  .  .  .  .  )  )  .  .  .  .  .  
+External loop                           :  -170
+Interior loop (  1, 15) GC; (  2, 14) GC:  -330
+Hairpin  loop (  2, 14) GC              :   510
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+(  (  (  .  .  .  .  .  .  .  .  )  )  )  .  .  .  .  .  .  
+External loop                           :   -80
+Interior loop (  1, 14) GC; (  2, 13) GC:  -330
+Interior loop (  2, 13) GC; (  3, 12) AU:  -240
+Hairpin  loop (  3, 12) AU              :   520
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+(  (  .  .  .  .  .  .  )  )  .  .  .  .  .  .  .  .  .  .  
+External loop                           :  -170
+Interior loop (  1, 10) GC; (  2,  9) GC:  -330
+Hairpin  loop (  2,  9) GC              :   390
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+(  (  .  .  .  .  .  )  )  .  .  .  .  .  .  .  .  .  .  .  
+External loop                           :   -80
+Interior loop (  1,  9) GC; (  2,  8) GC:  -330
+Hairpin  loop (  2,  8) GC              :   460
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+.  .  (  (  .  .  .  .  .  .  .  .  .  .  .  .  )  )  .  .  
+External loop                           :   -60
+Interior loop (  3, 18) AU; (  4, 17) AU:   -90
+Hairpin  loop (  4, 17) AU              :   660
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+.  .  .  (  (  .  .  .  .  .  )  )  .  .  .  .  .  .  .  .  
+External loop                           :   -20
+Interior loop (  4, 12) AU; (  5, 11) UA:  -110
+Hairpin  loop (  5, 11) UA              :   540
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+.  .  .  .  (  (  (  (  .  .  .  .  .  .  .  )  )  )  )  .  
+External loop                           :   -30
+Interior loop (  5, 19) UA; (  6, 18) AU:  -130
+Interior loop (  6, 18) AU; (  7, 17) AU:   -90
+Interior loop (  7, 17) AU; (  8, 16) CG:  -220
+Hairpin  loop (  8, 16) CG              :   490
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  (  (  )  )  
+External loop                           :    30
+Interior loop ( 17, 20) UA; ( 18, 19) UA:   -90
+Hairpin  loop ( 18, 19) UA              : 10000000
+
+
