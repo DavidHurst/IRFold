@@ -1,0 +1,44 @@
+Palindromes of: rand_rna.fasta
+Sequence name: rand_rna
+Sequence length is: 20
+Start at position: 1
+End at position: 20
+Minimum length of Palindromes is: 2
+Maximum length of Palindromes is: 20
+Maximum gap between elements is: 19
+Number of mismatches allowed in Palindrome: 0
+
+
+
+Palindromes:
+1        cu        2
+         ||
+9        ga        8
+
+2        ug        3
+         ||
+16       ac       15
+
+2        ug        3
+         ||
+6        ac        5
+
+4        ac        5
+         ||
+10       ug        9
+
+5        ca        6
+         ||
+13       gu       12
+
+9        gu       10
+         ||
+20       ca       19
+
+12       ug       13
+         ||
+16       ac       15
+
+
+
+

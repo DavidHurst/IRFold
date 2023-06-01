@@ -1,0 +1,58 @@
+=====Energies for seq: CUGACAAAGUAUGGCAAAAC
+
+=====Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+(  (  .  .  .  .  .  )  )  .  .  .  .  .  .  .  .  .  .  .  
+External loop                           :   -60
+Interior loop (  1,  9) CG; (  2,  8) UA:  -210
+Hairpin  loop (  2,  8) UA              :   420
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+.  (  (  .  .  .  .  .  .  .  .  .  .  .  )  )  .  .  .  .  
+External loop                           :   -50
+Interior loop (  2, 16) UA; (  3, 15) GC:  -210
+Hairpin  loop (  3, 15) GC              :   530
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+.  (  (  .  )  )  .  .  .  .  .  .  .  .  .  .  .  .  .  .  
+External loop                           :   -50
+Interior loop (  2,  6) UA; (  3,  5) GC:  -210
+Hairpin  loop (  3,  5) GC              : 10000000
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+.  .  .  (  (  .  .  .  )  )  .  .  .  .  .  .  .  .  .  .  
+External loop                           :   -60
+Interior loop (  4, 10) AU; (  5,  9) CG:  -220
+Hairpin  loop (  5,  9) CG              :   540
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+.  .  .  .  (  (  .  .  .  .  .  )  )  .  .  .  .  .  .  .  
+External loop                           :  -160
+Interior loop (  5, 13) CG; (  6, 12) AU:  -210
+Hairpin  loop (  6, 12) AU              :   540
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+.  .  .  .  .  .  .  .  (  (  .  .  .  .  .  .  .  .  )  )  
+External loop                           :   -20
+Interior loop (  9, 20) GC; ( 10, 19) UA:  -220
+Hairpin  loop ( 10, 19) UA              :   500
+
+
+Evaluating shape:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 
+.  .  .  .  .  .  .  .  .  .  .  (  (  .  )  )  .  .  .  .  
+External loop                           :   -30
+Interior loop ( 12, 16) UA; ( 13, 15) GC:  -210
+Hairpin  loop ( 13, 15) GC              : 10000000
+
+
