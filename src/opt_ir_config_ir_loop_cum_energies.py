@@ -32,7 +32,7 @@ def irs_to_dot_brkt(active_irs, all_irs, seq_len):
     return "".join(paired_bases)
 
 
-def calc_free_energy(dot_brk_repr, seq, out_fname): #, *, free=False):
+def calc_free_energy(dot_brk_repr, seq, out_fname):  # , *, free=False):
     # Free=True: calculate free energy, =False: calculate cum. loop energy
     # if free:
     with open(f"data/{out_fname}.txt", "a") as f:
@@ -137,7 +137,8 @@ def main():
     ir_cum_loop_energies = []
     for i, ir in enumerate(all_irs):
         cum_energy = calc_free_energy(
-            irs_to_dot_brkt([i], all_irs, seq_len), seq, seq_energies_fname)
+            irs_to_dot_brkt([i], all_irs, seq_len), seq, seq_energies_fname
+        )
         ir_cum_loop_energies.append(cum_energy)
 
     print("Cumulative energies of loops in IRs".center(50, "="))

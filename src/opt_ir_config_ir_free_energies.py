@@ -6,9 +6,7 @@ import forgi.graph.bulge_graph as fgb
 import forgi
 import itertools
 import RNA
-
-# import rnastructure
-# import contrafold
+import pandas as pd
 from ortools.linear_solver import pywraplp
 import random
 
@@ -79,137 +77,202 @@ def main():
     # exit()
     random.seed()
 
+    our_shape_preds = []
+    our_preds_mfes = []
+    rnalib_shape_preds = []
+    rnalib_preds_mfes = []
+    sequence_lengths = []
+    num_irs = []
+    num_variables = []
+    num_constraints = []
+    num_solver_iters = []
+    num_b_n_b_nodes = []
+    solution_time_msecs = []
+
     # Generate random RNA sequence and write it to file for IUPACpal to use
-    seq_len = 200
-    seq = "".join(random.choice("ACGU") for _ in range(seq_len))
-    seq_fname = "rand_rna"
-    seq_energies_fname = f"{seq_fname}_energies"
+    print_info = False
+    for s_len in list(range(10, 150, 5)):
+        print(f'Sequence length = {s_len}')
+        for i in range(40):
+            print(f'  Iteration: {i}')
+            seq_len = s_len
+            seq = "".join(random.choice("ACGU") for _ in range(seq_len))
+            seq_fname = "rand_rna"
+            seq_energies_fname = f"{seq_fname}_energies"
 
-    with open(f"data/{seq_fname}.fasta", "w") as file:
-        file.write(">rand_rna\n")
-        file.write(seq)
+            with open(f"data/{seq_fname}.fasta", "w") as file:
+                file.write(">rand_rna\n")
+                file.write(seq)
 
-    print(f"Seq.: {seq}")
-    print(f"Seq. len.: {seq_len}")
-    print(f"Seq. file name: {seq_fname}")
+            if print_info:
+                print(f"Seq.: {seq}")
+                print(f"Seq. len.: {seq_len}")
+                print(f"Seq. file name: {seq_fname}")
 
-    # Prep free energy values file
-    with open(f"data/{seq_energies_fname}.txt", "w") as file:
-        file.write(f"Energies for seq: {seq}\n\n".center(50, "="))
+            # Prep free energy values file
+            with open(f"data/{seq_energies_fname}.txt", "w") as file:
+                file.write(f"Energies for seq: {seq}".center(50, "="))
+                file.write("\n\n")
 
-    # Find inverted repeats in given sequence
-    inverted_repeats = find_inverted_repeats(
-        input_file="data/rand_rna.fasta",
-        seq_name="rand_rna",
-        min_len=2,
-        max_len=20,
-        max_gap=19,
-        mismatches=0,
-        output_file=f"data/{seq_fname}_irs.txt",
+            # Find inverted repeats in given sequence
+            inverted_repeats = find_inverted_repeats(
+                input_file="data/rand_rna.fasta",
+                seq_name="rand_rna",
+                min_len=2,
+                max_len=seq_len,
+                max_gap=seq_len-1,
+                mismatches=0,
+                output_file=f"data/{seq_fname}_irs.txt",
+            )
+
+            n_irs = len(inverted_repeats)
+
+            if print_info:
+                print(f"Found IRs ({n_irs})".center(50, "="))
+                for i, ir in enumerate(inverted_repeats):
+                    print(f"IR#{i:<2}: {ir}")
+
+            # Compute free energy of each IR
+            free_energies = []
+            for i in range(n_irs):
+                dot_b = shape_state_to_dot_bracket([i], inverted_repeats, seq_len)
+                fe = eval_free_energy(dot_b, seq, seq_energies_fname)
+                free_energies.append(fe)
+
+            if print_info:
+                print("Free energies of IRs".center(50, "="))
+                for i, e_ir in zip([_ for _ in range(n_irs)], free_energies):
+                    print(f"IR#{i:<2} = {e_ir:.4f}")
+
+            # Instantiate MIP solver with SCIP backend
+            solver = pywraplp.Solver.CreateSolver("SCIP")
+            if not solver:
+                print("Failed to init solver.")
+                return
+
+            # Define variables: binary indicators for each IR
+            # (hand crafted for above IUPACpal settings and input for now)
+            if print_info:
+                print("Variables".center(50, "="))
+            variables = []
+            for i in range(n_irs):
+                variables.append(solver.IntVar(0, 1, f"ir_{i}"))
+
+            # Add varibale which represents how many irs are included, n_irs - # included. Minimse this
+            # included_irs_var = solver.IntVar(0, infinity, 'irs_included')
+
+            if print_info:
+                print(f"Num variables: {solver.NumVariables()}")
+                # for i, v in enumerate(variables):
+                #     print(f'Var #{i}: {v.name()}')
+
+                # Define constraints: XOR between those IRs that match the same bases
+                print("Constraints".center(50, "="))
+
+            # Find all pairs of IRs that are incompatible with each other i.e.
+            # those that match the same bases
+            unique_ir_pairs = itertools.combinations([_ for _ in range(n_irs)], 2)
+            incompatible_ir_pairs = []
+            n_unique_ir_pairs = 0
+            for pair in unique_ir_pairs:
+                n_unique_ir_pairs += 1
+                ir_a = inverted_repeats[pair[0]]
+                ir_b = inverted_repeats[pair[1]]
+                incompatible = irs_incompatible(ir_a, ir_b)
+                if incompatible:
+                    incompatible_ir_pairs.append(pair)
+
+            # Add an XOR for all incompatiable IR pairs i.e. ir_i + ir_j <= 1
+            for inc_pair in incompatible_ir_pairs:
+                ir_a_idx = inc_pair[0]
+                ir_b_idx = inc_pair[1]
+
+                # constraint = solver.Constraint(0, 1, f"ir_{ir_a_idx} XOR ir_{ir_b_idx}")
+                # constraint.SetCoefficient(variables[ir_a_idx], 1)
+                # constraint.SetCoefficient(variables[ir_b_idx], 1)
+                solver.Add(variables[ir_a_idx] + variables[ir_b_idx] <= 1)
+
+            # Add constraint that at least one IR is included in any solution
+            one_or_more_irs_constr = solver.Add(solver.Sum(variables) >= 1)
+
+            if print_info:
+                # print(f'Num possible IR combinations = {n_unique_ir_pairs}, num valid = {n_unique_ir_pairs - len(list(incompatible_ir_pairs))}')
+                print(f"Num constraints: {solver.NumConstraints()}")
+
+            # Objective: free energy of current configuration of binary indicators
+            # print("Objective".center(50, "="))
+            obj_fn = solver.Objective()
+            for i in range(n_irs):
+                obj_fn.SetCoefficient(variables[i], free_energies[i])
+            obj_fn.SetMinimization()
+
+            if print_info:
+                print("Solver Solution".center(50, "="))
+            status = solver.Solve()
+
+            if status == pywraplp.Solver.OPTIMAL:
+                if print_info:
+                    print("Objective value =", solver.Objective().Value())
+                    for v in variables:
+                        print(f'Var. "{v.name()}" opt. val. = {v.solution_value()}')
+                    print("Problem solved in %f milliseconds" % solver.wall_time())
+                    print("Problem solved in %d iterations" % solver.iterations())
+                    print("Problem solved in %d branch-and-bound nodes" % solver.nodes())
+
+                    print()
+
+                    print(f"Dot Bracket: {solution_dot_brk_repr}")
+                    print(f"MFE: {solver.Objective().Value():.4f}")
+
+                ir_vars = [int(v.solution_value()) for v in variables]
+                included_irs = [i for i, ir_v in enumerate(ir_vars) if ir_v == 1]
+                solution_dot_brk_repr = shape_state_to_dot_bracket(
+                    included_irs, inverted_repeats, seq_len
+                )
+                solution_mfe = solver.Objective().Value()
+            else:
+                if print_info:
+                    print("The problem does not have an optimal solution.")
+                solution_dot_brk_repr = '-'
+                solution_mfe = 10000000
+
+            # RNAlib pred
+            opt_dot_brkt = str()
+            out = RNA.fold(seq, opt_dot_brkt)
+            if print_info:
+                print("RNAlib Solution".center(50, "="))
+                print(f"Dot Bracket: {out[0]}")
+                print(f"MFE: {out[1]:.4f}")
+
+            our_shape_preds.append(solution_dot_brk_repr)
+            our_preds_mfes.append(solution_mfe)
+            rnalib_shape_preds.append(out[0])
+            rnalib_preds_mfes.append(out[1])
+            sequence_lengths.append(seq_len)
+            num_irs.append(n_irs)
+            num_variables.append(solver.NumVariables())
+            num_constraints.append(solver.NumConstraints())
+            num_solver_iters.append(solver.iterations())
+            num_b_n_b_nodes.append(solver.nodes())
+            solution_time_msecs.append(solver.wall_time())
+
+    results_df = pd.DataFrame(
+        {
+            "our_shape_preds": our_shape_preds,
+            "our_preds_mfes": our_preds_mfes,
+            "rnalib_shape_preds": rnalib_shape_preds,
+            "rnalib_preds_mfes": rnalib_preds_mfes,
+            "seq_length": sequence_lengths,
+            "num_irs": num_irs,
+            "num_variables": num_variables,
+            "num_constraints": num_constraints,
+            "num_solver_iters": num_solver_iters,
+            "num_b_n_b_nodes": num_b_n_b_nodes,
+            "solution_time_msecs": solution_time_msecs
+        }
     )
+    results_df.to_csv("performance.csv")
 
-    n_irs = len(inverted_repeats)
-
-    print(f"Found IRs ({n_irs})".center(50, "="))
-    for i, ir in enumerate(inverted_repeats):
-        print(f"IR#{i:<2}: {ir}")
-
-    # Compute free energy of each IR
-    free_energies = []
-    for i in range(n_irs):
-        dot_b = shape_state_to_dot_bracket([i], inverted_repeats, seq_len)
-        fe = eval_free_energy(dot_b, seq, seq_energies_fname)
-        free_energies.append(fe)
-
-    print("Free energies of IRs".center(50, "="))
-    for i, e_ir in zip([_ for _ in range(n_irs)], free_energies):
-        print(f"IR#{i:<2} = {e_ir:.4f}")
-
-    # Instantiate MIP solver with SCIP backend
-    solver = pywraplp.Solver.CreateSolver("SCIP")
-    if not solver:
-        print("Failed to init solver.")
-        return
-
-    # Define variables: binary indicators for each IR
-    # (hand crafted for above IUPACpal settings and input for now)
-    print("Variables".center(50, "="))
-    variables = []
-    for i in range(n_irs):
-        variables.append(solver.IntVar(0, 1, f"ir_{i}"))
-
-    # Add varibale which represents how many irs are included, n_irs - # included. Minimse this
-    # included_irs_var = solver.IntVar(0, infinity, 'irs_included')
-
-    print(f"Num variables: {solver.NumVariables()}")
-    # for i, v in enumerate(variables):
-    #     print(f'Var #{i}: {v.name()}')
-
-    # Define constraints: XOR between those IRs that match the same bases
-    print("Constraints".center(50, "="))
-
-    # Find all pairs of IRs that are incompatible with each other i.e.
-    # those that match the same bases
-    unique_ir_pairs = itertools.combinations([_ for _ in range(n_irs)], 2)
-    incompatible_ir_pairs = []
-    n_unique_ir_pairs = 0
-    for pair in unique_ir_pairs:
-        n_unique_ir_pairs += 1
-        ir_a = inverted_repeats[pair[0]]
-        ir_b = inverted_repeats[pair[1]]
-        incompatible = irs_incompatible(ir_a, ir_b)
-        if incompatible:
-            incompatible_ir_pairs.append(pair)
-
-    # Add an XOR for all incompatiable IR pairs i.e. ir_i + ir_j <= 1
-    for inc_pair in incompatible_ir_pairs:
-        ir_a_idx = inc_pair[0]
-        ir_b_idx = inc_pair[1]
-
-        # constraint = solver.Constraint(0, 1, f"ir_{ir_a_idx} XOR ir_{ir_b_idx}")
-        # constraint.SetCoefficient(variables[ir_a_idx], 1)
-        # constraint.SetCoefficient(variables[ir_b_idx], 1)
-        solver.Add(variables[ir_a_idx] + variables[ir_b_idx] <= 1)
-
-    # Add constraint that at least one IR is included in any solution
-    one_or_more_irs_constr = solver.Add(solver.Sum(variables) >= 1)
-
-    # print(f'Num possible IR combinations = {n_unique_ir_pairs}, num valid = {n_unique_ir_pairs - len(list(incompatible_ir_pairs))}')
-    print(f"Num constraints: {solver.NumConstraints()}")
-
-    # Objective: free energy of current configuration of binary indicators
-    # print("Objective".center(50, "="))
-    obj_fn = solver.Objective()
-    for i in range(n_irs):
-        obj_fn.SetCoefficient(variables[i], free_energies[i])
-    obj_fn.SetMinimization()
-
-    print("Solver Solution".center(50, "="))
-    status = solver.Solve()
-    if status == pywraplp.Solver.OPTIMAL:
-        print("Objective value =", solver.Objective().Value())
-        for v in variables:
-            print(f'Var. "{v.name()}" opt. val. = {v.solution_value()}')
-        print("Problem solved in %f milliseconds" % solver.wall_time())
-        print("Problem solved in %d iterations" % solver.iterations())
-        print("Problem solved in %d branch-and-bound nodes" % solver.nodes())
-
-        print()
-
-        ir_vars = [int(v.solution_value()) for v in variables]
-        included_irs = [i for i, ir_v in enumerate(ir_vars) if ir_v == 1 ]
-        solution_dot_brk_repr = shape_state_to_dot_bracket(included_irs, inverted_repeats, seq_len)
-        print(f'Dot Bracket: {solution_dot_brk_repr}')
-        print(f'MFE: {solver.Objective().Value():.4f}')
-    else:
-        print("The problem does not have an optimal solution.")
-
-    # RNAlib pred
-    print("RNAlib Solution".center(50, "="))
-    opt_dot_brkt = str()
-    out = RNA.fold(seq, opt_dot_brkt)
-    print(f'Dot Bracket: {out[0]}')
-    print(f'MFE: {out[1]:.4f}')
 
 if __name__ == "__main__":
     main()
