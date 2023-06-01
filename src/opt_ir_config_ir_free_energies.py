@@ -48,7 +48,6 @@ def eval_free_energy(dot_brk_repr, seq, out_fname):
         free_energy = RNA.eval_structure_simple(seq, dot_brk_repr, 1, out_file)
         out_file.write(f"\n\n")
 
-
     return free_energy
 
 
@@ -78,11 +77,11 @@ def main():
     # for x in dir(RNA):
     #     print(x)
     # exit()
+    random.seed()
 
     # Generate random RNA sequence and write it to file for IUPACpal to use
-    RNA.init_rand()
-    seq_len = 20
-    seq = RNA.random_string(seq_len, 'ACGU')
+    seq_len = 200
+    seq = "".join(random.choice("ACGU") for _ in range(seq_len))
     seq_fname = "rand_rna"
     seq_energies_fname = f"{seq_fname}_energies"
 
@@ -90,13 +89,13 @@ def main():
         file.write(">rand_rna\n")
         file.write(seq)
 
-    print(f'Seq.: {seq}')
-    print(f'Seq. len.: {seq_len}')
-    print(f'Seq. file name: {seq_fname}')
+    print(f"Seq.: {seq}")
+    print(f"Seq. len.: {seq_len}")
+    print(f"Seq. file name: {seq_fname}")
 
     # Prep free energy values file
     with open(f"data/{seq_energies_fname}.txt", "w") as file:
-        file.write(f'Energies for seq: {seq}\n\n'.center(50, "="))
+        file.write(f"Energies for seq: {seq}\n\n".center(50, "="))
 
     # Find inverted repeats in given sequence
     inverted_repeats = find_inverted_repeats(
@@ -112,7 +111,8 @@ def main():
     n_irs = len(inverted_repeats)
 
     print(f"Found IRs ({n_irs})".center(50, "="))
-    print(inverted_repeats)
+    for i, ir in enumerate(inverted_repeats):
+        print(f"IR#{i:<2}: {ir}")
 
     # Compute free energy of each IR
     free_energies = []
@@ -122,7 +122,8 @@ def main():
         free_energies.append(fe)
 
     print("Free energies of IRs".center(50, "="))
-    print(*zip([_ for _ in range(n_irs)], free_energies))
+    for i, e_ir in zip([_ for _ in range(n_irs)], free_energies):
+        print(f"IR#{i:<2} = {e_ir:.4f}")
 
     # Instantiate MIP solver with SCIP backend
     solver = pywraplp.Solver.CreateSolver("SCIP")
@@ -183,21 +184,32 @@ def main():
         obj_fn.SetCoefficient(variables[i], free_energies[i])
     obj_fn.SetMinimization()
 
-    print("Solution".center(50, "="))
+    print("Solver Solution".center(50, "="))
     status = solver.Solve()
     if status == pywraplp.Solver.OPTIMAL:
         print("Objective value =", solver.Objective().Value())
         for v in variables:
             print(f'Var. "{v.name()}" opt. val. = {v.solution_value()}')
-        print()
         print("Problem solved in %f milliseconds" % solver.wall_time())
         print("Problem solved in %d iterations" % solver.iterations())
         print("Problem solved in %d branch-and-bound nodes" % solver.nodes())
+
+        print()
+
+        ir_vars = [int(v.solution_value()) for v in variables]
+        included_irs = [i for i, ir_v in enumerate(ir_vars) if ir_v == 1 ]
+        solution_dot_brk_repr = shape_state_to_dot_bracket(included_irs, inverted_repeats, seq_len)
+        print(f'Dot Bracket: {solution_dot_brk_repr}')
+        print(f'MFE: {solver.Objective().Value():.4f}')
     else:
         print("The problem does not have an optimal solution.")
 
-    print(f"Done.")
-
+    # RNAlib pred
+    print("RNAlib Solution".center(50, "="))
+    opt_dot_brkt = str()
+    out = RNA.fold(seq, opt_dot_brkt)
+    print(f'Dot Bracket: {out[0]}')
+    print(f'MFE: {out[1]:.4f}')
 
 if __name__ == "__main__":
     main()
