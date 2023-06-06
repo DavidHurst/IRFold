@@ -1,19 +1,20 @@
 from irfold import IRFold
 import random
+import RNA
 
-random.seed(4)
+# random.seed(4)
 
 data_dir = "./data"
-seq_len = 25
+seq_len = 35
 seq = "".join(random.choice("ACGU") for _ in range(seq_len))
 seq_name = "test_seq"
 seq_energies_file = f"{seq_name}_energies.txt"
 
-print(f"Seq.:        {seq}")
-print(f"Seq. length: {seq_len}")
+print(f"Seq.        : {seq}")
+print(f"Seq. length : {seq_len}")
 
-ir_f = IRFold(data_dir)
-secondary_structure, mfe = ir_f.fold(
+ir_fold = IRFold(data_dir)
+secondary_structure, mfe = ir_fold.fold(
     sequence=seq,
     seq_name=seq_name,
     min_len=2,
@@ -22,5 +23,11 @@ secondary_structure, mfe = ir_f.fold(
     mismatches=0,
 )
 
+print('Our Solution'.center(50, '='))
 print(f"Dot Bracket: {secondary_structure}")
-print(f"MFE: {mfe:.4f}")
+print(f"MFE        : {mfe:.4f}")
+
+out = RNA.fold(seq, '')
+print("RNAlib Solution".center(50, "="))
+print(f"Dot Bracket: {out[0]}")
+print(f"MFE        : {out[1]:.4f}")

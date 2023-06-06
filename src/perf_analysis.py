@@ -5,7 +5,7 @@ import numpy as np
 
 plt.rcParams["figure.figsize"] = (6, 4)
 
-df = pd.read_csv("performance.csv")
+df = pd.read_csv("./data/performance.csv")
 
 # Sequence length vs. similarity between our and rnalibs preds
 mean_lv_distances = []
