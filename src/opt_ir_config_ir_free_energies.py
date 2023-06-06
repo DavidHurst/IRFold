@@ -92,9 +92,9 @@ def main():
     # Generate random RNA sequence and write it to file for IUPACpal to use
     print_info = False
     for s_len in list(range(10, 150, 5)):
-        print(f'Sequence length = {s_len}')
+        print(f"Sequence length = {s_len}")
         for i in range(40):
-            print(f'  Iteration: {i}')
+            print(f"  Iteration: {i}")
             seq_len = s_len
             seq = "".join(random.choice("ACGU") for _ in range(seq_len))
             seq_fname = "rand_rna"
@@ -120,7 +120,7 @@ def main():
                 seq_name="rand_rna",
                 min_len=2,
                 max_len=seq_len,
-                max_gap=seq_len-1,
+                max_gap=seq_len - 1,
                 mismatches=0,
                 output_file=f"data/{seq_fname}_irs.txt",
             )
@@ -217,7 +217,9 @@ def main():
                         print(f'Var. "{v.name()}" opt. val. = {v.solution_value()}')
                     print("Problem solved in %f milliseconds" % solver.wall_time())
                     print("Problem solved in %d iterations" % solver.iterations())
-                    print("Problem solved in %d branch-and-bound nodes" % solver.nodes())
+                    print(
+                        "Problem solved in %d branch-and-bound nodes" % solver.nodes()
+                    )
 
                     print()
 
@@ -233,7 +235,7 @@ def main():
             else:
                 if print_info:
                     print("The problem does not have an optimal solution.")
-                solution_dot_brk_repr = '-'
+                solution_dot_brk_repr = "-"
                 solution_mfe = 10000000
 
             # RNAlib pred
@@ -268,7 +270,7 @@ def main():
             "num_constraints": num_constraints,
             "num_solver_iters": num_solver_iters,
             "num_b_n_b_nodes": num_b_n_b_nodes,
-            "solution_time_msecs": solution_time_msecs
+            "solution_time_msecs": solution_time_msecs,
         }
     )
     results_df.to_csv("performance.csv")
