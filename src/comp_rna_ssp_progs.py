@@ -3,17 +3,17 @@ import random
 import RNA
 
 if __name__ == "__main__":
-    random.seed(4)
+    # random.seed(4)
 
     data_dir = "../data"
-    seq_len = 200
+    seq_len = 15
     seq = "".join(random.choice("ACGU") for _ in range(seq_len))
 
     print(f"Seq. length: {seq_len}")
     print(f"Seq.       : {seq}")
 
-    ir_fold = IRFold(data_dir)
-    our_secondary_structure, our_mfe = ir_fold.fold(
+    # ir_fold = (data_dir)
+    our_secondary_structure, our_mfe = IRFold.fold(
         sequence=seq,
         min_len=2,
         max_len=seq_len,

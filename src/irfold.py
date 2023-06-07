@@ -9,8 +9,6 @@ from pathlib import Path
 from typing import Tuple, List
 from ortools.linear_solver import pywraplp
 
-__all__ = ["IRFold"]
-
 # ((left_strand_start, left_strand_end), (right_strand_start, right_strand_end))
 IR = Tuple[Tuple[int, int], Tuple[int, int]]
 
@@ -20,10 +18,9 @@ class IRFold:
     inverted repeat configurations from the primary sequence"""
 
     def __init__(self, data_dir: str = None):
-        if data_dir is None:
-            self.data_dir = "."
-        else:
-            self.data_dir = data_dir
+        self.data_dir: Path = (
+            Path(".").resolve() if data_dir is None else Path(data_dir).resolve()
+        )
 
     def fold(
         self,
@@ -31,11 +28,9 @@ class IRFold:
         min_len: int,
         max_len: int,
         max_gap: int,
-        input_file: str = None,
+        # seq_file: str = None,
+        # seq_name: str = "seq",
         mismatches: int = 0,
-        seq_name: str = "seq",
-        irs_output_file: str = "found_irs.txt",
-        ir_energies_output_file: str = None,
         solver_backend: str = "SCIP",
     ) -> Tuple[str, float]:
         seq_len: int = len(sequence)
@@ -43,13 +38,12 @@ class IRFold:
         # Find IRs in sequence
         found_irs: List[IR] = self.find_irs(
             sequence=sequence,
-            input_file=input_file,
-            seq_name=seq_name,
+            # seq_file=seq_file,
+            # seq_name=seq_name,
             min_len=min_len,
             max_len=max_len,
             max_gap=max_gap,
             mismatches=mismatches,
-            irs_output_file=irs_output_file,
         )
         n_irs_found: int = len(found_irs)
         if n_irs_found == 0:
@@ -58,12 +52,10 @@ class IRFold:
 
         # Evaluate free energy of each IR respectively
         db_reprs: List[str] = [
-            self.__irs_to_dot_bracket([found_irs[i]], seq_len)
-            for i in range(n_irs_found)
+            self.irs_to_dot_bracket([found_irs[i]], seq_len) for i in range(n_irs_found)
         ]
         ir_free_energies: List[float] = [
-            self.__eval_free_energy(db_repr, sequence, ir_energies_output_file)
-            for db_repr in db_reprs
+            self.__eval_free_energy(db_repr, sequence) for db_repr in db_reprs
         ]
         # for i, (rpr, e) in enumerate(zip(db_reprs, ir_free_energies)):
         #     print(f"IR#{i:<2}:      ", rpr, e)
@@ -81,7 +73,7 @@ class IRFold:
                 for i, v in enumerate(solver.variables())
                 if int(v.solution_value()) == 1
             ]
-            dp_repr: str = self.__irs_to_dot_bracket(
+            dp_repr: str = self.irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
             return dp_repr, solver.Objective().Value()
@@ -92,28 +84,27 @@ class IRFold:
     def find_irs(
         self,
         sequence: str,
-        input_file: str,
-        seq_name: str,
         min_len: int,
         max_len: int,
         max_gap: int,
         mismatches: int = 0,  # not supported yet
-        irs_output_file: str = "iupacpal_output.txt",
     ) -> List[IR]:
-        # If no file specified create it for IUPACpal
-        if input_file is None:
-            input_file = Path(self.data_dir) / f"{seq_name}.fasta"
-            with open(input_file, "w") as file:
-                file.write(f">{seq_name}\n")
-                file.write(sequence)
-        else:  # Check file provided exists
-            raise NotImplementedError
+        # Check IUPACpal has been compiled to this cwd
+        if not (Path(__file__).parent / "IUPACpal").exists():
+            raise FileNotFoundError("Could not find compiled IUPACpal binary.")
+
+        # Write sequence to file for IUPACpal
+        # ToDo: Parameterise these in/out files
+        seq_name: str = "seq"
+        seq_file: str = self.data_dir / f"{seq_name}.fasta"
+        self.__create_seq_file(sequence, seq_name, seq_file)
+        irs_output_file: str = self.data_dir / f"{seq_name}_found_irs.txt"
 
         _, out, err = self.__run(
             [
                 "./IUPACpal",
                 "-f",
-                input_file,
+                str(seq_file),
                 "-s",
                 seq_name,
                 "-m",
@@ -125,7 +116,7 @@ class IRFold:
                 "-x",
                 str(mismatches),
                 "-o",
-                irs_output_file,
+                str(self.data_dir / "seq_found_irs.txt"),
             ]
         )
 
@@ -153,6 +144,11 @@ class IRFold:
             print(str(out.decode("utf-8")))
             return None
 
+    def __create_seq_file(self, seq: str, seq_name: str, file_name: str) -> None:
+        with open(file_name, "w") as file:
+            file.write(f">{seq_name}\n")
+            file.write(seq)
+
     def __run(self, cmd):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate()
@@ -164,7 +160,7 @@ class IRFold:
         b = int(x[-1])
         return a, b
 
-    def __irs_to_dot_bracket(self, irs: List[IR], seq_len: int) -> str:
+    def irs_to_dot_bracket(self, irs: List[IR], seq_len: int) -> str:
         """Does not support mismatches."""
         paired_bases: List[str] = ["." for _ in range(seq_len)]  # Initially none paired
         for ir in irs:
@@ -180,11 +176,8 @@ class IRFold:
 
         return "".join(paired_bases)
 
-    def __eval_free_energy(
-        self, dot_brk_repr: str, sequence: str, out_file: str
-    ) -> float:
-        if out_file is None:
-            out_file = f"{self.data_dir}/calculated_ir_energies.txt"
+    def __eval_free_energy(self, dot_brk_repr: str, sequence: str) -> float:
+        out_file: str = str(self.data_dir / "calculated_ir_energies.txt")
 
         with open(out_file, "a") as file:
             file.write(f"Evaluting IR:\n")
