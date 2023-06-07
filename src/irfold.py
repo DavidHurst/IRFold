@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Tuple, List
 from ortools.linear_solver import pywraplp
 
-
 __all__ = ["IRFold"]
 
 # ((left_strand_start, left_strand_end), (right_strand_start, right_strand_end))
@@ -29,12 +28,12 @@ class IRFold:
     def fold(
         self,
         sequence: str,
-        seq_name: str,
         min_len: int,
         max_len: int,
         max_gap: int,
         input_file: str = None,
         mismatches: int = 0,
+        seq_name: str = "seq",
         irs_output_file: str = "found_irs.txt",
         ir_energies_output_file: str = None,
         solver_backend: str = "SCIP",
@@ -66,8 +65,8 @@ class IRFold:
             self.__eval_free_energy(db_repr, sequence, ir_energies_output_file)
             for db_repr in db_reprs
         ]
-        for i, (rpr, e) in enumerate(zip(db_reprs, ir_free_energies)):
-            print(f"IR#{i:<2}:      ", rpr, e)
+        # for i, (rpr, e) in enumerate(zip(db_reprs, ir_free_energies)):
+        #     print(f"IR#{i:<2}:      ", rpr, e)
 
         # Define ILP and solve
         solver = self.__get_solver(
@@ -124,7 +123,7 @@ class IRFold:
                 "-g",
                 str(max_gap),
                 "-x",
-                str(0),
+                str(mismatches),
                 "-o",
                 irs_output_file,
             ]
@@ -241,6 +240,7 @@ class IRFold:
         return solver
 
     def irs_incompatible(self, ir_a: IR, ir_b: IR) -> bool:
+        # ToDo: use variables here for the ranges
         paired_base_idxs_a = [idx for idx in range(ir_a[0][0], ir_a[0][1] + 1)] + [
             idx for idx in range(ir_a[1][0], ir_a[1][1] + 1)
         ]

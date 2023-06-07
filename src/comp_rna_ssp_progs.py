@@ -2,32 +2,30 @@ from irfold import IRFold
 import random
 import RNA
 
-# random.seed(4)
+if __name__ == "__main__":
+    random.seed(4)
 
-data_dir = "./data"
-seq_len = 35
-seq = "".join(random.choice("ACGU") for _ in range(seq_len))
-seq_name = "test_seq"
-seq_energies_file = f"{seq_name}_energies.txt"
+    data_dir = "../data"
+    seq_len = 200
+    seq = "".join(random.choice("ACGU") for _ in range(seq_len))
 
-print(f"Seq.        : {seq}")
-print(f"Seq. length : {seq_len}")
+    print(f"Seq. length: {seq_len}")
+    print(f"Seq.       : {seq}")
 
-ir_fold = IRFold(data_dir)
-secondary_structure, mfe = ir_fold.fold(
-    sequence=seq,
-    seq_name=seq_name,
-    min_len=2,
-    max_len=seq_len,
-    max_gap=seq_len - 1,
-    mismatches=0,
-)
+    ir_fold = IRFold(data_dir)
+    our_secondary_structure, our_mfe = ir_fold.fold(
+        sequence=seq,
+        min_len=2,
+        max_len=seq_len,
+        max_gap=seq_len - 1,
+        mismatches=0,
+    )
 
-print('Our Solution'.center(50, '='))
-print(f"Dot Bracket: {secondary_structure}")
-print(f"MFE        : {mfe:.4f}")
+    print("Our Solution".center(50, "="))
+    print(f"Dot Bracket: {our_secondary_structure}")
+    print(f"MFE        : {our_mfe:.4f}")
 
-out = RNA.fold(seq, '')
-print("RNAlib Solution".center(50, "="))
-print(f"Dot Bracket: {out[0]}")
-print(f"MFE        : {out[1]:.4f}")
+    rna_secondary_structure, rna_mfe = RNA.fold(seq, "")
+    print("RNAlib Solution".center(50, "="))
+    print(f"Dot Bracket: {rna_secondary_structure}")
+    print(f"MFE        : {rna_mfe:.4f}")
