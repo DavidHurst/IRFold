@@ -51,7 +51,7 @@ class IRFold:
             for i in range(n_irs_found)
         ]
         ir_free_energies: List[float] = [
-            IRFold.eval_free_energy(db_repr, sequence, out_dir) for db_repr in db_reprs
+            IRFold.calc_free_energy(db_repr, sequence, out_dir) for db_repr in db_reprs
         ]
 
         # Define ILP and solve
@@ -93,7 +93,7 @@ class IRFold:
             raise FileNotFoundError("Could not find compiled IUPACpal binary.")
 
         # Write sequence to file for IUPACpal
-        # ToDo: Parameterise these in/out files
+        # ToDo: Parametrise these in/out files
 
         seq_name: str = "seq"
         seq_file: str = str(out_dir_path / f"{seq_name}.fasta")
@@ -104,7 +104,7 @@ class IRFold:
             [
                 "./IUPACpal",
                 "-f",
-                str(seq_file),
+                seq_file,
                 "-s",
                 seq_name,
                 "-m",
@@ -134,8 +134,8 @@ class IRFold:
                 ir_lines[i : i + 3] for i in range(0, len(ir_lines), 3)
             ]
 
-            for uf_ir in formatted_irs:
-                ir_idxs: List[int] = re.findall(r"-?\d+\.?\d*", "".join(uf_ir))
+            for f_ir in formatted_irs:
+                ir_idxs: List[int] = re.findall(r"-?\d+\.?\d*", "".join(f_ir))
 
                 left_start, left_end = int(ir_idxs[0]), int(ir_idxs[1])
                 right_start, right_end = int(ir_idxs[3]), int(ir_idxs[2])
@@ -178,7 +178,7 @@ class IRFold:
         return "".join(paired_bases)
 
     @staticmethod
-    def eval_free_energy(dot_brk_repr: str, sequence: str, out_dir: str) -> float:
+    def calc_free_energy(dot_brk_repr: str, sequence: str, out_dir: str) -> float:
         out_dir_path: Path = Path(out_dir).resolve()
         if not out_dir_path.exists():
             print(f"Output directory not found, defaulting to current directory.")

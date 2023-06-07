@@ -1,11 +1,11 @@
 Palindromes of: /home/david/dev/msc_proj/data/seq.fasta
 Sequence name: seq
-Sequence length is: 15
+Sequence length is: 25
 Start at position: 1
-End at position: 15
+End at position: 25
 Minimum length of Palindromes is: 2
-Maximum length of Palindromes is: 15
-Maximum gap between elements is: 14
+Maximum length of Palindromes is: 25
+Maximum gap between elements is: 24
 Number of mismatches allowed in Palindrome: 0
 
 
@@ -13,15 +13,39 @@ Number of mismatches allowed in Palindrome: 0
 Palindromes:
 2        ug        3
          ||
-8        ac        7
+22       ac       21
 
-3        gc        4
+3        gu        4
          ||
-6        cg        5
+7        ca        6
 
-7        ca        8
+4        uga        6
+         |||
+22       acu       20
+
+5        ga        6
          ||
-15       gu       14
+19       cu       18
+
+5        gac        7
+         |||
+14       cug       12
+
+6        ac        7
+         ||
+25       ug       24
+
+9        ug       10
+         ||
+22       ac       21
+
+15       ug       16
+         ||
+22       ac       21
+
+21       ca       22
+         ||
+24       gu       23
 
 
 
