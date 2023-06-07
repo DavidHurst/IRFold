@@ -19,7 +19,7 @@ if __name__ == "__main__":
         max_len=seq_len,
         max_gap=seq_len - 1,
         mismatches=0,
-        out_dir='../data'
+        out_dir="../data",
     )
 
     print("Our Solution".center(50, "="))

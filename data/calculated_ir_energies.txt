@@ -55,3 +55,151 @@ Interior loop ( 10, 14) GC; ( 11, 13) UA:  -220
 Hairpin  loop ( 11, 13) UA              : 10000000
 
 
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  (  (  (  .  )  )  )  .  .  .  .  .  .  
+External loop                           :   -50
+Interior loop (  3,  9) CG; (  4,  8) AU:  -210
+Interior loop (  4,  8) AU; (  5,  7) GC:  -210
+Hairpin  loop (  5,  7) GC              : 10000000
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  .  .  (  (  .  .  .  .  .  )  )  .  .  
+External loop                           :  -150
+Interior loop (  5, 13) GC; (  6, 12) UA:  -220
+Hairpin  loop (  6, 12) UA              :   550
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  .  .  .  .  (  (  (  .  .  .  )  )  )  
+External loop                           :   -10
+Interior loop (  7, 15) CG; (  8, 14) UA:  -210
+Interior loop (  8, 14) UA; (  9, 13) GC:  -210
+Hairpin  loop (  9, 13) GC              :   540
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  .  .  .  .  .  (  (  )  )  .  .  .  .  
+External loop                           :   -50
+Interior loop (  8, 11) UA; (  9, 10) GC:  -210
+Hairpin  loop (  9, 10) GC              : 10000000
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  (  (  .  .  .  .  .  .  .  .  )  )  .  .  
+External loop                           :  -140
+Interior loop (  2, 13) GC; (  3, 12) GC:  -330
+Hairpin  loop (  3, 12) GC              :   440
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  .  (  (  (  .  .  .  .  .  )  )  )  .  
+External loop                           :  -110
+Interior loop (  4, 14) CG; (  5, 13) GC:  -240
+Interior loop (  5, 13) GC; (  6, 12) GC:  -330
+Hairpin  loop (  6, 12) GC              :   320
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  .  .  .  (  (  .  .  .  .  )  )  .  .  
+External loop                           :  -160
+Interior loop (  6, 13) GC; (  7, 12) GC:  -330
+Hairpin  loop (  7, 12) GC              :   450
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  .  .  .  .  .  .  (  (  .  .  .  )  )  
+External loop                           :    20
+Interior loop (  9, 15) AU; ( 10, 14) CG:  -220
+Hairpin  loop ( 10, 14) CG              :   540
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  .  .  .  .  .  .  .  .  (  (  .  )  )  
+External loop                           :    20
+Interior loop ( 11, 15) AU; ( 12, 14) CG:  -220
+Hairpin  loop ( 12, 14) CG              : 10000000
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+(  (  .  .  )  )  .  .  .  .  .  .  .  .  .  
+External loop                           :  -170
+Interior loop (  1,  6) GC; (  2,  5) UA:  -220
+Hairpin  loop (  2,  5) UA              : 10000000
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+(  (  )  )  .  .  .  .  .  .  .  .  .  .  .  
+External loop                           :  -170
+Interior loop (  1,  4) GC; (  2,  3) UA:  -220
+Hairpin  loop (  2,  3) UA              : 10000000
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  (  (  .  .  .  .  .  )  )  .  .  .  .  
+External loop                           :     0
+Interior loop (  3, 11) AU; (  4, 10) CG:  -220
+Hairpin  loop (  4, 10) CG              :   420
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  .  .  (  (  (  .  )  )  )  .  .  .  .  
+External loop                           :   -10
+Interior loop (  5, 11) AU; (  6, 10) CG:  -220
+Interior loop (  6, 10) CG; (  7,  9) GC:  -240
+Hairpin  loop (  7,  9) GC              : 10000000
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  (  (  .  .  .  .  .  .  .  .  .  )  )  .  
+External loop                           :   -30
+Interior loop (  2, 14) UA; (  3, 13) CG:  -240
+Hairpin  loop (  3, 13) CG              :   500
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  (  (  .  .  .  .  .  .  )  )  .  .  .  
+External loop                           :  -150
+Interior loop (  3, 12) CG; (  4, 11) AU:  -210
+Hairpin  loop (  4, 11) AU              :   420
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  (  (  .  .  .  )  )  .  .  .  .  .  .  .  
+External loop                           :   -20
+Interior loop (  2,  8) UA; (  3,  7) GC:  -210
+Hairpin  loop (  3,  7) GC              :   540
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  (  (  )  )  .  .  .  .  .  .  .  .  .  
+External loop                           :   -80
+Interior loop (  3,  6) GC; (  4,  5) CG:  -340
+Hairpin  loop (  4,  5) CG              : 10000000
+
+
+Evaluating IR:
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+.  .  .  .  .  .  (  (  .  .  .  .  .  )  )  
+External loop                           :   -30
+Interior loop (  7, 15) CG; (  8, 14) AU:  -210
+Hairpin  loop (  8, 14) AU              :   550
+
+

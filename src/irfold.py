@@ -1,6 +1,7 @@
 import subprocess
 import RNA
 import itertools
+import re
 
 from pathlib import Path
 from typing import Tuple, List
@@ -85,8 +86,8 @@ class IRFold:
     ) -> List[IR]:
         out_dir_path: Path = Path(out_dir).resolve()
         if not out_dir_path.exists():
-            print(f'Output directory not found, defaulting to current directory.')
-            out_dir_path = Path('.').resolve()
+            print(f"Output directory not found, defaulting to current directory.")
+            out_dir_path = Path(".").resolve()
         # Check IUPACpal has been compiled to this cwd
         if not (Path(__file__).parent / "IUPACpal").exists():
             raise FileNotFoundError("Could not find compiled IUPACpal binary.")
@@ -99,7 +100,7 @@ class IRFold:
         IRFold.create_seq_file(sequence, seq_name, seq_file)
         irs_output_file: str = str(out_dir_path / f"{seq_name}_found_irs.txt")
 
-        _, out, err = IRFold.__run(
+        _, out, err = IRFold.__run_cmd(
             [
                 "./IUPACpal",
                 "-f",
@@ -119,21 +120,25 @@ class IRFold:
             ]
         )
 
-        inverted_repeats = []
+        if "Error" not in str(out):
+            # Extract IR indices from format IUPACpal outputs
+            inverted_repeats: List[IR] = []
 
-        valid_run = not "Error" in str(out)
-
-        if valid_run:
             with open(irs_output_file) as f_in:
-                lines = list(line for line in (l.strip() for l in f_in) if line)
+                lines: List[str] = list(
+                    line for line in (l.strip() for l in f_in) if line
+                )
 
-            lines = lines[lines.index("Palindromes:") + 1 :]
+            ir_lines: List[str] = lines[lines.index("Palindromes:") + 1 :]
+            formatted_irs: List[List[str]] = [
+                ir_lines[i : i + 3] for i in range(0, len(ir_lines), 3)
+            ]
 
-            chunks = [lines[i : i + 3] for i in range(0, len(lines), 3)]
+            for uf_ir in formatted_irs:
+                ir_idxs: List[int] = re.findall(r"-?\d+\.?\d*", "".join(uf_ir))
 
-            for chunk in chunks:
-                left_start, left_end = IRFold.extract_locs(chunk[0])
-                right_end, right_start = IRFold.extract_locs(chunk[2])
+                left_start, left_end = int(ir_idxs[0]), int(ir_idxs[1])
+                right_start, right_end = int(ir_idxs[3]), int(ir_idxs[2])
                 inverted_repeats.append(
                     ((left_start, left_end), (right_start, right_end))
                 )
@@ -150,17 +155,10 @@ class IRFold:
             file.write(seq)
 
     @staticmethod
-    def __run(cmd):
+    def __run_cmd(cmd):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate()
         return proc.returncode, stdout, stderr
-
-    @staticmethod
-    def extract_locs(data):
-        x = data.split(" ")
-        a = int(x[0])
-        b = int(x[-1])
-        return a, b
 
     @staticmethod
     def irs_to_dot_bracket(irs: List[IR], seq_len: int) -> str:
@@ -183,8 +181,8 @@ class IRFold:
     def eval_free_energy(dot_brk_repr: str, sequence: str, out_dir: str) -> float:
         out_dir_path: Path = Path(out_dir).resolve()
         if not out_dir_path.exists():
-            print(f'Output directory not found, defaulting to current directory.')
-            out_dir_path = Path('.').resolve()
+            print(f"Output directory not found, defaulting to current directory.")
+            out_dir_path = Path(".").resolve()
         out_file: str = str(out_dir_path / "calculated_ir_energies.txt")
 
         with open(out_file, "a") as file:
