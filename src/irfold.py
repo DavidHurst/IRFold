@@ -1,8 +1,5 @@
-import typing
 import subprocess
 import RNA
-import errno
-import os
 import itertools
 
 from pathlib import Path
@@ -13,17 +10,13 @@ from ortools.linear_solver import pywraplp
 IR = Tuple[Tuple[int, int], Tuple[int, int]]
 
 
+# ToDo: Make fold and get_irs static
 class IRFold:
     """RNA secondary structure prediction based on extracting optimal
     inverted repeat configurations from the primary sequence"""
 
-    def __init__(self, data_dir: str = None):
-        self.data_dir: Path = (
-            Path(".").resolve() if data_dir is None else Path(data_dir).resolve()
-        )
-
+    @staticmethod
     def fold(
-        self,
         sequence: str,
         min_len: int,
         max_len: int,
@@ -32,11 +25,10 @@ class IRFold:
         # seq_name: str = "seq",
         mismatches: int = 0,
         solver_backend: str = "SCIP",
+        out_dir: str = ".",
     ) -> Tuple[str, float]:
-        seq_len: int = len(sequence)
-
         # Find IRs in sequence
-        found_irs: List[IR] = self.find_irs(
+        found_irs: List[IR] = IRFold.find_irs(
             sequence=sequence,
             # seq_file=seq_file,
             # seq_name=seq_name,
@@ -44,24 +36,25 @@ class IRFold:
             max_len=max_len,
             max_gap=max_gap,
             mismatches=mismatches,
+            out_dir=out_dir,
         )
         n_irs_found: int = len(found_irs)
+        seq_len: int = len(sequence)
         if n_irs_found == 0:
             print(f"No IRs found, returning primary sequence.")
             return "".join(["." for _ in range(seq_len)]), 0
 
         # Evaluate free energy of each IR respectively
         db_reprs: List[str] = [
-            self.irs_to_dot_bracket([found_irs[i]], seq_len) for i in range(n_irs_found)
+            IRFold.irs_to_dot_bracket([found_irs[i]], seq_len)
+            for i in range(n_irs_found)
         ]
         ir_free_energies: List[float] = [
-            self.__eval_free_energy(db_repr, sequence) for db_repr in db_reprs
+            IRFold.eval_free_energy(db_repr, sequence, out_dir) for db_repr in db_reprs
         ]
-        # for i, (rpr, e) in enumerate(zip(db_reprs, ir_free_energies)):
-        #     print(f"IR#{i:<2}:      ", rpr, e)
 
         # Define ILP and solve
-        solver = self.__get_solver(
+        solver = IRFold.ir_ilp_solver(
             n_irs_found, found_irs, ir_free_energies, solver_backend
         )
         status = solver.Solve()
@@ -73,7 +66,7 @@ class IRFold:
                 for i, v in enumerate(solver.variables())
                 if int(v.solution_value()) == 1
             ]
-            dp_repr: str = self.irs_to_dot_bracket(
+            dp_repr: str = IRFold.irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
             return dp_repr, solver.Objective().Value()
@@ -81,26 +74,32 @@ class IRFold:
             print("The problem does not have an optimal solution")
             return "".join(["." for _ in range(seq_len)]), 0
 
+    @staticmethod
     def find_irs(
-        self,
         sequence: str,
         min_len: int,
         max_len: int,
         max_gap: int,
         mismatches: int = 0,  # not supported yet
+        out_dir: str = ".",
     ) -> List[IR]:
+        out_dir_path: Path = Path(out_dir).resolve()
+        if not out_dir_path.exists():
+            print(f'Output directory not found, defaulting to current directory.')
+            out_dir_path = Path('.').resolve()
         # Check IUPACpal has been compiled to this cwd
         if not (Path(__file__).parent / "IUPACpal").exists():
             raise FileNotFoundError("Could not find compiled IUPACpal binary.")
 
         # Write sequence to file for IUPACpal
         # ToDo: Parameterise these in/out files
-        seq_name: str = "seq"
-        seq_file: str = self.data_dir / f"{seq_name}.fasta"
-        self.__create_seq_file(sequence, seq_name, seq_file)
-        irs_output_file: str = self.data_dir / f"{seq_name}_found_irs.txt"
 
-        _, out, err = self.__run(
+        seq_name: str = "seq"
+        seq_file: str = str(out_dir_path / f"{seq_name}.fasta")
+        IRFold.create_seq_file(sequence, seq_name, seq_file)
+        irs_output_file: str = str(out_dir_path / f"{seq_name}_found_irs.txt")
+
+        _, out, err = IRFold.__run(
             [
                 "./IUPACpal",
                 "-f",
@@ -116,7 +115,7 @@ class IRFold:
                 "-x",
                 str(mismatches),
                 "-o",
-                str(self.data_dir / "seq_found_irs.txt"),
+                str(out_dir_path / "seq_found_irs.txt"),
             ]
         )
 
@@ -133,8 +132,8 @@ class IRFold:
             chunks = [lines[i : i + 3] for i in range(0, len(lines), 3)]
 
             for chunk in chunks:
-                left_start, left_end = self.__extract_locs(chunk[0])
-                right_end, right_start = self.__extract_locs(chunk[2])
+                left_start, left_end = IRFold.extract_locs(chunk[0])
+                right_end, right_start = IRFold.extract_locs(chunk[2])
                 inverted_repeats.append(
                     ((left_start, left_end), (right_start, right_end))
                 )
@@ -142,25 +141,29 @@ class IRFold:
             return inverted_repeats
         else:
             print(str(out.decode("utf-8")))
-            return None
+            return []
 
-    def __create_seq_file(self, seq: str, seq_name: str, file_name: str) -> None:
+    @staticmethod
+    def create_seq_file(seq: str, seq_name: str, file_name: str) -> None:
         with open(file_name, "w") as file:
             file.write(f">{seq_name}\n")
             file.write(seq)
 
-    def __run(self, cmd):
+    @staticmethod
+    def __run(cmd):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate()
         return proc.returncode, stdout, stderr
 
-    def __extract_locs(self, data):
+    @staticmethod
+    def extract_locs(data):
         x = data.split(" ")
         a = int(x[0])
         b = int(x[-1])
         return a, b
 
-    def irs_to_dot_bracket(self, irs: List[IR], seq_len: int) -> str:
+    @staticmethod
+    def irs_to_dot_bracket(irs: List[IR], seq_len: int) -> str:
         """Does not support mismatches."""
         paired_bases: List[str] = ["." for _ in range(seq_len)]  # Initially none paired
         for ir in irs:
@@ -176,13 +179,18 @@ class IRFold:
 
         return "".join(paired_bases)
 
-    def __eval_free_energy(self, dot_brk_repr: str, sequence: str) -> float:
-        out_file: str = str(self.data_dir / "calculated_ir_energies.txt")
+    @staticmethod
+    def eval_free_energy(dot_brk_repr: str, sequence: str, out_dir: str) -> float:
+        out_dir_path: Path = Path(out_dir).resolve()
+        if not out_dir_path.exists():
+            print(f'Output directory not found, defaulting to current directory.')
+            out_dir_path = Path('.').resolve()
+        out_file: str = str(out_dir_path / "calculated_ir_energies.txt")
 
         with open(out_file, "a") as file:
-            file.write(f"Evaluting IR:\n")
+            file.write(f"Evaluating IR:\n")
             for i in range(len(dot_brk_repr)):
-                file.write(f"{i+1:<3}")
+                file.write(f"{i + 1:<3}")
             file.write("\n")
             for b in dot_brk_repr:
                 file.write(f"{b:<3}")
@@ -193,8 +201,8 @@ class IRFold:
 
         return free_energy
 
-    def __get_solver(
-        self,
+    @staticmethod
+    def ir_ilp_solver(
         n_irs: int,
         all_irs: List[IR],
         ir_free_energies: List[float],
@@ -218,7 +226,7 @@ class IRFold:
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if self.irs_incompatible(ir_pair[0], ir_pair[1])
+            if IRFold.irs_incompatible(ir_pair[0], ir_pair[1])
         ]
 
         for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:
@@ -232,7 +240,8 @@ class IRFold:
 
         return solver
 
-    def irs_incompatible(self, ir_a: IR, ir_b: IR) -> bool:
+    @staticmethod
+    def irs_incompatible(ir_a: IR, ir_b: IR) -> bool:
         # ToDo: use variables here for the ranges
         paired_base_idxs_a = [idx for idx in range(ir_a[0][0], ir_a[0][1] + 1)] + [
             idx for idx in range(ir_a[1][0], ir_a[1][1] + 1)

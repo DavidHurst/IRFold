@@ -10,11 +10,6 @@ DATA_DIR = "./tests_data"
 
 
 @pytest.fixture
-def IRFold_obj():
-    return IRFold(DATA_DIR)
-
-
-@pytest.fixture
 def rna_seq_15_bases_3_irs():
     return "CACCACCAUAAGGCU", 3
 
@@ -34,19 +29,20 @@ def find_irs_params(rna_seq_15_bases_3_irs):
         "max_len": seq_len,
         "max_gap": seq_len - 1,
         "mismatches": 0,
+        "out_dir": DATA_DIR,
     }
 
 
 @pytest.fixture
-def list_of_found_irs(IRFold_obj, find_irs_params):
-    return IRFold_obj.find_irs(**find_irs_params)
+def list_of_found_irs(find_irs_params):
+    return IRFold.find_irs(**find_irs_params)
 
 
-def test_ir_to_db_conversion(list_of_found_irs, find_irs_params, IRFold_obj):
+def test_ir_to_db_conversion(list_of_found_irs, find_irs_params):
     seq_len = len(find_irs_params["sequence"])
     expected_db_reprs = ["..((.......))..", ".....((....))..", "..........((.))"]
 
     for i, ir in enumerate(list_of_found_irs):
-        generated_db_repr = IRFold_obj.irs_to_dot_bracket([ir], seq_len)
+        generated_db_repr = IRFold.irs_to_dot_bracket([ir], seq_len)
         assert len(generated_db_repr) == seq_len
         assert generated_db_repr == expected_db_reprs[i]
