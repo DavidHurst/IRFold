@@ -129,7 +129,8 @@ if __name__ == "__main__":
     valid_loop_forming_compatible_irs = [
         ir_pair
         for ir_pair in unique_ir_pairs
-        if irs_form_valid_loop(ir_pair[0], ir_pair[1]) and not IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
+        if irs_form_valid_loop(ir_pair[0], ir_pair[1])
+        and not IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
     ]
 
     print(f"IUPACpal Parameters:")
@@ -141,7 +142,6 @@ if __name__ == "__main__":
     print(f"Num. valid loop forming pairs  : {len(valid_loop_forming_irs)}")
     print(f"Num. compatible pairs          : {len(compatible_ir_pairs)}")
     print(f"Num. compatible + valid loop   : {len(valid_loop_forming_compatible_irs)}")
-
 
     # Classify compatible IR pairs as nested or not nested
     print("Nested Compatible IR Pairs".center(50, "="))
