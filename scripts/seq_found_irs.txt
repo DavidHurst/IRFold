@@ -11,61 +11,37 @@ Number of mismatches allowed in Palindrome: 0
 
 
 Palindromes:
-1        agau        4
-         ||||
-12       ucua        9
-
-1        ag        2
+1        uc        2
          ||
-8        uc        7
+6        ag        5
 
-2        ga        3
+5        gac        7
+         |||
+21       cug       19
+
+6        ac        7
          ||
-13       cu       12
+24       ug       23
 
-2        ga        3
+6        ac        7
          ||
-5        cu        4
+14       ug       13
 
-5        cg        6
+13       gu       14
          ||
-15       gc       14
+17       ca       16
 
-6        gcua        9
-         ||||
-23       cgau       20
-
-6        gc        7
+14       ua       15
          ||
-16       cg       15
+25       au       24
 
-7        cu        8
+16       ac       17
          ||
-18       ga       17
+24       ug       23
 
-11       cu       12
+16       ac       17
          ||
-22       ga       21
-
-11       cu       12
-         ||
-18       ga       17
-
-13       cc       14
-         ||
-19       gg       18
-
-15       gc       16
-         ||
-23       cg       22
-
-18       gg       19
-         ||
-25       cc       24
-
-18       gg       19
-         ||
-24       cc       23
+20       ug       19
 
 
 

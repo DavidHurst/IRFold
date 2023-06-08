@@ -233,7 +233,7 @@ class IRFold:
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
+            if IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1]) and not IRFold.irs_form_valid_loop(ir_pair[0], ir_pair[1])
         ]
 
         for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:
@@ -281,25 +281,22 @@ class IRFold:
         matches up with loops that RNAlib assigns infinite free energy to so validated."""
         # Note: IUPACpal is 0-based indexing IRs
         latest_left_string_base_idx = (
-                                          ir_a[0][1] if ir_a[0][1] > ir_b[0][1] else ir_b[0][1]
-                                      ) - 1
+            ir_a[0][1] if ir_a[0][1] > ir_b[0][1] else ir_b[0][1]
+        ) - 1
         earliest_right_string_base_idx = (
-                                             ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
-                                         ) - 1
+            ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
+        ) - 1
 
         # Case 1: Disjoint
         if IRFold.irs_disjoint(ir_a, ir_b):
             return True
 
-        # Case 2: Invalid hairpin
+        # Case 2: Invalid loop
         bases_inbetween_parens = (
-                earliest_right_string_base_idx - latest_left_string_base_idx - 1
+            earliest_right_string_base_idx - latest_left_string_base_idx - 1
         )
         if bases_inbetween_parens < 3:
             return False
 
-        # Case 3: Valid hairpin / loop?
-        # hp_region_dp_repr = [" " for _ in range(seq_len)]
-        # hp_region_dp_repr[latest_left_string_base_idx] = "("
-        # hp_region_dp_repr[earliest_right_string_base_idx] = ")"
+        # Case 3: Valid loop
         return True

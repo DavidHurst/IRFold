@@ -116,10 +116,20 @@ if __name__ == "__main__":
     # ToDo: Also evaluate triples, quadruples etc.
     unique_idx_pairs = list(itertools.combinations([i for i in range(n_irs)], 2))
     unique_ir_pairs = [(found_irs[i], found_irs[j]) for i, j in unique_idx_pairs]
+    valid_loop_forming_irs = [
+        ir_pair
+        for ir_pair in unique_ir_pairs
+        if irs_form_valid_loop(ir_pair[0], ir_pair[1])
+    ]
     compatible_ir_pairs = [
         ir_pair
         for ir_pair in unique_ir_pairs
         if not IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
+    ]
+    valid_loop_forming_compatible_irs = [
+        ir_pair
+        for ir_pair in unique_ir_pairs
+        if irs_form_valid_loop(ir_pair[0], ir_pair[1]) and not IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
     ]
 
     print(f"IUPACpal Parameters:")
@@ -128,13 +138,15 @@ if __name__ == "__main__":
             print(f"  - {kw} = {kwarg}")
     print(f"Num. IRs found         : {n_irs}")
     print(f"Num. unique pairs      : {len(unique_ir_pairs)}")
-    print(f"Num. compatible pairs  : {len(compatible_ir_pairs)}")
-    print(f"Num. incompatible pairs: {len(unique_ir_pairs) - len(compatible_ir_pairs)}")
+    print(f"Num. valid loop forming pairs  : {len(valid_loop_forming_irs)}")
+    print(f"Num. compatible pairs          : {len(compatible_ir_pairs)}")
+    print(f"Num. compatible + valid loop   : {len(valid_loop_forming_compatible_irs)}")
+
 
     # Classify compatible IR pairs as nested or not nested
     print("Nested Compatible IR Pairs".center(50, "="))
     nested_ir_pairs, non_nested_ir_pairs = [], []
-    for p in compatible_ir_pairs:
+    for p in valid_loop_forming_compatible_irs:
         ir_i, ir_j = p[0], p[1]
 
         if irs_wholly_nested(ir_i, ir_j) or irs_wholly_nested(ir_j, ir_i):
@@ -191,7 +203,7 @@ if __name__ == "__main__":
 
         (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j, seq_len)
 
-        valid_loop_formed = irs_form_valid_loop(ir_i, ir_j, seq_len)
+        valid_loop_formed = irs_form_valid_loop(ir_i, ir_j)
 
         assumption_held = fe_sum == fe_union
         assumption_holds_count_non_nested_compatible.append(assumption_held)
