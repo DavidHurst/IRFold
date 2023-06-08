@@ -1,4 +1,4 @@
-Palindromes of: /home/david/dev/msc_proj/data/seq.fasta
+Palindromes of: /home/david/dev/rna_ssp/data/seq.fasta
 Sequence name: seq
 Sequence length is: 25
 Start at position: 1
@@ -11,49 +11,53 @@ Number of mismatches allowed in Palindrome: 0
 
 
 Palindromes:
-1        uca        3
-         |||
-6        agu        4
-
-2        ca        3
+1        cg        2
          ||
-23       gu       22
+13       gc       12
 
-2        ca        3
+2        gc        3
          ||
-19       gu       18
+10       cg        9
 
-3        au        4
+4        ag        5
          ||
-8        ua        7
+23       uc       22
 
 5        ga        6
          ||
 25       cu       24
 
-5        gaa        7
-         |||
-16       cuu       14
-
 5        ga        6
          ||
-9        cu        8
+17       cu       16
 
-6        aa        7
+6        ac        7
          ||
-22       uu       21
+14       ug       13
 
-6        aa        7
+8        ag        9
          ||
-21       uu       20
+23       uc       22
 
-6        aa        7
+11       ac       12
          ||
-18       uu       17
+14       ug       13
 
-9        cg       10
+13       gu       14
          ||
-12       gc       11
+22       ca       21
+
+16       uc       17
+         ||
+20       ag       19
+
+18       ag       19
+         ||
+23       uc       22
+
+19       gaa       21
+         |||
+25       cuu       23
 
 
 

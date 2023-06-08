@@ -148,13 +148,6 @@ class IRFold:
                 ir for ir in found_irs if ir[1][0] - ir[0][1] - 1 >= 3
             ]
 
-            for ir in found_irs:
-                print(ir, f"gap sz = {ir[1][0] - ir[0][1] - 1}")
-            print()
-
-            for ir in valid_irs:
-                print(ir, f"gap sz = {ir[1][0] - ir[0][1] - 1}")
-
             return valid_irs
         else:
             print(str(out.decode("utf-8")))
@@ -184,8 +177,12 @@ class IRFold:
             left_strand, right_strand = ir[0], ir[1]
 
             # IUPACpal returns base pairings using 1-based indexing
-            paired_bases[left_strand[0] - 1 : left_strand[1]] = ["(" for _ in range(n_base_pairs)]
-            paired_bases[right_strand[0] - 1 : right_strand[1]] = [")" for _ in range(n_base_pairs)]
+            paired_bases[left_strand[0] - 1 : left_strand[1]] = [
+                "(" for _ in range(n_base_pairs)
+            ]
+            paired_bases[right_strand[0] - 1 : right_strand[1]] = [
+                ")" for _ in range(n_base_pairs)
+            ]
 
         return "".join(paired_bases)
 
@@ -236,7 +233,7 @@ class IRFold:
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if IRFold.irs_match_same_bases(ir_pair[0], ir_pair[1])
+            if IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
         ]
 
         for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:
@@ -251,24 +248,58 @@ class IRFold:
         return solver
 
     @staticmethod
-    def irs_match_same_bases(ir_a: IR, ir_b: IR) -> bool:
+    def irs_share_base_pair(ir_a: IR, ir_b: IR) -> bool:
         # Check that IRs don't match the same bases
-        ir_a_left_strand: Tuple[int, int]
-        ir_a_right_strand: Tuple[int, int]
         ir_a_left_strand, ir_a_right_strand = ir_a[0], ir_a[1]
-        paired_base_idxs_a = [idx for idx in range(ir_a_left_strand[0], ir_a_left_strand[1] + 1)] + [
-            idx for idx in range(ir_a[1][0], ir_a[1][1] + 1)
-        ]
+        paired_base_idxs_a = [
+            idx for idx in range(ir_a_left_strand[0], ir_a_left_strand[1] + 1)
+        ] + [idx for idx in range(ir_a_right_strand[0], ir_a_right_strand[1] + 1)]
 
-        ir_b_left_strand: Tuple[int, int]
-        ir_b_right_strand: Tuple[int, int]
         ir_b_left_strand, ir_b_right_strand = ir_b[0], ir_b[1]
-        paired_base_idxs_b = [idx for idx in range(ir_b_left_strand[0], ir_b_left_strand[1] + 1)] + [
-            idx for idx in range(ir_b_right_strand[0], ir_b_right_strand[1] + 1)
-        ]
+        paired_base_idxs_b = [
+            idx for idx in range(ir_b_left_strand[0], ir_b_left_strand[1] + 1)
+        ] + [idx for idx in range(ir_b_right_strand[0], ir_b_right_strand[1] + 1)]
 
-        irs_match_same_bases: bool =  any(
+        any_shared_base_pairs: bool = any(
             [ir_b_bases in paired_base_idxs_a for ir_b_bases in paired_base_idxs_b]
         )
-        return irs_match_same_bases
+        return any_shared_base_pairs
 
+    @staticmethod
+    def irs_disjoint(ir_a, ir_b):
+        # ir_a comes entirely before ir_b
+        ir_a_strictly_before_ir_b = ir_a[1][1] < ir_b[0][0]
+
+        # ir_b comes entirely before ir_a
+        ir_b_strictly_before_ir_a = ir_b[1][1] < ir_a[0][0]
+
+        return ir_a_strictly_before_ir_b or ir_b_strictly_before_ir_a
+
+    @staticmethod
+    def irs_form_valid_loop(ir_a, ir_b):
+        """This won't scale up, not entirely sure what kind of invalid loop this finds but
+        matches up with loops that RNAlib assigns infinite free energy to so validated."""
+        # Note: IUPACpal is 0-based indexing IRs
+        latest_left_string_base_idx = (
+                                          ir_a[0][1] if ir_a[0][1] > ir_b[0][1] else ir_b[0][1]
+                                      ) - 1
+        earliest_right_string_base_idx = (
+                                             ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
+                                         ) - 1
+
+        # Case 1: Disjoint
+        if IRFold.irs_disjoint(ir_a, ir_b):
+            return True
+
+        # Case 2: Invalid hairpin
+        bases_inbetween_parens = (
+                earliest_right_string_base_idx - latest_left_string_base_idx - 1
+        )
+        if bases_inbetween_parens < 3:
+            return False
+
+        # Case 3: Valid hairpin / loop?
+        # hp_region_dp_repr = [" " for _ in range(seq_len)]
+        # hp_region_dp_repr[latest_left_string_base_idx] = "("
+        # hp_region_dp_repr[earliest_right_string_base_idx] = ")"
+        return True

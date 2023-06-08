@@ -13,11 +13,21 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 from ir_fold import IRFold
 
 
-def irs_nested(outer_ir, nested_ir):
+def irs_wholly_nested(outer_ir, nested_ir):
     return outer_ir[0][0] < nested_ir[0][0] and nested_ir[1][1] < outer_ir[1][0]
 
 
-def irs_fe_union_fe_sum(ir_a, ir_b):
+def irs_disjoint(ir_a, ir_b):
+    # ir_a comes entirely before ir_b
+    ir_a_strictly_before_ir_b = ir_a[1][1] < ir_b[0][0]
+
+    # ir_b comes entirely before ir_a
+    ir_b_strictly_before_ir_a = ir_b[1][1] < ir_a[0][0]
+
+    return ir_a_strictly_before_ir_b or ir_b_strictly_before_ir_a
+
+
+def irs_fe_union_fe_sum(ir_a, ir_b, seq_len):
     # FE(IR_a) + FE(IR_b)
     ir_a_db_repr = IRFold.irs_to_dot_bracket([ir_a], seq_len)
     ir_b_db_repr = IRFold.irs_to_dot_bracket([ir_b], seq_len)
@@ -31,6 +41,34 @@ def irs_fe_union_fe_sum(ir_a, ir_b):
     fe_union = round(IRFold.calc_free_energy(ir_a_b_db_repr, seq, data_dir), 4)
 
     return (ir_a_fe, ir_b_fe), fe_union, fe_sum
+
+
+def irs_form_valid_loop(ir_a, ir_b):
+    """This won't scale up"""
+    # Note: IUPACpal is 0-based indexing IRs
+    latest_left_string_base_idx = (
+        ir_a[0][1] if ir_a[0][1] > ir_b[0][1] else ir_b[0][1]
+    ) - 1
+    earliest_right_string_base_idx = (
+        ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
+    ) - 1
+
+    # Case 1: Disjoint
+    if irs_disjoint(ir_a, ir_b):
+        return True
+
+    # Case 2: Invalid hairpin
+    bases_inbetween_parens = (
+        earliest_right_string_base_idx - latest_left_string_base_idx - 1
+    )
+    if bases_inbetween_parens < 3:
+        return False
+
+    # Case 3: Valid hairpin / loop?
+    # hp_region_dp_repr = [" " for _ in range(seq_len)]
+    # hp_region_dp_repr[latest_left_string_base_idx] = "("
+    # hp_region_dp_repr[earliest_right_string_base_idx] = ")"
+    return True
 
 
 def id_base_pairs(db_repr, irs):
@@ -52,11 +90,11 @@ def id_base_pairs(db_repr, irs):
 
 
 if __name__ == "__main__":
-    verbose = True
+    print_output = True
     # random.seed(4)
 
     data_dir = "."
-    seq_len = 35
+    seq_len = 25
     seq = "".join(random.choice("ACGU") for _ in range(seq_len))
 
     print(f"Seq. length: {seq_len}")
@@ -81,7 +119,7 @@ if __name__ == "__main__":
     compatible_ir_pairs = [
         ir_pair
         for ir_pair in unique_ir_pairs
-        if not IRFold.irs_match_same_bases(ir_pair[0], ir_pair[1])
+        if not IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
     ]
 
     print(f"IUPACpal Parameters:")
@@ -99,7 +137,7 @@ if __name__ == "__main__":
     for p in compatible_ir_pairs:
         ir_i, ir_j = p[0], p[1]
 
-        if irs_nested(ir_i, ir_j) or irs_nested(ir_j, ir_i):
+        if irs_wholly_nested(ir_i, ir_j) or irs_wholly_nested(ir_j, ir_i):
             nested_ir_pairs.append(p)
         else:
             non_nested_ir_pairs.append(p)
@@ -115,12 +153,12 @@ if __name__ == "__main__":
 
         ir_i, ir_j = p[0], p[1]
 
-        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j)
+        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j, seq_len)
 
         assumption_held = fe_sum == fe_union
         assumption_holds_count_nested_compatible.append(assumption_held)
 
-        if verbose:
+        if print_output:
             ir_i_fmt = f"[{str(ir_i[0][0]).zfill(2)}->{str(ir_i[0][1]).zfill(2)} {str(ir_i[1][0]).zfill(2)}->{str(ir_i[1][1]).zfill(2)}]"
             ir_j_fmt = f"[{str(ir_j[0][0]).zfill(2)}->{str(ir_j[0][1]).zfill(2)} {str(ir_j[1][0]).zfill(2)}->{str(ir_j[1][1]).zfill(2)}]"
 
@@ -130,7 +168,7 @@ if __name__ == "__main__":
             print(f"Pair:")
             print(f"  A = {ir_i_fmt}")
             print(f"  B = {ir_j_fmt}")
-            if irs_nested(ir_i, ir_j):
+            if irs_wholly_nested(ir_i, ir_j):
                 print(f"  B is nested in A:")
             else:
                 print(f"  A is nested in B:")
@@ -145,19 +183,20 @@ if __name__ == "__main__":
             print(f"  FE(A) + FE(B): {fe_sum:.4f}")
             print(f"  FE(A U B)    : {fe_union:.4f}")
             print(f"  Assumption holds: {assumption_held}")
-            # print(f"  FE(A) + FE(B) == FE(A U B): {assumption_held}")
 
     print("Non-Nested Compatible IR Pair Free Energies".center(50, "="))
     assumption_holds_count_non_nested_compatible = []
     for p in non_nested_ir_pairs:
         ir_i, ir_j = p[0], p[1]
 
-        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j)
+        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j, seq_len)
+
+        valid_loop_formed = irs_form_valid_loop(ir_i, ir_j, seq_len)
 
         assumption_held = fe_sum == fe_union
         assumption_holds_count_non_nested_compatible.append(assumption_held)
 
-        if verbose:
+        if print_output:
             ir_i_fmt = f"[{str(ir_i[0][0]).zfill(2)}->{str(ir_i[0][1]).zfill(2)} {str(ir_i[1][0]).zfill(2)}->{str(ir_i[1][1]).zfill(2)}]"
             ir_j_fmt = f"[{str(ir_j[0][0]).zfill(2)}->{str(ir_j[0][1]).zfill(2)} {str(ir_j[1][0]).zfill(2)}->{str(ir_j[1][1]).zfill(2)}]"
 
@@ -167,8 +206,9 @@ if __name__ == "__main__":
             print(f"Pair:")
             print(f"  A = {ir_i_fmt}")
             print(f"  B = {ir_j_fmt}")
-            print(f"  A U B = {db_repr}")
-            print(f"  A U B = {db_repr_id_assigned}")
+            print(f"    A U B = {db_repr}")
+            print(f"    A U B = {db_repr_id_assigned}")
+            print(f"  Valid loop = {valid_loop_formed}")
             print(f"  FE(A) = {ir_i_fe:.4f}")
             if ir_i_fe > 9000:
                 print(f"    [i] A would never be selected")
@@ -178,7 +218,6 @@ if __name__ == "__main__":
             print(f"  FE(A) + FE(B): {fe_sum:.4f}")
             print(f"  FE(A U B)    : {fe_union:.4f}")
             print(f"  Assumption holds: {assumption_held}")
-            # print(f"  FE(A) + FE(B) == FE(A U B): {assumption_held}")
 
     print("Assumption Holding Summary Stats.".center(50, "="))
     print("Nested:")
