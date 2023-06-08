@@ -38,6 +38,7 @@ class IRFold:
             mismatches=mismatches,
             out_dir=out_dir,
         )
+
         n_irs_found: int = len(found_irs)
         seq_len: int = len(sequence)
         if n_irs_found == 0:
@@ -123,7 +124,7 @@ class IRFold:
 
         if "Error" not in str(out):
             # Extract IR indices from format IUPACpal outputs
-            inverted_repeats: List[IR] = []
+            found_irs: List[IR] = []
 
             with open(irs_output_file) as f_in:
                 lines: List[str] = list(
@@ -140,11 +141,21 @@ class IRFold:
 
                 left_start, left_end = int(ir_idxs[0]), int(ir_idxs[1])
                 right_start, right_end = int(ir_idxs[3]), int(ir_idxs[2])
-                inverted_repeats.append(
-                    ((left_start, left_end), (right_start, right_end))
-                )
+                found_irs.append(((left_start, left_end), (right_start, right_end)))
 
-            return inverted_repeats
+            # Remove IRs with a gap < 3, these are sterically impossible
+            valid_irs: List[IR] = [
+                ir for ir in found_irs if ir[1][0] - ir[0][1] - 1 >= 3
+            ]
+
+            for ir in found_irs:
+                print(ir, f"gap sz = {ir[1][0] - ir[0][1] - 1}")
+            print()
+
+            for ir in valid_irs:
+                print(ir, f"gap sz = {ir[1][0] - ir[0][1] - 1}")
+
+            return valid_irs
         else:
             print(str(out.decode("utf-8")))
             return []
@@ -168,13 +179,13 @@ class IRFold:
         for ir in irs:
             n_base_pairs: int = ir[0][1] - ir[0][0] + 1
 
-            lhs: Tuple[int, int]
-            rhs: Tuple[int, int]
-            lhs, rhs = ir[0], ir[1]
+            left_strand: Tuple[int, int]
+            right_strand: Tuple[int, int]
+            left_strand, right_strand = ir[0], ir[1]
 
             # IUPACpal returns base pairings using 1-based indexing
-            paired_bases[lhs[0] - 1 : lhs[1]] = ["(" for _ in range(n_base_pairs)]
-            paired_bases[rhs[0] - 1 : rhs[1]] = [")" for _ in range(n_base_pairs)]
+            paired_bases[left_strand[0] - 1 : left_strand[1]] = ["(" for _ in range(n_base_pairs)]
+            paired_bases[right_strand[0] - 1 : right_strand[1]] = [")" for _ in range(n_base_pairs)]
 
         return "".join(paired_bases)
 
@@ -241,14 +252,24 @@ class IRFold:
 
     @staticmethod
     def irs_incompatible(ir_a: IR, ir_b: IR) -> bool:
-        # ToDo: use variables here for the ranges
-        paired_base_idxs_a = [idx for idx in range(ir_a[0][0], ir_a[0][1] + 1)] + [
+        # Check that IRs don't match the same bases
+        ir_a_left_strand: Tuple[int, int]
+        ir_a_right_strand: Tuple[int, int]
+        ir_a_left_strand, ir_a_right_strand = ir_a[0], ir_a[1]
+        paired_base_idxs_a = [idx for idx in range(ir_a_left_strand[0], ir_a_left_strand[1] + 1)] + [
             idx for idx in range(ir_a[1][0], ir_a[1][1] + 1)
         ]
-        paired_base_idxs_b = [idx for idx in range(ir_b[0][0], ir_b[0][1] + 1)] + [
-            idx for idx in range(ir_b[1][0], ir_b[1][1] + 1)
+
+        ir_b_left_strand: Tuple[int, int]
+        ir_b_right_strand: Tuple[int, int]
+        ir_b_left_strand, ir_b_right_strand = ir_b[0], ir_b[1]
+        paired_base_idxs_b = [idx for idx in range(ir_b_left_strand[0], ir_b_left_strand[1] + 1)] + [
+            idx for idx in range(ir_b_right_strand[0], ir_b_right_strand[1] + 1)
         ]
 
-        return any(
+        irs_match_same_bases: bool =  any(
             [ir_b_bases in paired_base_idxs_a for ir_b_bases in paired_base_idxs_b]
         )
+        return irs_match_same_bases
+
+        # Check that IRs when combined don't create a hairpin with < 3 bases in its loop

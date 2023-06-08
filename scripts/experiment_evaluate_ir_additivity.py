@@ -3,6 +3,7 @@ import random
 import sys
 import itertools
 import warnings
+
 warnings.filterwarnings("error")
 
 from pathlib import Path
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     random.seed(4)
 
     data_dir = "."
-    seq_len = 25
+    seq_len = 35
     seq = "".join(random.choice("ACGU") for _ in range(seq_len))
 
     print(f"Seq. length: {seq_len}")
@@ -141,42 +142,43 @@ if __name__ == "__main__":
             print(f"  FE(B) = {ir_j_fe:.4f}")
             if ir_j_fe > 9000:
                 print(f"    [i] B would never be selected")
-            # print(f"  FE(A) + FE(B): {fe_sum:.4f}")
-            # print(f"  FE(A U B)    : {fe_union:.4f}")
+            print(f"  FE(A) + FE(B): {fe_sum:.4f}")
+            print(f"  FE(A U B)    : {fe_union:.4f}")
             print(f"  Assumption holds: {assumption_held}")
             # print(f"  FE(A) + FE(B) == FE(A U B): {assumption_held}")
 
-    # print("Non-Nested Compatible IR Pair Free Energies".center(50, "="))
-    # assumption_holds_count_non_nested_compatible = []
-    # for p in non_nested_ir_pairs:
-    #     ir_i, ir_j = p[0], p[1]
-    #
-    #     (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j)
-    #
-    #     assumption_held = fe_sum == fe_union
-    #     assumption_holds_count_non_nested_compatible.append(assumption_held)
-    #
-    #     if verbose:
-    #         ir_i_fmt = f"[{str(ir_i[0][0]).zfill(2)}->{str(ir_i[0][1]).zfill(2)} {str(ir_i[1][0]).zfill(2)}->{str(ir_i[1][1]).zfill(2)}]"
-    #         ir_j_fmt = f"[{str(ir_j[0][0]).zfill(2)}->{str(ir_j[0][1]).zfill(2)} {str(ir_j[1][0]).zfill(2)}->{str(ir_j[1][1]).zfill(2)}]"
-    #
-    #         db_repr = IRFold.irs_to_dot_bracket([ir_i, ir_j], seq_len)
-    #         db_repr_id_assigned = id_base_pairs(db_repr, [ir_i, ir_j])
-    #
-    #         print(f"Pair:")
-    #         print(f"  A = {ir_i_fmt}")
-    #         print(f"  B = {ir_j_fmt}")
-    #         print(f"  A U B = {db_repr}")
-    #         print(f"  A U B = {db_repr_id_assigned}")
-    #         print(f"  FE(A) = {ir_i_fe:.4f}")
-    #         if ir_i_fe > 9000:
-    #             print(f"    [i] A would never be selected")
-    #         print(f"  FE(B) = {ir_j_fe:.4f}")
-    #         if ir_j_fe > 9000:
-    #             print(f"    [i] B would never be selected")
-    #         print(f"  FE(A) + FE(B): {fe_sum:.4f}")
-    #         print(f"  FE(A U B)    : {fe_union:.4f}")
-    #         print(f"  FE(A) + FE(B) == FE(A U B): {assumption_held}")
+    print("Non-Nested Compatible IR Pair Free Energies".center(50, "="))
+    assumption_holds_count_non_nested_compatible = []
+    for p in non_nested_ir_pairs:
+        ir_i, ir_j = p[0], p[1]
+
+        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j)
+
+        assumption_held = fe_sum == fe_union
+        assumption_holds_count_non_nested_compatible.append(assumption_held)
+
+        if verbose:
+            ir_i_fmt = f"[{str(ir_i[0][0]).zfill(2)}->{str(ir_i[0][1]).zfill(2)} {str(ir_i[1][0]).zfill(2)}->{str(ir_i[1][1]).zfill(2)}]"
+            ir_j_fmt = f"[{str(ir_j[0][0]).zfill(2)}->{str(ir_j[0][1]).zfill(2)} {str(ir_j[1][0]).zfill(2)}->{str(ir_j[1][1]).zfill(2)}]"
+
+            db_repr = IRFold.irs_to_dot_bracket([ir_i, ir_j], seq_len)
+            db_repr_id_assigned = id_base_pairs(db_repr, [ir_i, ir_j])
+
+            print(f"Pair:")
+            print(f"  A = {ir_i_fmt}")
+            print(f"  B = {ir_j_fmt}")
+            print(f"  A U B = {db_repr}")
+            print(f"  A U B = {db_repr_id_assigned}")
+            print(f"  FE(A) = {ir_i_fe:.4f}")
+            if ir_i_fe > 9000:
+                print(f"    [i] A would never be selected")
+            print(f"  FE(B) = {ir_j_fe:.4f}")
+            if ir_j_fe > 9000:
+                print(f"    [i] B would never be selected")
+            print(f"  FE(A) + FE(B): {fe_sum:.4f}")
+            print(f"  FE(A U B)    : {fe_union:.4f}")
+            print(f"  Assumption holds: {assumption_held}")
+            # print(f"  FE(A) + FE(B) == FE(A U B): {assumption_held}")
 
     print("Assumption Holding Summary Stats.".center(50, "="))
     print("Nested:")
@@ -186,20 +188,20 @@ if __name__ == "__main__":
     )
     print(f"  Assumption Held: {times_assumption_held_nested}/{n_nested_pairs} times")
 
-    # print("Non-Nested:")
-    # print(f"  Num. pairs: {n_non_nested_pairs}")
-    # times_assumption_held_not_nested = len(
-    #     [res for res in assumption_holds_count_non_nested_compatible if res == True]
-    # )
-    # print(
-    #     f"  Assumption Held: {times_assumption_held_not_nested}/{n_non_nested_pairs} times"
-    # )
+    print("Non-Nested:")
+    print(f"  Num. pairs: {n_non_nested_pairs}")
+    times_assumption_held_not_nested = len(
+        [res for res in assumption_holds_count_non_nested_compatible if res == True]
+    )
+    print(
+        f"  Assumption Held: {times_assumption_held_not_nested}/{n_non_nested_pairs} times"
+    )
 
-    # print("Overall:")
-    # print(f"  Num. pairs: {len(compatible_ir_pairs)}")
-    # total_times_assumption_held = (
-    #     times_assumption_held_nested + times_assumption_held_not_nested
-    # )
-    # print(
-    #     f"  Assumption Held: {total_times_assumption_held}/{len(compatible_ir_pairs)} times"
-    # )
+    print("Overall:")
+    print(f"  Num. pairs: {len(compatible_ir_pairs)}")
+    total_times_assumption_held = (
+        times_assumption_held_nested + times_assumption_held_not_nested
+    )
+    print(
+        f"  Assumption Held: {total_times_assumption_held}/{len(compatible_ir_pairs)} times"
+    )

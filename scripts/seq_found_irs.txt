@@ -1,67 +1,123 @@
 Palindromes of: /home/david/dev/msc_proj/scripts/seq.fasta
 Sequence name: seq
-Sequence length is: 25
+Sequence length is: 35
 Start at position: 1
-End at position: 25
+End at position: 35
 Minimum length of Palindromes is: 2
-Maximum length of Palindromes is: 25
-Maximum gap between elements is: 24
+Maximum length of Palindromes is: 35
+Maximum gap between elements is: 34
 Number of mismatches allowed in Palindrome: 0
 
 
 
 Palindromes:
-1        ug        2
+1        cg        2
          ||
-24       ac       23
+25       gc       24
 
-1        ug        2
+1        cg        2
          ||
-19       ac       18
+14       gc       13
 
-1        ug        2
+2        ga        3
          ||
-4        ac        3
+31       cu       30
 
-2        gc        3
+2        ga        3
          ||
-10       cg        9
+6        cu        5
 
-2        gc        3
-         ||
-8        cg        7
-
-4        acc        6
+3        auu        5
          |||
-22       ugg       20
+10       uaa        8
 
-6        cg        7
+4        uu        5
          ||
-9        gc        8
+8        aa        7
 
-7        gc        8
+5        uc        6
          ||
-10       cg        9
+28       ag       27
 
-10       cc       11
-         ||
-21       gg       20
-
-11       cc       12
-         ||
-21       gg       20
-
-12       ccu       14
+5        uca        7
          |||
-21       gga       19
+12       agu       10
 
-17       cc       18
+6        ca        7
          ||
-21       gg       20
+35       gu       34
 
-21       gu       22
+10       ug       11
          ||
-25       ca       24
+20       ac       19
+
+10       ug       11
+         ||
+17       ac       16
+
+11       gac       13
+         |||
+31       cug       29
+
+13       cggc       16
+         ||||
+25       gccg       22
+
+14       gg       15
+         ||
+33       cc       32
+
+14       gg       15
+         ||
+32       cc       31
+
+15       gc       16
+         ||
+19       cg       18
+
+16       cag       18
+         |||
+35       guc       33
+
+18       gc       19
+         ||
+23       cg       22
+
+19       cagg       22
+         ||||
+35       gucc       32
+
+21       gg       22
+         ||
+32       cc       31
+
+21       gg       22
+         ||
+24       cc       23
+
+23       cc       24
+         ||
+27       gg       26
+
+23       cc       24
+         ||
+26       gg       25
+
+25       ggga       28
+         ||||
+33       cccu       30
+
+25       gg       26
+         ||
+32       cc       31
+
+26       gg       27
+         ||
+33       cc       32
+
+28       ag       29
+         ||
+34       uc       33
 
 
 

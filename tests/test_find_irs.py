@@ -10,9 +10,10 @@ DATA_DIR = "./tests_data"
 
 # ToDo: add conftest.py file to share these fixtures across tests
 
+
 @pytest.fixture
 def rna_seq_15_bases_3_irs():
-    return "CACCACCAUAAGGCU", 3
+    return "CACCACCAUAAGGCU", 2
 
 
 @pytest.fixture
@@ -62,3 +63,10 @@ def test_n_irs_found(list_of_found_irs, rna_seq_15_bases_3_irs):
     irs_found = list_of_found_irs
 
     assert len(irs_found) == rna_seq_15_bases_3_irs[1]
+
+
+def test_found_irs_gap_over_3(list_of_found_irs):
+    for ir in list_of_found_irs:
+        gap_sz = ir[1][0] - ir[0][1] - 1
+        print(f"IR: {ir}, gap sz.: {gap_sz}")
+        assert gap_sz >= 3

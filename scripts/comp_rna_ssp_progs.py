@@ -1,4 +1,3 @@
-from irfold import IRFold
 import random
 import RNA
 import sys
@@ -6,6 +5,8 @@ import sys
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+from src import IRFold
 
 if __name__ == "__main__":
     # random.seed(4)
