@@ -11,7 +11,6 @@ from ortools.linear_solver import pywraplp
 IR = Tuple[Tuple[int, int], Tuple[int, int]]
 
 
-# ToDo: Make fold and get_irs static
 class IRFold:
     """RNA secondary structure prediction based on extracting optimal
     inverted repeat configurations from the primary sequence"""
