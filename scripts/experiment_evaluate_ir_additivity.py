@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from src import IRFold
+from ir_fold import IRFold
 
 
 def irs_nested(outer_ir, nested_ir):
@@ -53,7 +53,7 @@ def id_base_pairs(db_repr, irs):
 
 if __name__ == "__main__":
     verbose = True
-    random.seed(4)
+    # random.seed(4)
 
     data_dir = "."
     seq_len = 35
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     compatible_ir_pairs = [
         ir_pair
         for ir_pair in unique_ir_pairs
-        if not IRFold.irs_incompatible(ir_pair[0], ir_pair[1])
+        if not IRFold.irs_match_same_bases(ir_pair[0], ir_pair[1])
     ]
 
     print(f"IUPACpal Parameters:")

@@ -1,4 +1,4 @@
-Palindromes of: /home/david/dev/msc_proj/scripts/seq.fasta
+Palindromes of: /home/david/dev/rna_ssp/scripts/seq.fasta
 Sequence name: seq
 Sequence length is: 35
 Start at position: 1
@@ -11,113 +11,133 @@ Number of mismatches allowed in Palindrome: 0
 
 
 Palindromes:
-1        cg        2
+1        uc        2
          ||
-25       gc       24
+32       ag       31
 
-1        cg        2
+1        uc        2
          ||
-14       gc       13
+17       ag       16
 
-2        ga        3
+1        uc        2
          ||
-31       cu       30
+9        ag        8
 
-2        ga        3
+3        au        4
          ||
-6        cu        5
+33       ua       32
 
-3        auu        5
-         |||
-10       uaa        8
+3        au        4
+         ||
+27       ua       26
+
+3        au        4
+         ||
+13       ua       12
 
 4        uu        5
          ||
-8        aa        7
+29       aa       28
+
+4        uu        5
+         ||
+23       aa       22
+
+5        ucc        7
+         |||
+32       agg       30
 
 5        uc        6
          ||
-28       ag       27
+17       ag       16
 
-5        uca        7
+5        uc        6
+         ||
+9        ag        8
+
+7        cga        9
          |||
-12       agu       10
+35       gcu       33
 
-6        ca        7
-         ||
-35       gu       34
-
-10       ug       11
-         ||
-20       ac       19
-
-10       ug       11
-         ||
-17       ac       16
-
-11       gac       13
+9        acu       11
          |||
-31       cug       29
+25       uga       23
 
-13       cggc       16
-         ||||
-25       gccg       22
-
-14       gg       15
+10       cu       11
          ||
-33       cc       32
+30       ga       29
 
-14       gg       15
-         ||
-32       cc       31
-
-15       gc       16
-         ||
-19       cg       18
-
-16       cag       18
+10       cua       12
          |||
-35       guc       33
+16       gau       14
 
-18       gc       19
+11       uau       13
+         |||
+28       aua       26
+
+11       ua       12
          ||
-23       cg       22
+26       au       25
 
-19       cagg       22
+11       ua       12
+         ||
+22       au       21
+
+12       au       13
+         ||
+33       ua       32
+
+13       uua       15
+         |||
+29       aau       27
+
+13       uuag       16
          ||||
-35       gucc       32
+23       aauc       20
 
-21       gg       22
+14       ua       15
          ||
-32       cc       31
+26       au       25
 
-21       gg       22
+16       ga       17
          ||
-24       cc       23
+34       cu       33
 
-23       cc       24
+17       ac       18
          ||
-27       gg       26
+25       ug       24
 
-23       cc       24
+18       cc       19
          ||
-26       gg       25
+31       gg       30
 
-25       ggga       28
-         ||||
-33       cccu       30
+19       ccu       21
+         |||
+31       gga       29
 
-25       gg       26
+20       cu       21
          ||
-32       cc       31
+24       ga       23
 
-26       gg       27
+21       ua       22
          ||
-33       cc       32
+28       au       27
 
-28       ag       29
+21       ua       22
          ||
-34       uc       33
+26       au       25
+
+25       ua       26
+         ||
+28       au       27
+
+26       au       27
+         ||
+33       ua       32
+
+31       ga       32
+         ||
+34       cu       33
 
 
 

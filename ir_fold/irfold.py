@@ -236,7 +236,7 @@ class IRFold:
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if IRFold.irs_incompatible(ir_pair[0], ir_pair[1])
+            if IRFold.irs_match_same_bases(ir_pair[0], ir_pair[1])
         ]
 
         for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:
@@ -251,7 +251,7 @@ class IRFold:
         return solver
 
     @staticmethod
-    def irs_incompatible(ir_a: IR, ir_b: IR) -> bool:
+    def irs_match_same_bases(ir_a: IR, ir_b: IR) -> bool:
         # Check that IRs don't match the same bases
         ir_a_left_strand: Tuple[int, int]
         ir_a_right_strand: Tuple[int, int]
@@ -272,4 +272,3 @@ class IRFold:
         )
         return irs_match_same_bases
 
-        # Check that IRs when combined don't create a hairpin with < 3 bases in its loop

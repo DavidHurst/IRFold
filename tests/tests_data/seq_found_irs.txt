@@ -1,4 +1,4 @@
-Palindromes of: /home/david/dev/msc_proj/tests/tests_data/seq.fasta
+Palindromes of: /home/david/dev/rna_ssp/tests/tests_data/seq.fasta
 Sequence name: seq
 Sequence length is: 15
 Start at position: 1
