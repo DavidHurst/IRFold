@@ -88,21 +88,23 @@ class IRFold:
         if not out_dir_path.exists():
             print(f"Output directory not found, defaulting to current directory.")
             out_dir_path = Path(".").resolve()
+
         # Check IUPACpal has been compiled to this cwd
-        if not (Path(__file__).parent / "IUPACpal").exists():
-            raise FileNotFoundError("Could not find compiled IUPACpal binary.")
+        iupacpal_exe: Path = Path(__file__).parent / "IUPACpal"
+        if not iupacpal_exe.exists():
+            raise FileNotFoundError("Could not find IUPACpal executable.")
 
         # Write sequence to file for IUPACpal
         # ToDo: Parametrise these in/out files
-
         seq_name: str = "seq"
         seq_file: str = str(out_dir_path / f"{seq_name}.fasta")
         IRFold.create_seq_file(sequence, seq_name, seq_file)
         irs_output_file: str = str(out_dir_path / f"{seq_name}_found_irs.txt")
 
-        _, out, err = IRFold.__run_cmd(
+        # ToDo: Refactor this to capture stdout of running IUPACpal instead of writing to file then extracting
+        _, out, _ = IRFold.__run_cmd(
             [
-                "./IUPACpal",
+                str(iupacpal_exe),
                 "-f",
                 seq_file,
                 "-s",

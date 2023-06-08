@@ -46,6 +46,7 @@ if __name__ == "__main__":
     print(f'FE(IR#2)           : {ir_2_fe:.3f}')
     print(f'FE(IR#1) + FE(IR#2): {ir_1_fe + ir_2_fe:.3f}')
     print(f'FE(IR#1 u IR#2)    : {ir_1_2_fe:.3f}')
+    print(f'FE(IR_i) + FE(IR_j) == FE(IR_i u IR_j) -> {ir_1_fe + ir_2_fe == ir_1_2_fe}')
 
     # ir_fold = (data_dir)
     # our_secondary_structure, our_mfe = IRFold.fold(
