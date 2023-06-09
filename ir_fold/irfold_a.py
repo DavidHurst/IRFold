@@ -1,13 +1,14 @@
+__all__ = ['IRFoldA']
+
 import itertools
 
-from irfold import IRFold
+from ir_fold import IRFold
 from typing import Tuple, List
 from ortools.linear_solver import pywraplp
 
 IR = Tuple[Tuple[int, int], Tuple[int, int]]
 
-
-class IRFoldII(IRFold):
+class IRFoldA(IRFold):
     @staticmethod
     def irs_disjoint(ir_a, ir_b):
         # ir_a comes entirely before ir_b
@@ -31,7 +32,7 @@ class IRFoldII(IRFold):
         ) - 1
 
         # Case 1: Disjoint
-        if IRFoldII.irs_disjoint(ir_a, ir_b):
+        if IRFoldA.irs_disjoint(ir_a, ir_b):
             return True
 
         # Case 2: Invalid loop
@@ -71,7 +72,7 @@ class IRFoldII(IRFold):
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
             if IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
-            and not IRFoldII.irs_form_valid_loop(ir_pair[0], ir_pair[1])
+               and not IRFoldA.irs_form_valid_loop(ir_pair[0], ir_pair[1])
         ]
 
         for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:

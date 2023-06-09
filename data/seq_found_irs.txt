@@ -1,47 +1,131 @@
 Palindromes of: /home/david/dev/rna_ssp/data/seq.fasta
 Sequence name: seq
-Sequence length is: 25
+Sequence length is: 35
 Start at position: 1
-End at position: 25
+End at position: 35
 Minimum length of Palindromes is: 2
-Maximum length of Palindromes is: 25
-Maximum gap between elements is: 24
+Maximum length of Palindromes is: 35
+Maximum gap between elements is: 34
 Number of mismatches allowed in Palindrome: 0
 
 
 
 Palindromes:
-5        ga        6
+1        cg        2
          ||
-13       cu       12
+9        gc        8
 
-6        au        7
-         ||
-10       ua        9
-
-13       cccg       16
-         ||||
-22       gggc       19
-
-13       cc       14
-         ||
-21       gg       20
-
-14       cc       15
-         ||
-22       gg       21
-
-17       ccc       19
+3        cua        5
          |||
-22       ggg       20
+30       gau       28
 
-17       cc       18
+3        cu        4
          ||
-21       gg       20
+24       ga       23
 
-18       cc       19
+3        cu        4
          ||
-22       gg       21
+11       ga       10
+
+4        ua        5
+         ||
+34       au       33
+
+5        acc        7
+         |||
+32       ugg       30
+
+5        acc        7
+         |||
+13       ugg       11
+
+6        cc        7
+         ||
+25       gg       24
+
+7        cc        8
+         ||
+31       gg       30
+
+7        cc        8
+         ||
+25       gg       24
+
+7        cc        8
+         ||
+12       gg       11
+
+9        gag       11
+         |||
+21       cuc       19
+
+9        ga       10
+         ||
+19       cu       18
+
+9        ga       10
+         ||
+14       cu       13
+
+10       ag       11
+         ||
+28       uc       27
+
+11       gg       12
+         ||
+22       cc       21
+
+12       guc       14
+         |||
+27       cag       25
+
+15       aa       16
+         ||
+33       uu       32
+
+15       aa       16
+         ||
+18       uu       17
+
+16       au       17
+         ||
+35       ua       34
+
+18       uc       19
+         ||
+26       ag       25
+
+19       cu       20
+         ||
+30       ga       29
+
+19       cu       20
+         ||
+24       ga       23
+
+20       ucc       22
+         |||
+26       agg       24
+
+21       cc       22
+         ||
+31       gg       30
+
+23       ag       24
+         ||
+28       uc       27
+
+26       ac       27
+         ||
+32       ug       31
+
+27       cu       28
+         ||
+30       ga       29
+
+28       ua       29
+         ||
+34       au       33
 
 
 

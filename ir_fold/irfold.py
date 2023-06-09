@@ -1,3 +1,5 @@
+__all__ = ['IRFold']
+
 import subprocess
 import RNA
 import itertools
@@ -9,7 +11,6 @@ from ortools.linear_solver import pywraplp
 
 # ((left_strand_start, left_strand_end), (right_strand_start, right_strand_end))
 IR = Tuple[Tuple[int, int], Tuple[int, int]]
-
 
 class IRFold:
     """RNA secondary structure prediction based on extracting optimal
