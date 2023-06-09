@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from ir_fold import IRFold
+from ir_fold import IRFold0
 
 DATA_DIR = str(Path(__file__).parent / 'tests_data')
 
@@ -38,7 +38,7 @@ def find_irs_params(rna_seq_15_bases_3_irs):
 
 @pytest.fixture
 def list_of_found_irs(find_irs_params):
-    return IRFold.find_irs(**find_irs_params)
+    return IRFold0.find_irs(**find_irs_params)
 
 
 # ToDo: Write test for not having iupacpal compiled

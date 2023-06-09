@@ -1,0 +1,272 @@
+Palindromes of: /home/david/dev/rna_ssp/data/random.fasta
+Sequence name: random
+Sequence length is: 55
+Start at position: 1
+End at position: 55
+Minimum length of Palindromes is: 2
+Maximum length of Palindromes is: 55
+Maximum gap between elements is: 54
+Number of mismatches allowed in Palindrome: 0
+
+
+
+Palindromes:
+1        cgg        3
+         |||
+26       gcc       24
+
+1        cgg        3
+         |||
+12       gcc       10
+
+2        ggc        4
+         |||
+24       ccg       22
+
+4        cuu        6
+         |||
+52       gaa       50
+
+4        cuu        6
+         |||
+48       gaa       46
+
+4        cuu        6
+         |||
+40       gaa       38
+
+4        cu        5
+         ||
+36       ga       35
+
+4        cu        5
+         ||
+17       ga       16
+
+6        uuc        8
+         |||
+51       aag       49
+
+6        uu        7
+         ||
+47       aa       46
+
+6        uuc        8
+         |||
+39       aag       37
+
+7        uc        8
+         ||
+28       ag       27
+
+7        uc        8
+         ||
+16       ag       15
+
+8        cu        9
+         ||
+52       ga       51
+
+8        cu        9
+         ||
+48       ga       47
+
+8        cu        9
+         ||
+40       ga       39
+
+8        cu        9
+         ||
+36       ga       35
+
+8        cucc       11
+         ||||
+17       gagg       14
+
+9        ucc       11
+         |||
+50       agg       48
+
+9        ucc       11
+         |||
+38       agg       36
+
+9        uccggg       14
+         ||||||
+28       aggccc       23
+
+10       cc       11
+         ||
+18       gg       17
+
+10       cc       11
+         ||
+14       gg       13
+
+10       cc       11
+         ||
+13       gg       12
+
+12       gg       13
+         ||
+24       cc       23
+
+13       ggg       15
+         |||
+25       ccc       23
+
+14       gg       15
+         ||
+25       cc       24
+
+15       ga       16
+         ||
+54       cu       53
+
+16       ag       17
+         ||
+55       uc       54
+
+16       ag       17
+         ||
+30       uc       29
+
+17       gg       18
+         ||
+25       cc       24
+
+17       gg       18
+         ||
+24       cc       23
+
+18       gu       19
+         ||
+34       ca       33
+
+18       gu       19
+         ||
+29       ca       28
+
+19       uu       20
+         ||
+51       aa       50
+
+19       uu       20
+         ||
+47       aa       46
+
+19       uu       20
+         ||
+39       aa       38
+
+20       uu       21
+         ||
+51       aa       50
+
+20       uu       21
+         ||
+47       aa       46
+
+20       uu       21
+         ||
+39       aa       38
+
+21       ug       22
+         ||
+35       ac       34
+
+23       cc       24
+         ||
+49       gg       48
+
+23       cc       24
+         ||
+37       gg       36
+
+23       cc       24
+         ||
+27       gg       26
+
+24       cc       25
+         ||
+49       gg       48
+
+24       cc       25
+         ||
+37       gg       36
+
+24       cc       25
+         ||
+27       gg       26
+
+27       gacuu       31
+         |||||
+54       cugaa       50
+
+28       ac       29
+         ||
+45       ug       44
+
+28       acuu       31
+         ||||
+41       ugaa       38
+
+29       cuu       31
+         |||
+48       gaa       46
+
+29       cu       30
+         ||
+36       ga       35
+
+31       uu       32
+         ||
+51       aa       50
+
+31       uuaca       35
+         |||||
+47       aaugu       43
+
+31       uu       32
+         ||
+39       aa       38
+
+32       uac       34
+         |||
+42       aug       40
+
+33       ac       34
+         ||
+53       ug       52
+
+35       ag       36
+         ||
+55       uc       54
+
+37       ga       38
+         ||
+54       cu       53
+
+39       ag       40
+         ||
+55       uc       54
+
+41       ua       42
+         ||
+46       au       45
+
+47       ag       48
+         ||
+55       uc       54
+
+49       ga       50
+         ||
+54       cu       53
+
+51       ag       52
+         ||
+55       uc       54
+
+
+
+

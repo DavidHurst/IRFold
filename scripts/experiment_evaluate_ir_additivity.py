@@ -3,13 +3,11 @@ import sys
 import itertools
 import warnings
 
-warnings.filterwarnings("error")
-
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from ir_fold import IRFold
+from ir_fold import IRFold0
 
 DATA_DIR = str(Path(__file__).parent.parent / 'data')
 
@@ -30,16 +28,16 @@ def irs_disjoint(ir_a, ir_b):
 
 def irs_fe_union_fe_sum(ir_a, ir_b, sequence_len, out_dir):
     # FE(IR_a) + FE(IR_b)
-    ir_a_db_repr = IRFold.irs_to_dot_bracket([ir_a], sequence_len)
-    ir_b_db_repr = IRFold.irs_to_dot_bracket([ir_b], sequence_len)
+    ir_a_db_repr = IRFold0.irs_to_dot_bracket([ir_a], sequence_len)
+    ir_b_db_repr = IRFold0.irs_to_dot_bracket([ir_b], sequence_len)
 
-    ir_a_fe = round(IRFold.calc_free_energy(ir_a_db_repr, seq, out_dir), 4)
-    ir_b_fe = round(IRFold.calc_free_energy(ir_b_db_repr, seq, out_dir), 4)
+    ir_a_fe = round(IRFold0.calc_free_energy(ir_a_db_repr, seq, out_dir), 4)
+    ir_b_fe = round(IRFold0.calc_free_energy(ir_b_db_repr, seq, out_dir), 4)
     fe_sum = round(ir_a_fe + ir_b_fe, 4)
 
     # FE(IR_a U IR_b)
-    ir_a_b_db_repr = IRFold.irs_to_dot_bracket([ir_a, ir_b], sequence_len)
-    fe_union = round(IRFold.calc_free_energy(ir_a_b_db_repr, seq, out_dir), 4)
+    ir_a_b_db_repr = IRFold0.irs_to_dot_bracket([ir_a, ir_b], sequence_len)
+    fe_union = round(IRFold0.calc_free_energy(ir_a_b_db_repr, seq, out_dir), 4)
 
     return (ir_a_fe, ir_b_fe), fe_union, fe_sum
 
@@ -108,7 +106,7 @@ if __name__ == "__main__":
         "mismatches": 0,
         "out_dir": DATA_DIR,
     }
-    found_irs = IRFold.find_irs(**find_irs_kwargs)
+    found_irs = IRFold0.find_irs(**find_irs_kwargs)
     n_irs = len(found_irs)
 
     # Find all compatible IR pairs
@@ -124,13 +122,13 @@ if __name__ == "__main__":
     compatible_ir_pairs = [
         ir_pair
         for ir_pair in unique_ir_pairs
-        if not IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
+        if not IRFold0.irs_share_base_pair(ir_pair[0], ir_pair[1])
     ]
     valid_loop_forming_compatible_irs = [
         ir_pair
         for ir_pair in unique_ir_pairs
         if irs_form_valid_loop(ir_pair[0], ir_pair[1])
-        and not IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
+        and not IRFold0.irs_share_base_pair(ir_pair[0], ir_pair[1])
     ]
 
     print(f"IUPACpal Parameters:")
@@ -174,7 +172,7 @@ if __name__ == "__main__":
             ir_i_fmt = f"[{str(ir_i[0][0]).zfill(2)}->{str(ir_i[0][1]).zfill(2)} {str(ir_i[1][0]).zfill(2)}->{str(ir_i[1][1]).zfill(2)}]"
             ir_j_fmt = f"[{str(ir_j[0][0]).zfill(2)}->{str(ir_j[0][1]).zfill(2)} {str(ir_j[1][0]).zfill(2)}->{str(ir_j[1][1]).zfill(2)}]"
 
-            db_repr = IRFold.irs_to_dot_bracket([ir_i, ir_j], seq_len)
+            db_repr = IRFold0.irs_to_dot_bracket([ir_i, ir_j], seq_len)
             db_repr_id_assigned = id_base_pairs(db_repr, [ir_i, ir_j])
 
             print(f"Pair:")
@@ -212,7 +210,7 @@ if __name__ == "__main__":
             ir_i_fmt = f"[{str(ir_i[0][0]).zfill(2)}->{str(ir_i[0][1]).zfill(2)} {str(ir_i[1][0]).zfill(2)}->{str(ir_i[1][1]).zfill(2)}]"
             ir_j_fmt = f"[{str(ir_j[0][0]).zfill(2)}->{str(ir_j[0][1]).zfill(2)} {str(ir_j[1][0]).zfill(2)}->{str(ir_j[1][1]).zfill(2)}]"
 
-            db_repr = IRFold.irs_to_dot_bracket([ir_i, ir_j], seq_len)
+            db_repr = IRFold0.irs_to_dot_bracket([ir_i, ir_j], seq_len)
             db_repr_id_assigned = id_base_pairs(db_repr, [ir_i, ir_j])
 
             print(f"Pair:")

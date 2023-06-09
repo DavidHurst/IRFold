@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 DATA_DIR = str(Path(__file__).parent.parent / 'data')
 
-from ir_fold import IRFold, IRFoldA
+from ir_fold import IRFold0, IRFold1
 
 if __name__ == "__main__":
     # random.seed(4)
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     print(f"Seq. length: {seq_len}")
     print(f"Seq.       : {seq}")
 
-    irfold0_secondary_structure, irfold0_mfe = IRFold.fold(
+    irfold0_secondary_structure, irfold0_mfe = IRFold0.fold(
         sequence=seq,
         min_len=2,
         max_len=seq_len,
@@ -29,7 +29,7 @@ if __name__ == "__main__":
         seq_name=seq_name
     )
 
-    irfold1_secondary_structure, irfold1_mfe = IRFoldA.fold(
+    irfold1_secondary_structure, irfold1_mfe = IRFold1.fold(
         sequence=seq,
         min_len=2,
         max_len=seq_len,
@@ -41,11 +41,11 @@ if __name__ == "__main__":
 
     rnalib_secondary_structure, rnalib_mfe = RNA.fold(seq, "")
 
-    print(f"{IRFold.__name__} Solution".center(50, "="))
+    print(f"{IRFold0.__name__} Solution".center(50, "="))
     print(f"Dot Bracket: {irfold0_secondary_structure}")
     print(f"MFE        : {irfold0_mfe:.4f}")
 
-    print(f"{IRFoldA.__name__} Solution".center(50, "="))
+    print(f"{IRFold1.__name__} Solution".center(50, "="))
     print(f"Dot Bracket: {irfold1_secondary_structure}")
     print(f"MFE        : {irfold1_mfe:.4f}")
 

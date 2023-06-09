@@ -1,4 +1,4 @@
-__all__ = ['IRFold']
+__all__ = ['IRFold0']
 
 import subprocess
 import RNA
@@ -12,7 +12,7 @@ from ortools.linear_solver import pywraplp
 # ((left_strand_start, left_strand_end), (right_strand_start, right_strand_end))
 IR = Tuple[Tuple[int, int], Tuple[int, int]]
 
-class IRFold:
+class IRFold0:
     """RNA secondary structure prediction based on extracting optimal
     inverted repeat configurations from the primary sequence"""
 
@@ -28,7 +28,7 @@ class IRFold:
         out_dir: str = ".",
     ) -> Tuple[str, float]:
         # Find IRs in sequence
-        found_irs: List[IR] = IRFold.find_irs(
+        found_irs: List[IR] = IRFold0.find_irs(
             sequence=sequence,
             seq_name=seq_name,
             min_len=min_len,
@@ -46,15 +46,15 @@ class IRFold:
 
         # Evaluate free energy of each IR respectively
         db_reprs: List[str] = [
-            IRFold.irs_to_dot_bracket([found_irs[i]], seq_len)
+            IRFold0.irs_to_dot_bracket([found_irs[i]], seq_len)
             for i in range(n_irs_found)
         ]
         ir_free_energies: List[float] = [
-            IRFold.calc_free_energy(db_repr, sequence, out_dir, seq_name) for db_repr in db_reprs
+            IRFold0.calc_free_energy(db_repr, sequence, out_dir, seq_name) for db_repr in db_reprs
         ]
 
         # Define ILP and solve
-        solver = IRFold.ir_ilp_solver(
+        solver = IRFold0.ir_ilp_solver(
             n_irs_found, found_irs, ir_free_energies, solver_backend
         )
         status = solver.Solve()
@@ -66,7 +66,7 @@ class IRFold:
                 for i, v in enumerate(solver.variables())
                 if int(v.solution_value()) == 1
             ]
-            dp_repr: str = IRFold.irs_to_dot_bracket(
+            dp_repr: str = IRFold0.irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
             return dp_repr, solver.Objective().Value()
@@ -96,11 +96,11 @@ class IRFold:
         # Write sequence to file for IUPACpal
         # ToDo: Parametrise these in/out files
         seq_file: str = str(out_dir_path / f"{seq_name}.fasta")
-        IRFold.create_seq_file(sequence, seq_name, seq_file)
+        IRFold0.create_seq_file(sequence, seq_name, seq_file)
         irs_output_file: str = str(out_dir_path / f"{seq_name}_found_irs.txt")
 
         # ToDo: Refactor this to capture stdout of running IUPACpal instead of writing to file then extracting
-        _, out, _ = IRFold.__run_cmd(
+        _, out, _ = IRFold0.__run_cmd(
             [
                 str(iupacpal_exe),
                 "-f",
@@ -231,7 +231,7 @@ class IRFold:
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
+            if IRFold0.irs_share_base_pair(ir_pair[0], ir_pair[1])
         ]
 
         for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:

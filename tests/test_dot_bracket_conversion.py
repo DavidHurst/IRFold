@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from ir_fold import IRFold
+from ir_fold import IRFold0
 
 DATA_DIR = str(Path(__file__).parent / 'tests_data')
 
@@ -36,7 +36,7 @@ def find_irs_params(rna_seq_15_bases_3_irs):
 
 @pytest.fixture
 def list_of_found_irs(find_irs_params):
-    return IRFold.find_irs(**find_irs_params)
+    return IRFold0.find_irs(**find_irs_params)
 
 
 def test_ir_to_db_conversion(list_of_found_irs, find_irs_params):
@@ -44,6 +44,6 @@ def test_ir_to_db_conversion(list_of_found_irs, find_irs_params):
     expected_db_reprs = ["..((.......))..", ".....((....))..", "..........((.))"]
 
     for i, ir in enumerate(list_of_found_irs):
-        generated_db_repr = IRFold.irs_to_dot_bracket([ir], seq_len)
+        generated_db_repr = IRFold0.irs_to_dot_bracket([ir], seq_len)
         assert len(generated_db_repr) == seq_len
         assert generated_db_repr == expected_db_reprs[i]

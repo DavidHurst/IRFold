@@ -1,2 +1,2 @@
-from .irfold import *
-from .irfold_a import *
+from .irfold0 import *
+from .irfold1 import *
