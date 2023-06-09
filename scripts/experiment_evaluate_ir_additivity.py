@@ -1,4 +1,3 @@
-import functools
 import random
 import sys
 import itertools
@@ -11,6 +10,8 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from ir_fold import IRFold
+
+DATA_DIR = str(Path(__file__).parent.parent / 'data')
 
 
 def irs_wholly_nested(outer_ir, nested_ir):
@@ -27,18 +28,18 @@ def irs_disjoint(ir_a, ir_b):
     return ir_a_strictly_before_ir_b or ir_b_strictly_before_ir_a
 
 
-def irs_fe_union_fe_sum(ir_a, ir_b, seq_len):
+def irs_fe_union_fe_sum(ir_a, ir_b, sequence_len, out_dir):
     # FE(IR_a) + FE(IR_b)
-    ir_a_db_repr = IRFold.irs_to_dot_bracket([ir_a], seq_len)
-    ir_b_db_repr = IRFold.irs_to_dot_bracket([ir_b], seq_len)
+    ir_a_db_repr = IRFold.irs_to_dot_bracket([ir_a], sequence_len)
+    ir_b_db_repr = IRFold.irs_to_dot_bracket([ir_b], sequence_len)
 
-    ir_a_fe = round(IRFold.calc_free_energy(ir_a_db_repr, seq, data_dir), 4)
-    ir_b_fe = round(IRFold.calc_free_energy(ir_b_db_repr, seq, data_dir), 4)
+    ir_a_fe = round(IRFold.calc_free_energy(ir_a_db_repr, seq, out_dir), 4)
+    ir_b_fe = round(IRFold.calc_free_energy(ir_b_db_repr, seq, out_dir), 4)
     fe_sum = round(ir_a_fe + ir_b_fe, 4)
 
     # FE(IR_a U IR_b)
-    ir_a_b_db_repr = IRFold.irs_to_dot_bracket([ir_a, ir_b], seq_len)
-    fe_union = round(IRFold.calc_free_energy(ir_a_b_db_repr, seq, data_dir), 4)
+    ir_a_b_db_repr = IRFold.irs_to_dot_bracket([ir_a, ir_b], sequence_len)
+    fe_union = round(IRFold.calc_free_energy(ir_a_b_db_repr, seq, out_dir), 4)
 
     return (ir_a_fe, ir_b_fe), fe_union, fe_sum
 
@@ -93,7 +94,6 @@ if __name__ == "__main__":
     print_output = True
     # random.seed(4)
 
-    data_dir = "."
     seq_len = 25
     seq = "".join(random.choice("ACGU") for _ in range(seq_len))
 
@@ -106,7 +106,7 @@ if __name__ == "__main__":
         "max_len": seq_len,
         "max_gap": seq_len - 1,
         "mismatches": 0,
-        "out_dir": data_dir,
+        "out_dir": DATA_DIR,
     }
     found_irs = IRFold.find_irs(**find_irs_kwargs)
     n_irs = len(found_irs)
@@ -165,7 +165,7 @@ if __name__ == "__main__":
 
         ir_i, ir_j = p[0], p[1]
 
-        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j, seq_len)
+        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j, seq_len, DATA_DIR)
 
         assumption_held = fe_sum == fe_union
         assumption_holds_count_nested_compatible.append(assumption_held)
@@ -201,7 +201,7 @@ if __name__ == "__main__":
     for p in non_nested_ir_pairs:
         ir_i, ir_j = p[0], p[1]
 
-        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j, seq_len)
+        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j, seq_len, DATA_DIR)
 
         valid_loop_formed = irs_form_valid_loop(ir_i, ir_j)
 

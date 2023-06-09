@@ -6,7 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from ir_fold import IRFold
 
-DATA_DIR = "./tests_data"
+DATA_DIR = str(Path(__file__).parent / 'tests_data')
 
 # ToDo: add conftest.py file to share these fixtures across tests
 
@@ -54,7 +54,7 @@ def test_irs_out_files_created(list_of_found_irs, find_irs_params):
     assert (Path(DATA_DIR) / "seq.fasta").exists()  # Sequence file is created
     assert (Path(DATA_DIR) / "seq_found_irs.txt").exists()  # Found IRs file is created
 
-    with open(str(Path(DATA_DIR) / "seq.fasta")) as seq_file:
+    with open(str(Path(DATA_DIR).resolve() / "seq.fasta")) as seq_file:
         written_seq = seq_file.readlines()[1]
     assert written_seq == seq
 

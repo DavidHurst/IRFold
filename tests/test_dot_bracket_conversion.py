@@ -6,7 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from ir_fold import IRFold
 
-DATA_DIR = "./tests_data"
+DATA_DIR = str(Path(__file__).parent / 'tests_data')
 
 
 @pytest.fixture

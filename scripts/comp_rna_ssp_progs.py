@@ -5,27 +5,26 @@ import sys
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
+DATA_DIR = str(Path(__file__).parent.parent / 'data')
 
 from ir_fold import IRFold
 
 if __name__ == "__main__":
     # random.seed(4)
 
-    data_dir = "../data"
     seq_len = 25
     seq = "".join(random.choice("ACGU") for _ in range(seq_len))
 
     print(f"Seq. length: {seq_len}")
     print(f"Seq.       : {seq}")
 
-    ir_fold = data_dir
     our_secondary_structure, our_mfe = IRFold.fold(
         sequence=seq,
         min_len=2,
         max_len=seq_len,
         max_gap=seq_len - 1,
         mismatches=0,
-        out_dir="../data",
+        out_dir=DATA_DIR,
     )
 
     print("Our Solution".center(50, "="))

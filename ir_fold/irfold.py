@@ -86,8 +86,7 @@ class IRFold:
     ) -> List[IR]:
         out_dir_path: Path = Path(out_dir).resolve()
         if not out_dir_path.exists():
-            print(f"Output directory not found, defaulting to current directory.")
-            out_dir_path = Path(".").resolve()
+            out_dir_path = Path.cwd().resolve()
 
         # Check IUPACpal has been compiled to this cwd
         iupacpal_exe: Path = Path(__file__).parent / "IUPACpal"
@@ -131,9 +130,9 @@ class IRFold:
                     line for line in (l.strip() for l in f_in) if line
                 )
 
-            ir_lines: List[str] = lines[lines.index("Palindromes:") + 1 :]
+            ir_lines: List[str] = lines[lines.index("Palindromes:") + 1:]
             formatted_irs: List[List[str]] = [
-                ir_lines[i : i + 3] for i in range(0, len(ir_lines), 3)
+                ir_lines[i: i + 3] for i in range(0, len(ir_lines), 3)
             ]
 
             for f_ir in formatted_irs:
@@ -177,10 +176,10 @@ class IRFold:
             left_strand, right_strand = ir[0], ir[1]
 
             # IUPACpal returns base pairings using 1-based indexing
-            paired_bases[left_strand[0] - 1 : left_strand[1]] = [
+            paired_bases[left_strand[0] - 1: left_strand[1]] = [
                 "(" for _ in range(n_base_pairs)
             ]
-            paired_bases[right_strand[0] - 1 : right_strand[1]] = [
+            paired_bases[right_strand[0] - 1: right_strand[1]] = [
                 ")" for _ in range(n_base_pairs)
             ]
 
@@ -190,8 +189,8 @@ class IRFold:
     def calc_free_energy(dot_brk_repr: str, sequence: str, out_dir: str) -> float:
         out_dir_path: Path = Path(out_dir).resolve()
         if not out_dir_path.exists():
-            print(f"Output directory not found, defaulting to current directory.")
-            out_dir_path = Path(".").resolve()
+            out_dir_path = Path.cwd().resolve()
+
         out_file: str = str(out_dir_path / "calculated_ir_energies.txt")
 
         with open(out_file, "a") as file:
