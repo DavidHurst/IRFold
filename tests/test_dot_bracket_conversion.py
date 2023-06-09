@@ -30,6 +30,7 @@ def find_irs_params(rna_seq_15_bases_3_irs):
         "max_gap": seq_len - 1,
         "mismatches": 0,
         "out_dir": DATA_DIR,
+        "seq_name": 'test_db_seq',
     }
 
 

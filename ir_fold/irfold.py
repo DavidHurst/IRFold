@@ -22,8 +22,7 @@ class IRFold:
         min_len: int,
         max_len: int,
         max_gap: int,
-        # seq_file: str = None,
-        # seq_name: str = "seq",
+        seq_name: str = "seq",
         mismatches: int = 0,
         solver_backend: str = "SCIP",
         out_dir: str = ".",
@@ -31,8 +30,7 @@ class IRFold:
         # Find IRs in sequence
         found_irs: List[IR] = IRFold.find_irs(
             sequence=sequence,
-            # seq_file=seq_file,
-            # seq_name=seq_name,
+            seq_name=seq_name,
             min_len=min_len,
             max_len=max_len,
             max_gap=max_gap,
@@ -52,7 +50,7 @@ class IRFold:
             for i in range(n_irs_found)
         ]
         ir_free_energies: List[float] = [
-            IRFold.calc_free_energy(db_repr, sequence, out_dir) for db_repr in db_reprs
+            IRFold.calc_free_energy(db_repr, sequence, out_dir, seq_name) for db_repr in db_reprs
         ]
 
         # Define ILP and solve
@@ -82,6 +80,7 @@ class IRFold:
         min_len: int,
         max_len: int,
         max_gap: int,
+        seq_name: str = "seq",
         mismatches: int = 0,  # not supported yet
         out_dir: str = ".",
     ) -> List[IR]:
@@ -96,7 +95,6 @@ class IRFold:
 
         # Write sequence to file for IUPACpal
         # ToDo: Parametrise these in/out files
-        seq_name: str = "seq"
         seq_file: str = str(out_dir_path / f"{seq_name}.fasta")
         IRFold.create_seq_file(sequence, seq_name, seq_file)
         irs_output_file: str = str(out_dir_path / f"{seq_name}_found_irs.txt")
@@ -118,7 +116,7 @@ class IRFold:
                 "-x",
                 str(mismatches),
                 "-o",
-                str(out_dir_path / "seq_found_irs.txt"),
+                str(out_dir_path / f"{seq_name}_found_irs.txt"),
             ]
         )
 
@@ -187,12 +185,12 @@ class IRFold:
         return "".join(paired_bases)
 
     @staticmethod
-    def calc_free_energy(dot_brk_repr: str, sequence: str, out_dir: str) -> float:
+    def calc_free_energy(dot_brk_repr: str, sequence: str, out_dir: str, seq_name:str = 'seq') -> float:
         out_dir_path: Path = Path(out_dir).resolve()
         if not out_dir_path.exists():
             out_dir_path = Path.cwd().resolve()
 
-        out_file: str = str(out_dir_path / "calculated_ir_energies.txt")
+        out_file: str = str(out_dir_path / f"{seq_name}_calculated_ir_energies.txt")
 
         with open(out_file, "a") as file:
             file.write(f"Evaluating IR:\n")

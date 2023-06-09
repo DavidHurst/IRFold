@@ -71,7 +71,7 @@ class IRFoldA(IRFold):
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if IRFold.irs_share_base_pair(ir_pair[0], ir_pair[1])
+            if IRFoldA.irs_share_base_pair(ir_pair[0], ir_pair[1])
                and not IRFoldA.irs_form_valid_loop(ir_pair[0], ir_pair[1])
         ]
 

@@ -1,5 +1,5 @@
-Palindromes of: /home/david/dev/rna_ssp/tests/tests_data/seq.fasta
-Sequence name: seq
+Palindromes of: /home/david/dev/rna_ssp/tests/tests_data/test_db_seq.fasta
+Sequence name: test_db_seq
 Sequence length is: 15
 Start at position: 1
 End at position: 15

@@ -12,8 +12,9 @@ from ir_fold import IRFold, IRFoldA
 if __name__ == "__main__":
     # random.seed(4)
 
-    seq_len = 35
+    seq_len = 55
     seq = "".join(random.choice("ACGU") for _ in range(seq_len))
+    seq_name = 'random'
 
     print(f"Seq. length: {seq_len}")
     print(f"Seq.       : {seq}")
@@ -25,6 +26,7 @@ if __name__ == "__main__":
         max_gap=seq_len - 1,
         mismatches=0,
         out_dir=DATA_DIR,
+        seq_name=seq_name
     )
 
     irfold1_secondary_structure, irfold1_mfe = IRFoldA.fold(
@@ -34,7 +36,10 @@ if __name__ == "__main__":
         max_gap=seq_len - 1,
         mismatches=0,
         out_dir=DATA_DIR,
+        seq_name=seq_name
     )
+
+    rnalib_secondary_structure, rnalib_mfe = RNA.fold(seq, "")
 
     print(f"{IRFold.__name__} Solution".center(50, "="))
     print(f"Dot Bracket: {irfold0_secondary_structure}")
@@ -44,7 +49,6 @@ if __name__ == "__main__":
     print(f"Dot Bracket: {irfold1_secondary_structure}")
     print(f"MFE        : {irfold1_mfe:.4f}")
 
-    rna_secondary_structure, rna_mfe = RNA.fold(seq, "")
     print("RNAlib Solution".center(50, "="))
-    print(f"Dot Bracket: {rna_secondary_structure}")
-    print(f"MFE        : {rna_mfe:.4f}")
+    print(f"Dot Bracket: {rnalib_secondary_structure}")
+    print(f"MFE        : {rnalib_mfe:.4f}")
