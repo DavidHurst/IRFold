@@ -140,8 +140,8 @@ class IRFold0:
                 ir_idxs: List[int] = re.findall(r"-?\d+\.?\d*", "".join(f_ir))
 
                 # ToDo: Subtract 1 from all irs below to convert them to 0-based indexing
-                left_start, left_end = int(ir_idxs[0]), int(ir_idxs[1])
-                right_start, right_end = int(ir_idxs[3]), int(ir_idxs[2])
+                left_start, left_end = int(ir_idxs[0]) - 1, int(ir_idxs[1]) - 1
+                right_start, right_end = int(ir_idxs[3]) - 1, int(ir_idxs[2]) - 1
                 found_irs.append(((left_start, left_end), (right_start, right_end)))
 
             return found_irs
@@ -165,18 +165,19 @@ class IRFold0:
     def irs_to_dot_bracket(irs: List[IR], seq_len: int) -> str:
         """Does not support mismatches."""
         paired_bases: List[str] = ["." for _ in range(seq_len)]  # Initially none paired
+
         for ir in irs:
-            n_base_pairs: int = ir[0][1] - ir[0][0] + 1
+            n_base_pairs: int = ir[0][1] - ir[0][0] + 1  # Assumes no mismatches
 
             left_strand: Tuple[int, int]
             right_strand: Tuple[int, int]
             left_strand, right_strand = ir[0], ir[1]
 
-            # IUPACpal returns base pairings using 1-based indexing
-            paired_bases[left_strand[0] - 1 : left_strand[1]] = [
+            paired_bases[left_strand[0]: left_strand[1] + 1] = [
                 "(" for _ in range(n_base_pairs)
             ]
-            paired_bases[right_strand[0] - 1 : right_strand[1]] = [
+
+            paired_bases[right_strand[0]: right_strand[1] + 1] = [
                 ")" for _ in range(n_base_pairs)
             ]
 

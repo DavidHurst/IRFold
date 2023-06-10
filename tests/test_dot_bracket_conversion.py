@@ -1,35 +1,21 @@
-import pytest
-from pytest_lazyfixture import lazy_fixture
 from ir_fold import IRFold0
 
 
-@pytest.mark.parametrize(
-    "irs, expected_db_reprs, seq_lens",
-    [
-        (
-            lazy_fixture("list_of_irs"),
-            lazy_fixture("expected_dot_bracket_reprs"),
-            lazy_fixture("sequence_lengths"),
-        )
-    ],
-)
-def test_conversion_lengths_match(irs, expected_db_reprs, seq_lens):
-    for ir, expected, s_len in zip(irs, expected_db_reprs, seq_lens):
-        generated_db_repr = IRFold0.irs_to_dot_bracket([ir], s_len)
+def test_conversion_lengths_match(
+    list_of_irs, expected_dot_bracket_reprs, sequence_lengths
+):
+    for ir, expected, seq_len in zip(
+        list_of_irs, expected_dot_bracket_reprs, sequence_lengths
+    ):
+        generated_db_repr = IRFold0.irs_to_dot_bracket([ir], seq_len)
         assert len(generated_db_repr) == len(expected)
 
 
-@pytest.mark.parametrize(
-    "irs, expected_db_reprs, seq_lens",
-    [
-        (
-            lazy_fixture("list_of_irs"),
-            lazy_fixture("expected_dot_bracket_reprs"),
-            lazy_fixture("sequence_lengths"),
-        )
-    ],
-)
-def test_conversion_output_matches(irs, expected_db_reprs, seq_lens):
-    for ir, expected, s_len in zip(irs, expected_db_reprs, seq_lens):
-        generated_db_repr = IRFold0.irs_to_dot_bracket([ir], s_len)
-        assert generated_db_repr == expected
+def test_conversion_output_matches(
+    list_of_irs, expected_dot_bracket_reprs, sequence_lengths
+):
+    for ir, expected_db_repr, seq_len in zip(
+        list_of_irs, expected_dot_bracket_reprs, sequence_lengths
+    ):
+        generated_db_repr = IRFold0.irs_to_dot_bracket([ir], seq_len)
+        assert generated_db_repr == expected_db_repr
