@@ -6,9 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from ir_fold import IRFold0
 
-DATA_DIR = str(Path(__file__).parent / 'tests_data')
-
-# ToDo: add conftest.py file to share these fixtures across tests
+DATA_DIR = str(Path(__file__).parent / "tests_data")
 
 
 @pytest.fixture
@@ -31,7 +29,7 @@ def find_irs_params(rna_seq_15_bases_3_irs):
         "max_len": seq_len,
         "max_gap": seq_len - 1,
         "mismatches": 0,
-        "seq_name": 'test_irs_seq',
+        "seq_name": "test_irs_seq",
         "out_dir": DATA_DIR,
     }
 
@@ -51,10 +49,12 @@ def test_irs_found(list_of_found_irs):
 
 def test_irs_out_files_created(list_of_found_irs, find_irs_params):
     seq = find_irs_params["sequence"]
-    seq_name = find_irs_params['seq_name']
+    seq_name = find_irs_params["seq_name"]
 
     assert (Path(DATA_DIR) / f"{seq_name}.fasta").exists()  # Sequence file is created
-    assert (Path(DATA_DIR) / f"{seq_name}_found_irs.txt").exists()  # Found IRs file is created
+    assert (
+        Path(DATA_DIR) / f"{seq_name}_found_irs.txt"
+    ).exists()  # Found IRs file is created
 
     with open(str(Path(DATA_DIR).resolve() / f"{seq_name}.fasta")) as seq_file:
         written_seq = seq_file.readlines()[1]
@@ -70,5 +70,4 @@ def test_n_irs_found(list_of_found_irs, rna_seq_15_bases_3_irs):
 def test_found_irs_gap_over_3(list_of_found_irs):
     for ir in list_of_found_irs:
         gap_sz = ir[1][0] - ir[0][1] - 1
-        print(f"IR: {ir}, gap sz.: {gap_sz}")
         assert gap_sz >= 3

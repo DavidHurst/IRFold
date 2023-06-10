@@ -9,7 +9,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from ir_fold import IRFold0
 
-DATA_DIR = str(Path(__file__).parent.parent / 'data')
+DATA_DIR = str(Path(__file__).parent.parent / "data")
 
 
 def irs_wholly_nested(outer_ir, nested_ir):
@@ -163,7 +163,9 @@ if __name__ == "__main__":
 
         ir_i, ir_j = p[0], p[1]
 
-        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j, seq_len, DATA_DIR)
+        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(
+            ir_i, ir_j, seq_len, DATA_DIR
+        )
 
         assumption_held = fe_sum == fe_union
         assumption_holds_count_nested_compatible.append(assumption_held)
@@ -199,7 +201,9 @@ if __name__ == "__main__":
     for p in non_nested_ir_pairs:
         ir_i, ir_j = p[0], p[1]
 
-        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(ir_i, ir_j, seq_len, DATA_DIR)
+        (ir_i_fe, ir_j_fe), fe_union, fe_sum = irs_fe_union_fe_sum(
+            ir_i, ir_j, seq_len, DATA_DIR
+        )
 
         valid_loop_formed = irs_form_valid_loop(ir_i, ir_j)
 

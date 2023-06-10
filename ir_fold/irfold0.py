@@ -1,4 +1,4 @@
-__all__ = ['IRFold0']
+__all__ = ["IRFold0"]
 
 import subprocess
 import RNA
@@ -11,6 +11,7 @@ from ortools.linear_solver import pywraplp
 
 # ((left_strand_start, left_strand_end), (right_strand_start, right_strand_end))
 IR = Tuple[Tuple[int, int], Tuple[int, int]]
+
 
 class IRFold0:
     """RNA secondary structure prediction based on extracting optimal
@@ -50,7 +51,8 @@ class IRFold0:
             for i in range(n_irs_found)
         ]
         ir_free_energies: List[float] = [
-            IRFold0.calc_free_energy(db_repr, sequence, out_dir, seq_name) for db_repr in db_reprs
+            IRFold0.calc_free_energy(db_repr, sequence, out_dir, seq_name)
+            for db_repr in db_reprs
         ]
 
         # Define ILP and solve
@@ -129,14 +131,15 @@ class IRFold0:
                     line for line in (l.strip() for l in f_in) if line
                 )
 
-            ir_lines: List[str] = lines[lines.index("Palindromes:") + 1:]
+            ir_lines: List[str] = lines[lines.index("Palindromes:") + 1 :]
             formatted_irs: List[List[str]] = [
-                ir_lines[i: i + 3] for i in range(0, len(ir_lines), 3)
+                ir_lines[i : i + 3] for i in range(0, len(ir_lines), 3)
             ]
 
             for f_ir in formatted_irs:
                 ir_idxs: List[int] = re.findall(r"-?\d+\.?\d*", "".join(f_ir))
 
+                # ToDo: Subtract 1 from all irs below to convert them to 0-based indexing
                 left_start, left_end = int(ir_idxs[0]), int(ir_idxs[1])
                 right_start, right_end = int(ir_idxs[3]), int(ir_idxs[2])
                 found_irs.append(((left_start, left_end), (right_start, right_end)))
@@ -175,17 +178,19 @@ class IRFold0:
             left_strand, right_strand = ir[0], ir[1]
 
             # IUPACpal returns base pairings using 1-based indexing
-            paired_bases[left_strand[0] - 1: left_strand[1]] = [
+            paired_bases[left_strand[0] - 1 : left_strand[1]] = [
                 "(" for _ in range(n_base_pairs)
             ]
-            paired_bases[right_strand[0] - 1: right_strand[1]] = [
+            paired_bases[right_strand[0] - 1 : right_strand[1]] = [
                 ")" for _ in range(n_base_pairs)
             ]
 
         return "".join(paired_bases)
 
     @staticmethod
-    def calc_free_energy(dot_brk_repr: str, sequence: str, out_dir: str, seq_name:str = 'seq') -> float:
+    def calc_free_energy(
+        dot_brk_repr: str, sequence: str, out_dir: str, seq_name: str = "seq"
+    ) -> float:
         out_dir_path: Path = Path(out_dir).resolve()
         if not out_dir_path.exists():
             out_dir_path = Path.cwd().resolve()

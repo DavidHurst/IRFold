@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
-DATA_DIR = str(Path(__file__).parent.parent / 'data')
+DATA_DIR = str(Path(__file__).parent.parent / "data")
 
 from ir_fold import IRFold0, IRFold1
 
@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     seq_len = 55
     seq = "".join(random.choice("ACGU") for _ in range(seq_len))
-    seq_name = 'random'
+    seq_name = "random"
 
     print(f"Seq. length: {seq_len}")
     print(f"Seq.       : {seq}")
@@ -26,7 +26,7 @@ if __name__ == "__main__":
         max_gap=seq_len - 1,
         mismatches=0,
         out_dir=DATA_DIR,
-        seq_name=seq_name
+        seq_name=seq_name,
     )
 
     irfold1_secondary_structure, irfold1_mfe = IRFold1.fold(
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         max_gap=seq_len - 1,
         mismatches=0,
         out_dir=DATA_DIR,
-        seq_name=seq_name
+        seq_name=seq_name,
     )
 
     rnalib_secondary_structure, rnalib_mfe = RNA.fold(seq, "")

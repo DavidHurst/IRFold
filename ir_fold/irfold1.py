@@ -1,4 +1,4 @@
-__all__ = ['IRFold1']
+__all__ = ["IRFold1"]
 
 import itertools
 
@@ -8,7 +8,12 @@ from ortools.linear_solver import pywraplp
 
 IR = Tuple[Tuple[int, int], Tuple[int, int]]
 
+
 class IRFold1(IRFold0):
+    """Extends base IRFold model by validating found IRs before passing them to the solver
+    and checks all IR pairs form valid loops when combined.
+    """
+
     @staticmethod
     def irs_disjoint(ir_a, ir_b):
         # ir_a comes entirely before ir_b
@@ -72,7 +77,7 @@ class IRFold1(IRFold0):
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
             if IRFold1.irs_share_base_pair(ir_pair[0], ir_pair[1])
-               and not IRFold1.irs_form_valid_loop(ir_pair[0], ir_pair[1])
+            and not IRFold1.irs_form_valid_loop(ir_pair[0], ir_pair[1])
         ]
 
         for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:
