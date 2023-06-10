@@ -4,7 +4,3 @@ Finding optimal foldings of given primary sequences of RNA by optimising the con
 
 To run tests run the following from root
 
-```
-python -m pytest
-```
-

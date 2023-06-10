@@ -1,0 +1,64 @@
+Palindromes of: /home/david/dev/rna_ssp/data/seq.fasta
+Sequence name: seq
+Sequence length is: 25
+Start at position: 1
+End at position: 25
+Minimum length of Palindromes is: 2
+Maximum length of Palindromes is: 25
+Maximum gap between elements is: 24
+Number of mismatches allowed in Palindrome: 0
+
+
+
+Palindromes:
+1        ca        2
+         ||
+24       gu       23
+
+1        cac        3
+         |||
+21       gug       19
+
+1        ca        2
+         ||
+19       gu       18
+
+1        ca        2
+         ||
+11       gu       10
+
+2        ac        3
+         ||
+22       ug       21
+
+2        ac        3
+         ||
+12       ug       11
+
+6        cua        8
+         |||
+14       gau       12
+
+8        aa        9
+         ||
+23       uu       22
+
+11       gu       12
+         ||
+16       ca       15
+
+13       ag       14
+         ||
+18       uc       17
+
+15       ac       16
+         ||
+22       ug       21
+
+15       ac       16
+         ||
+20       ug       19
+
+
+
+

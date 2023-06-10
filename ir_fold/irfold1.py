@@ -66,12 +66,17 @@ class IRFold1(IRFold0):
         # Create binary indicator variables
         variables = [solver.IntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
 
+        # Remove IRs with a gap < 3, these are sterically impossible
+        valid_irs: List[IR] = [
+            ir for ir in all_irs if ir[1][0] - ir[0][1] - 1 >= 3
+        ]
+
         # Add XOR between IRs that match the same bases
         unique_idx_pairs: List[Tuple[int, int]] = list(
             itertools.combinations([i for i in range(n_irs)], 2)
         )
         unique_ir_pairs: List[Tuple[IR, IR]] = [
-            (all_irs[i], all_irs[j]) for i, j in unique_idx_pairs
+            (valid_irs[i], valid_irs[j]) for i, j in unique_idx_pairs
         ]
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair

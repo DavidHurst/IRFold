@@ -144,12 +144,7 @@ class IRFold0:
                 right_start, right_end = int(ir_idxs[3]), int(ir_idxs[2])
                 found_irs.append(((left_start, left_end), (right_start, right_end)))
 
-            # Remove IRs with a gap < 3, these are sterically impossible
-            valid_irs: List[IR] = [
-                ir for ir in found_irs if ir[1][0] - ir[0][1] - 1 >= 3
-            ]
-
-            return valid_irs
+            return found_irs
         else:
             print(str(out.decode("utf-8")))
             return []
