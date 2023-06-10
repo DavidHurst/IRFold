@@ -173,11 +173,11 @@ class IRFold0:
             right_strand: Tuple[int, int]
             left_strand, right_strand = ir[0], ir[1]
 
-            paired_bases[left_strand[0]: left_strand[1] + 1] = [
+            paired_bases[left_strand[0] : left_strand[1] + 1] = [
                 "(" for _ in range(n_base_pairs)
             ]
 
-            paired_bases[right_strand[0]: right_strand[1] + 1] = [
+            paired_bases[right_strand[0] : right_strand[1] + 1] = [
                 ")" for _ in range(n_base_pairs)
             ]
 
@@ -232,7 +232,7 @@ class IRFold0:
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if IRFold0.irs_share_base_pair(ir_pair[0], ir_pair[1])
+            if IRFold0.ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
         for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:
@@ -247,7 +247,7 @@ class IRFold0:
         return solver
 
     @staticmethod
-    def irs_share_base_pair(ir_a: IR, ir_b: IR) -> bool:
+    def ir_pair_match_same_bases(ir_a: IR, ir_b: IR) -> bool:
         # Check that IRs don't match the same bases
         ir_a_left_strand, ir_a_right_strand = ir_a[0], ir_a[1]
         paired_base_idxs_a = [
@@ -263,3 +263,7 @@ class IRFold0:
             [ir_b_bases in paired_base_idxs_a for ir_b_bases in paired_base_idxs_b]
         )
         return any_shared_base_pairs
+
+    @staticmethod
+    def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
+        return IRFold0.ir_pair_match_same_bases(ir_a, ir_b)

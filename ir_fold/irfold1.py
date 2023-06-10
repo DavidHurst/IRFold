@@ -15,43 +15,6 @@ class IRFold1(IRFold0):
     """
 
     @staticmethod
-    def irs_disjoint(ir_a, ir_b):
-        # ir_a comes entirely before ir_b
-        ir_a_strictly_before_ir_b = ir_a[1][1] < ir_b[0][0]
-
-        # ir_b comes entirely before ir_a
-        ir_b_strictly_before_ir_a = ir_b[1][1] < ir_a[0][0]
-
-        return ir_a_strictly_before_ir_b or ir_b_strictly_before_ir_a
-
-    @staticmethod
-    def irs_form_valid_loop(ir_a, ir_b):
-        """This won't scale up, not entirely sure what kind of invalid loop this finds but
-        matches up with loops that RNAlib assigns infinite free energy to so validated."""
-        # Note: IUPACpal is 0-based indexing IRs
-        latest_left_string_base_idx = (
-            ir_a[0][1] if ir_a[0][1] > ir_b[0][1] else ir_b[0][1]
-        ) - 1
-        earliest_right_string_base_idx = (
-            ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
-        ) - 1
-
-        # Case 1: Disjoint
-        if IRFold1.irs_disjoint(ir_a, ir_b):
-            return True
-
-        # Case 2: Invalid loop
-        bases_inbetween_parens = (
-            earliest_right_string_base_idx - latest_left_string_base_idx - 1
-        )
-        if bases_inbetween_parens < 3:
-            return False
-
-        # Case 3: Valid loop
-        return True
-
-    @staticmethod
-    # @override # Upgrade to python 3.12 for this, import from typing
     def ir_ilp_solver(
         n_irs: int,
         all_irs: List[IR],
@@ -69,7 +32,7 @@ class IRFold1(IRFold0):
         # Remove IRs with a gap < 3, these are sterically impossible
         valid_irs: List[IR] = [ir for ir in all_irs if ir[1][0] - ir[0][1] - 1 >= 3]
 
-        # Add XOR between IRs that match the same bases
+        # Add XOR constraint between IR pairs that are incompatible
         unique_idx_pairs: List[Tuple[int, int]] = list(
             itertools.combinations([i for i in range(n_irs)], 2)
         )
@@ -79,8 +42,7 @@ class IRFold1(IRFold0):
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if IRFold1.irs_share_base_pair(ir_pair[0], ir_pair[1])
-            and not IRFold1.irs_form_valid_loop(ir_pair[0], ir_pair[1])
+            if IRFold1.ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
         for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:
@@ -93,3 +55,61 @@ class IRFold1(IRFold0):
         obj_fn.SetMinimization()
 
         return solver
+
+    @staticmethod
+    def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
+        return IRFold0.ir_pair_match_same_bases(
+            ir_a, ir_b
+        ) or not IRFold1.ir_pair_forms_valid_loop(ir_a, ir_b)
+
+    @staticmethod
+    def ir_pair_forms_valid_loop(ir_a, ir_b):
+        if IRFold1.ir_pair_wholly_nested(ir_a, ir_b) or IRFold1.ir_pair_wholly_nested(
+            ir_b, ir_a
+        ):
+            return True
+
+        ir_a_left_strand: Tuple[int, int]
+        ir_b_left_strand: Tuple[int, int]
+
+        ir_a_left_strand, ir_b_left_strand = ir_a[0], ir_b[0]
+
+        latest_left_string_base_idx = (
+            ir_a_left_strand[1]
+            if ir_a_left_strand[1] > ir_b_left_strand[1]
+            else ir_b_left_strand[1]
+        )
+        earliest_right_string_base_idx = (
+            ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
+        )
+
+        # Case 1: Disjoint
+        if IRFold1.ir_pair_disjoint(ir_a, ir_b):
+            return True
+
+        # Case 2: Invalid hairpin
+        bases_inbetween_parens = (
+            earliest_right_string_base_idx - latest_left_string_base_idx - 1
+        )
+        if bases_inbetween_parens < 3:
+            return False
+
+        # Case 3: Valid hairpin / loop?
+        # hp_region_dp_repr = [" " for _ in range(seq_len)]
+        # hp_region_dp_repr[latest_left_string_base_idx] = "("
+        # hp_region_dp_repr[earliest_right_string_base_idx] = ")"
+        return True
+
+    @staticmethod
+    def ir_pair_disjoint(ir_a, ir_b):
+        # ir_a comes entirely before ir_b
+        ir_a_strictly_before_ir_b = ir_a[1][1] < ir_b[0][0]
+
+        # ir_b comes entirely before ir_a
+        ir_b_strictly_before_ir_a = ir_b[1][1] < ir_a[0][0]
+
+        return ir_a_strictly_before_ir_b or ir_b_strictly_before_ir_a
+
+    @staticmethod
+    def ir_pair_wholly_nested(outer_ir, nested_ir):
+        return outer_ir[0][0] < nested_ir[0][0] and nested_ir[1][1] < outer_ir[1][0]
