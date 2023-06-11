@@ -4,10 +4,12 @@ import RNA
 import sys
 
 from pathlib import Path
-from irfold import IRFold0, IRFold1
+from tqdm import tqdm
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 DATA_DIR = str(Path(__file__).parent.parent / "data")
+
+from irfold import IRFold0, IRFold1
 
 if __name__ == "__main__":
     rnalib_performance_file_path = (Path(DATA_DIR) / "RNAlib_performance.csv").resolve()
@@ -15,8 +17,10 @@ if __name__ == "__main__":
         writer = csv.writer(perf_file)
         writer.writerow(["dot_bracket_repr", "solution_mfe", "seq_len"])
 
-    n_runs_per_seq_length = 10
-    for seq_len in range(10, 150):
+    n_runs_per_seq_length = 15
+    for seq_len in tqdm(
+        range(10, 250), desc=f"Running trials"
+    ):
         for _ in range(n_runs_per_seq_length):
             seq = "".join(random.choice("ACGU") for _ in range(seq_len))
             seq_name = "random_seq_for_ssp_program_comparison"

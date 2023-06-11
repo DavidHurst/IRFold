@@ -32,6 +32,7 @@ class IRFold0:
         *,
         save_performance: bool = False,
     ) -> Tuple[str, float]:
+
         # Find IRs in sequence
         found_irs: List[IR] = IRFold0.find_irs(
             sequence=sequence,
@@ -46,7 +47,21 @@ class IRFold0:
         n_irs_found: int = len(found_irs)
         seq_len: int = len(sequence)
         if n_irs_found == 0:  # Return sequence if no IRs found
-            return "".join(["." for _ in range(seq_len)]), 0
+            db_repr, mfe = "".join(["." for _ in range(seq_len)]), 0
+            if save_performance:
+                cls.__write_performance_to_file(
+                    db_repr,
+                    mfe,
+                    seq_len,
+                    n_irs_found,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    out_dir,
+                )
+            return db_repr, mfe
 
         # Evaluate free energy of each IR respectively
         db_reprs: List[str] = [
@@ -88,8 +103,22 @@ class IRFold0:
                 )
             return db_repr, solution_mfe
         else:
-            print("The problem does not have an optimal solution")
-            return "".join(["." for _ in range(seq_len)]), 0
+            # The optimisation problem does not have an optimal solution
+            db_repr, mfe = "".join(["." for _ in range(seq_len)]), 0
+            if save_performance:
+                cls.__write_performance_to_file(
+                    db_repr,
+                    mfe,
+                    seq_len,
+                    n_irs_found,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    out_dir,
+                )
+            return db_repr, mfe
 
     @staticmethod
     def find_irs(
@@ -335,6 +364,13 @@ class IRFold0:
                         solver_num_branch_bound_nodes,
                     ]
                 )
+            #     print(f'\n >>>>>> {cls.__name__} <<<<<')
+            # with open(str(performance_file_path), "r") as perf_file:
+            #     print(f'File contents after create and write:')
+            #     lines = perf_file.readlines()
+            #     for l in lines:
+            #         print(l)
+
         else:
             with open(str(performance_file_path), "a") as perf_file:
                 writer = csv.writer(perf_file)
@@ -351,3 +387,10 @@ class IRFold0:
                         solver_num_branch_bound_nodes,
                     ]
                 )
+            #     print(f'\n >>>>>> {cls.__name__} <<<<<')
+            #
+            # with open(str(performance_file_path), "r") as perf_file:
+            #     print(f'File contents after append:')
+            #     lines = perf_file.readlines()
+            #     for l in lines:
+            #         print(l)
