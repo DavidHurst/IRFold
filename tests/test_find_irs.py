@@ -1,5 +1,5 @@
 from pathlib import Path
-from ir_fold import IRFold0
+from irfold import IRFold0
 
 # ToDo: Write test for not having iupacpal compiled
 # ToDo: Parametrise tests below to run multiple sequences with varying ir counts

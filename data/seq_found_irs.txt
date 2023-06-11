@@ -11,101 +11,105 @@ Number of mismatches allowed in Palindrome: 0
 
 
 Palindromes:
-1        guug        4
-         ||||
-24       caac       21
-
-4        gg        5
+1        uc        2
          ||
-12       cc       11
+35       ag       34
+
+1        ucca        4
+         ||||
+28       aggu       25
+
+2        cc        3
+         ||
+31       gg       30
+
+2        cc        3
+         ||
+19       gg       18
+
+3        cag        5
+         |||
+34       guc       32
+
+3        ca        4
+         ||
+24       gu       23
+
+3        ca        4
+         ||
+15       gu       14
+
+3        ca        4
+         ||
+11       gu       10
 
 5        gu        6
          ||
-24       ca       23
+29       ca       28
 
-6        uc        7
+8        ag        9
          ||
-34       ag       33
+33       uc       32
 
-6        uc        7
+9        gu       10
          ||
-28       ag       27
+29       ca       28
 
-7        cgu        9
+10       ug       11
+         ||
+13       ac       12
+
+11       gc       12
+         ||
+32       cg       31
+
+11       gca       13
          |||
-25       gca       23
+16       cgu       14
 
-7        cg        8
+12       ca       13
          ||
-13       gc       12
+34       gu       33
 
-9        ugc       11
+12       ca       13
+         ||
+26       gu       25
+
+12       ca       13
+         ||
+24       gu       23
+
+15       gccg       18
+         ||||
+32       cggc       29
+
+16       cc       17
+         ||
+27       gg       26
+
+16       cc       17
+         ||
+19       gg       18
+
+17       cg       18
+         ||
+22       gc       21
+
+19       guc       21
          |||
-22       acg       20
+29       cag       27
 
-10       gcc       12
+20       uc       21
+         ||
+35       ag       34
+
+21       cgu       23
          |||
-17       cgg       15
+30       gca       28
 
-11       cc       12
+24       gu       25
          ||
-15       gg       14
-
-11       cc       12
-         ||
-14       gg       13
-
-12       cg       13
-         ||
-25       gc       24
-
-16       gcu       18
-         |||
-21       cga       19
-
-17       cu       18
-         ||
-35       ga       34
-
-17       cu       18
-         ||
-29       ga       28
-
-19       ag       20
-         ||
-32       uc       31
-
-21       ca       22
-         ||
-33       gu       32
-
-21       ca       22
-         ||
-27       gu       26
-
-23       ac       24
-         ||
-30       ug       29
-
-23       ac       24
-         ||
-26       ug       25
-
-27       ga       28
-         ||
-31       cu       30
-
-28       ag       29
-         ||
-32       uc       31
-
-30       uc       31
-         ||
-34       ag       33
-
-31       cu       32
-         ||
-35       ga       34
+29       ca       28
 
 
 

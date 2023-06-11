@@ -1,4 +1,4 @@
-from ir_fold import IRFold0
+from irfold import IRFold0
 
 
 def test_conversion_lengths_match(

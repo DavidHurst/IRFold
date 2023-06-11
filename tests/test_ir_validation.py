@@ -1,6 +1,6 @@
 import pytest
 
-from ir_fold import IRFold0, IRFold1
+from irfold import IRFold0, IRFold1
 
 
 @pytest.fixture(scope="module")
