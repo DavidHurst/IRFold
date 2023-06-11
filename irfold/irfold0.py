@@ -1,5 +1,6 @@
 __all__ = ["IRFold0"]
 
+import csv
 import subprocess
 import RNA
 import itertools
@@ -17,8 +18,9 @@ class IRFold0:
     """RNA secondary structure prediction based on extracting optimal
     inverted repeat configurations from the primary sequence"""
 
-    @staticmethod
+    @classmethod
     def fold(
+        cls,
         sequence: str,
         min_len: int,
         max_len: int,
@@ -27,6 +29,8 @@ class IRFold0:
         mismatches: int = 0,
         solver_backend: str = "SCIP",
         out_dir: str = ".",
+        *,
+        save_performance: bool = False,
     ) -> Tuple[str, float]:
         # Find IRs in sequence
         found_irs: List[IR] = IRFold0.find_irs(
@@ -41,8 +45,7 @@ class IRFold0:
 
         n_irs_found: int = len(found_irs)
         seq_len: int = len(sequence)
-        if n_irs_found == 0:
-            print(f"No IRs found, returning primary sequence.")
+        if n_irs_found == 0:  # Return sequence if no IRs found
             return "".join(["." for _ in range(seq_len)]), 0
 
         # Evaluate free energy of each IR respectively
@@ -56,9 +59,7 @@ class IRFold0:
         ]
 
         # Define ILP and solve
-        solver = IRFold0.ir_ilp_solver(
-            n_irs_found, found_irs, ir_free_energies, solver_backend
-        )
+        solver = cls.get_lp_solver(found_irs, ir_free_energies, solver_backend)
         status = solver.Solve()
 
         if status == pywraplp.Solver.OPTIMAL:
@@ -68,10 +69,24 @@ class IRFold0:
                 for i, v in enumerate(solver.variables())
                 if int(v.solution_value()) == 1
             ]
-            dp_repr: str = IRFold0.irs_to_dot_bracket(
+            db_repr: str = IRFold0.irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
-            return dp_repr, solver.Objective().Value()
+            solution_mfe: float = solver.Objective().Value()
+            if save_performance:
+                cls.__write_performance_to_file(
+                    db_repr,
+                    solution_mfe,
+                    seq_len,
+                    n_irs_found,
+                    solver.NumVariables(),
+                    solver.NumConstraints(),
+                    solver.wall_time(),
+                    solver.iterations(),
+                    solver.nodes(),
+                    out_dir,
+                )
+            return db_repr, solution_mfe
         else:
             print("The problem does not have an optimal solution")
             return "".join(["." for _ in range(seq_len)]), 0
@@ -96,7 +111,6 @@ class IRFold0:
             raise FileNotFoundError("Could not find IUPACpal executable.")
 
         # Write sequence to file for IUPACpal
-        # ToDo: Parametrise these in/out files
         seq_file: str = str(out_dir_path / f"{seq_name}.fasta")
         IRFold0.create_seq_file(sequence, seq_name, seq_file)
         irs_output_file: str = str(out_dir_path / f"{seq_name}_found_irs.txt")
@@ -139,7 +153,6 @@ class IRFold0:
             for f_ir in formatted_irs:
                 ir_idxs: List[int] = re.findall(r"-?\d+\.?\d*", "".join(f_ir))
 
-                # ToDo: Subtract 1 from all irs below to convert them to 0-based indexing
                 left_start, left_end = int(ir_idxs[0]) - 1, int(ir_idxs[1]) - 1
                 right_start, right_end = int(ir_idxs[3]) - 1, int(ir_idxs[2]) - 1
                 found_irs.append(((left_start, left_end), (right_start, right_end)))
@@ -208,9 +221,8 @@ class IRFold0:
         return free_energy
 
     @staticmethod
-    def ir_ilp_solver(
-        n_irs: int,
-        all_irs: List[IR],
+    def get_lp_solver(
+        ir_list: List[IR],
         ir_free_energies: List[float],
         backend: str = "SCIP",
     ) -> pywraplp.Solver:
@@ -218,6 +230,8 @@ class IRFold0:
         solver: pywraplp.Solver = pywraplp.Solver.CreateSolver(backend)
         if solver is None:
             raise Exception("Failed to create solver.")
+
+        n_irs: int = len(ir_list)
 
         # Create binary indicator variables
         variables = [solver.IntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
@@ -227,7 +241,7 @@ class IRFold0:
             itertools.combinations([i for i in range(n_irs)], 2)
         )
         unique_ir_pairs: List[Tuple[IR, IR]] = [
-            (all_irs[i], all_irs[j]) for i, j in unique_idx_pairs
+            (ir_list[i], ir_list[j]) for i, j in unique_idx_pairs
         ]
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
@@ -248,7 +262,7 @@ class IRFold0:
 
     @staticmethod
     def ir_pair_match_same_bases(ir_a: IR, ir_b: IR) -> bool:
-        # Check that IRs don't match the same bases
+        # Check if IRs match the same bases
         ir_a_left_strand, ir_a_right_strand = ir_a[0], ir_a[1]
         paired_base_idxs_a = [
             idx for idx in range(ir_a_left_strand[0], ir_a_left_strand[1] + 1)
@@ -267,3 +281,73 @@ class IRFold0:
     @staticmethod
     def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
         return IRFold0.ir_pair_match_same_bases(ir_a, ir_b)
+
+    @classmethod
+    def __write_performance_to_file(
+        cls,
+        dot_bracket_repr: str,
+        solution_mfe: float,
+        seq_len: int,
+        n_irs_found: int,
+        solver_num_variables: int,
+        solver_num_constraints: int,
+        solver_solve_time: float,
+        solver_iterations: int,
+        solver_num_branch_bound_nodes: int,
+        out_dir: str,
+    ):
+        out_dir_path: Path = Path(out_dir).resolve()
+        if not out_dir_path.exists():
+            out_dir_path = Path.cwd().resolve()
+
+        performance_file_name: str = f"{cls.__name__}_performance.csv"
+        performance_file_path: Path = (
+            Path(out_dir_path) / performance_file_name
+        ).resolve()
+
+        if not performance_file_path.exists():
+            performance_file_path = (out_dir_path / performance_file_name).resolve()
+            column_names = [
+                "dot_bracket_repr",
+                "solution_mfe",
+                "seq_len",
+                "n_irs_found",
+                "solver_num_variables",
+                "solver_num_constraints",
+                "solver_solve_time",
+                "solver_iterations",
+                "solver_num_branch_bound_nodes",
+            ]
+
+            with open(str(performance_file_path), "w") as perf_file:
+                writer = csv.writer(perf_file)
+                writer.writerow(column_names)
+                writer.writerow(
+                    [
+                        dot_bracket_repr,
+                        solution_mfe,
+                        seq_len,
+                        n_irs_found,
+                        solver_num_variables,
+                        solver_num_constraints,
+                        solver_solve_time,
+                        solver_iterations,
+                        solver_num_branch_bound_nodes,
+                    ]
+                )
+        else:
+            with open(str(performance_file_path), "a") as perf_file:
+                writer = csv.writer(perf_file)
+                writer.writerow(
+                    [
+                        dot_bracket_repr,
+                        solution_mfe,
+                        seq_len,
+                        n_irs_found,
+                        solver_num_variables,
+                        solver_num_constraints,
+                        solver_solve_time,
+                        solver_iterations,
+                        solver_num_branch_bound_nodes,
+                    ]
+                )

@@ -46,4 +46,3 @@ if __name__ == "__main__":
     pair_type_names = ["Disjoint", "Wholly Nested", "Partially Nested"]
     for pairs_df, pair_name in zip(pairs_dfs, pair_type_names):
         plot_pair_analysis(pairs_df, pair_name)
-

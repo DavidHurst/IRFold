@@ -10,14 +10,11 @@ IR = Tuple[Tuple[int, int], Tuple[int, int]]
 
 
 class IRFold1(IRFold0):
-    """Extends base IRFold model by validating found IRs before passing them to the solver
-    and checks all IR pairs form valid loops when combined.
-    """
+    """Extends base IRFold model by validating found IRs in pairs before passing them to the solver."""
 
     @staticmethod
-    def ir_ilp_solver(
-        n_irs: int,
-        all_irs: List[IR],
+    def get_lp_solver(
+        ir_list: List[IR],
         ir_free_energies: List[float],
         backend: str = "SCIP",
     ) -> pywraplp.Solver:
@@ -26,11 +23,12 @@ class IRFold1(IRFold0):
         if solver is None:
             raise Exception("Failed to create solver.")
 
+        # Remove IRs with a gap < 3, these are sterically impossible
+        valid_irs: List[IR] = [ir for ir in ir_list if ir[1][0] - ir[0][1] - 1 >= 3]
+        n_irs: int = len(valid_irs)
+
         # Create binary indicator variables
         variables = [solver.IntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
-
-        # Remove IRs with a gap < 3, these are sterically impossible
-        valid_irs: List[IR] = [ir for ir in all_irs if ir[1][0] - ir[0][1] - 1 >= 3]
 
         # Add XOR constraint between IR pairs that are incompatible
         unique_idx_pairs: List[Tuple[int, int]] = list(
