@@ -1,5 +1,5 @@
 __pycache__*
 .coverage
 .idea/
-.data/
-./tests/tests_data/
+data/
+tests/tests_data/
