@@ -15,7 +15,7 @@ IR = Tuple[Tuple[int, int], Tuple[int, int]]
 
 
 class IRFold0:
-    """RNA secondary structure prediction based on extracting optimal
+    """Base IRFold Model: RNA secondary structure prediction based on extracting optimal
     inverted repeat configurations from the primary sequence"""
 
     @classmethod
@@ -63,18 +63,10 @@ class IRFold0:
                 )
             return db_repr, mfe
 
-        # Evaluate free energy of each IR respectively
-        db_reprs: List[str] = [
-            IRFold0.irs_to_dot_bracket([found_irs[i]], seq_len)
-            for i in range(n_irs_found)
-        ]
-        ir_free_energies: List[float] = [
-            IRFold0.calc_free_energy(db_repr, sequence, out_dir, seq_name)
-            for db_repr in db_reprs
-        ]
-
         # Define ILP and solve
-        solver = cls.get_lp_solver(found_irs, ir_free_energies, solver_backend)
+        solver = cls.get_lp_solver(
+            found_irs, seq_len, sequence, out_dir, seq_name, solver_backend
+        )
         status = solver.Solve()
 
         if status == pywraplp.Solver.OPTIMAL:
@@ -252,15 +244,26 @@ class IRFold0:
     @staticmethod
     def get_lp_solver(
         ir_list: List[IR],
-        ir_free_energies: List[float],
+        seq_len: int,
+        sequence: str,
+        out_dir: str,
+        seq_name: str,
         backend: str = "SCIP",
     ) -> pywraplp.Solver:
         # Create solver
         solver: pywraplp.Solver = pywraplp.Solver.CreateSolver(backend)
         if solver is None:
             raise Exception("Failed to create solver.")
-
         n_irs: int = len(ir_list)
+
+        # Evaluate free energy of each IR respectively
+        db_reprs: List[str] = [
+            IRFold0.irs_to_dot_bracket([ir_list[i]], seq_len) for i in range(n_irs)
+        ]
+        ir_free_energies: List[float] = [
+            IRFold0.calc_free_energy(db_repr, sequence, out_dir, seq_name)
+            for db_repr in db_reprs
+        ]
 
         # Create binary indicator variables
         variables = [solver.IntVar(0, 1, f"ir_{i}") for i in range(n_irs)]

@@ -15,7 +15,10 @@ class IRFold1(IRFold0):
     @staticmethod
     def get_lp_solver(
         ir_list: List[IR],
-        ir_free_energies: List[float],
+        seq_len: int,
+        sequence: str,
+        out_dir: str,
+        seq_name: str,
         backend: str = "SCIP",
     ) -> pywraplp.Solver:
         # Create solver
@@ -27,7 +30,16 @@ class IRFold1(IRFold0):
         valid_irs: List[IR] = [ir for ir in ir_list if ir[1][0] - ir[0][1] - 1 >= 3]
         n_irs: int = len(valid_irs)
 
-        # Create binary indicator variables
+        # Evaluate free energy of each IR respectively
+        db_reprs: List[str] = [
+            IRFold0.irs_to_dot_bracket([valid_irs[i]], seq_len) for i in range(n_irs)
+        ]
+        ir_free_energies: List[float] = [
+            IRFold0.calc_free_energy(db_repr, sequence, out_dir, seq_name)
+            for db_repr in db_reprs
+        ]
+
+        # Create binary indicator variables for IRs
         variables = [solver.IntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
 
         # Add XOR constraint between IR pairs that are incompatible
@@ -81,21 +93,16 @@ class IRFold1(IRFold0):
             ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
         )
 
-        # Case 1: Disjoint
         if IRFold1.ir_pair_disjoint(ir_a, ir_b):
             return True
 
-        # Case 2: Invalid hairpin
+        # Invalid loop
         bases_inbetween_parens = (
             earliest_right_string_base_idx - latest_left_string_base_idx - 1
         )
         if bases_inbetween_parens < 3:
             return False
 
-        # Case 3: Valid hairpin / loop?
-        # hp_region_dp_repr = [" " for _ in range(seq_len)]
-        # hp_region_dp_repr[latest_left_string_base_idx] = "("
-        # hp_region_dp_repr[earliest_right_string_base_idx] = ")"
         return True
 
     @staticmethod
