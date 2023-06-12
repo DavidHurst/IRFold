@@ -25,6 +25,26 @@ def list_of_valid_and_invalid_ir_pairs(entirely_disjoint_ir_pairs):
     )
 
 
+def test_ir_gap_size_check():
+    invalid_gap_size_irs = [
+        ((0, 1), (2, 3)),
+        ((0, 1), (3, 4)),
+        ((0, 1), (4, 5)),
+    ]
+
+    valid_gap_size_irs = [
+        ((0, 1), (5, 6)),
+        ((2, 5), (10, 13)),
+        ((3, 6), (12, 15)),
+    ]
+
+    for ir in invalid_gap_size_irs:
+        assert IRFold1.ir_has_valid_gap_size(ir) == False
+
+    for ir in valid_gap_size_irs:
+        assert IRFold1.ir_has_valid_gap_size(ir) == True
+
+
 def test_ir_pair_matches_same_bases(
     list_of_ir_pairs_with_expected_value_for_base_overpairing,
 ):

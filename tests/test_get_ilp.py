@@ -2,10 +2,12 @@ import itertools
 import random
 import re
 
-from irfold import IRFold0
+import pytest
+
+from irfold import IRFold0, IRFold1
 
 
-def test_correct_ir_xor_constraints_generated(data_dir):
+def test_correct_ir_xor_constraints_generated_irfold0(data_dir):
     seq_len = 15
     seq = "AUGUAACAACCCGAC"
     irs = [
