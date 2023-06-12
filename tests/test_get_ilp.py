@@ -7,11 +7,13 @@ import pytest
 from irfold import IRFold0, IRFold1
 
 
-def test_correct_ir_xor_constraints_generated_irfold0(data_dir):
+@pytest.mark.parametrize("irfold_variant", [IRFold0, IRFold1])
+def test_correct_ir_xor_constraints_generated(data_dir, irfold_variant):
+    print(f"\n  testing {irfold_variant.__name__}")
     seq_len = 15
     seq = "AUGUAACAACCCGAC"
     irs = [
-        ((1, 3), (5, 7)),
+        ((1, 3), (10, 12)),
         ((2, 3), (13, 14)),
         ((2, 3), (8, 9)),
     ]
@@ -21,7 +23,7 @@ def test_correct_ir_xor_constraints_generated_irfold0(data_dir):
         (1, 2),
     ]
 
-    solver = IRFold0.get_lp_solver(
+    solver = irfold_variant.get_lp_solver(
         irs,
         seq_len,
         seq,

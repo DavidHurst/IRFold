@@ -55,7 +55,7 @@ class IRFold0:
                 cls.__write_performance_to_file(
                     db_repr,
                     0.0,
-                    mfe,
+                    0.0,
                     seq_len,
                     n_irs_found,
                     None,
@@ -76,32 +76,24 @@ class IRFold0:
         if status == pywraplp.Solver.OPTIMAL:
             # Return dot bracket repr and mfe of final solution
             active_ir_idxs: List[int] = [
-                i
-                for i, v in enumerate(solver.variables())
+                int(re.findall(r"-?\d+\.?\d*", v.name())[0])
+                for v in solver.variables()
                 if int(v.solution_value()) == 1
             ]
             db_repr: str = IRFold0.irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
-            solution_mfe: float = solver.Objective().Value()
-            print(f">>>> Before evaluating mfe of {cls.__name__}'s final solution")
-            print(
-                f"   Solver vars: {[var.solution_value() for var in solver.variables()]}"
-            )
-            print(f"   Active ir idxs: {active_ir_idxs}:")
-            for idx in active_ir_idxs:
-                print("     ", found_irs[idx])
 
-            print(f"   db_repr: {db_repr}")
-            db_repr_mfe: float = IRFold0.calc_free_energy(
+            solution_mfe: float = solver.Objective().Value()
+            dot_bracket_repr_mfe: float = cls.calc_free_energy(
                 db_repr, sequence, out_dir, seq_name
             )
-            print(f">>>> Before evaluating mfe of {cls.__name__}'s final solution")
+
             if save_performance:
                 cls.__write_performance_to_file(
                     db_repr,
-                    db_repr_mfe,
                     solution_mfe,
+                    dot_bracket_repr_mfe,
                     seq_len,
                     n_irs_found,
                     solver.NumVariables(),
@@ -118,8 +110,8 @@ class IRFold0:
             if save_performance:
                 cls.__write_performance_to_file(
                     db_repr,
-                    0.0,
                     mfe,
+                    0.0,
                     seq_len,
                     n_irs_found,
                     None,
@@ -129,6 +121,7 @@ class IRFold0:
                     None,
                     out_dir,
                 )
+            print("Exiting fold func".center(50, "="))
             return db_repr, mfe
 
     @staticmethod
@@ -284,7 +277,7 @@ class IRFold0:
             for db_repr in db_reprs
         ]
 
-        # Create binary indicator variables
+        # Create binary indicator variables for IRs
         variables = [solver.IntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
 
         # Add XOR between IRs that match the same bases
@@ -301,11 +294,10 @@ class IRFold0:
         ]
 
         for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
-            print(
-                f"Adding constraint {variables[ir_a_idx].name()} XOR {variables[ir_b_idx].name()}"
-            )
+            ir_a_var = solver.LookupVariable(f"ir_{ir_a_idx}")
+            ir_b_var = solver.LookupVariable(f"ir_{ir_b_idx}")
             solver.Add(
-                variables[ir_a_idx] + variables[ir_b_idx] <= 1,
+                ir_a_var + ir_b_var <= 1,
                 f"ir_{ir_a_idx}_XOR_ir_{ir_b_idx}",
             )
 
@@ -342,8 +334,8 @@ class IRFold0:
     def __write_performance_to_file(
         cls,
         dot_bracket_repr: str,
-        dot_bracket_repr_mfe: float,
         solution_mfe: float,
+        dot_bracket_repr_mfe: float,
         seq_len: int,
         n_irs_found: int,
         solver_num_variables: int,
@@ -366,8 +358,8 @@ class IRFold0:
             performance_file_path = (out_dir_path / performance_file_name).resolve()
             column_names = [
                 "dot_bracket_repr",
-                "dot_bracket_repr_mfe",
                 "solution_mfe",
+                "dot_bracket_repr_mfe",
                 "seq_len",
                 "n_irs_found",
                 "solver_num_variables",
@@ -383,8 +375,8 @@ class IRFold0:
                 writer.writerow(
                     [
                         dot_bracket_repr,
-                        dot_bracket_repr_mfe,
                         solution_mfe,
+                        dot_bracket_repr_mfe,
                         seq_len,
                         n_irs_found,
                         solver_num_variables,
@@ -400,8 +392,8 @@ class IRFold0:
                 writer.writerow(
                     [
                         dot_bracket_repr,
-                        dot_bracket_repr_mfe,
                         solution_mfe,
+                        dot_bracket_repr_mfe,
                         seq_len,
                         n_irs_found,
                         solver_num_variables,

@@ -1,6 +1,7 @@
 __all__ = ["IRFold1"]
 
 import itertools
+import re
 
 from irfold import IRFold0
 from typing import Tuple, List
@@ -25,46 +26,66 @@ class IRFold1(IRFold0):
         solver: pywraplp.Solver = pywraplp.Solver.CreateSolver(backend)
         if solver is None:
             raise Exception("Failed to create solver.")
-
-        # Remove IRs with a gap < 3, these are sterically impossible
-        valid_irs: List[IR] = [ir for ir in ir_list if ir[1][0] - ir[0][1] - 1 >= 3]
-        n_irs: int = len(valid_irs)
-
-        # Evaluate free energy of each IR respectively
-        db_reprs: List[str] = [
-            IRFold0.irs_to_dot_bracket([valid_irs[i]], seq_len) for i in range(n_irs)
-        ]
-        ir_free_energies: List[float] = [
-            IRFold0.calc_free_energy(db_repr, sequence, out_dir, seq_name)
-            for db_repr in db_reprs
-        ]
+        n_irs: int = len(ir_list)
 
         # Create binary indicator variables for IRs
-        variables = [solver.IntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
+        invalid_gap_ir_idxs: List[int] = [
+            i for i in range(n_irs) if not IRFold1.ir_has_valid_gap_size(ir_list[i])
+        ]
+        variables = [
+            solver.IntVar(0, 1, f"ir_{i}")
+            for i in range(n_irs)
+            if i not in invalid_gap_ir_idxs
+        ]
 
-        # Add XOR constraint between IR pairs that are incompatible
-        unique_idx_pairs: List[Tuple[int, int]] = list(
+        if len(variables) <= 1:
+            return solver
+
+        # Add XOR between IRs that match the same bases
+        unique_possible_idx_pairs: List[Tuple[int, int]] = list(
             itertools.combinations([i for i in range(n_irs)], 2)
         )
+        valid_idx_pairs: List[Tuple[int, int]]  = [
+            pair
+            for pair in unique_possible_idx_pairs
+            if pair[0] not in invalid_gap_ir_idxs and pair[1] not in invalid_gap_ir_idxs
+        ]
+
         unique_ir_pairs: List[Tuple[IR, IR]] = [
-            (valid_irs[i], valid_irs[j]) for i, j in unique_idx_pairs
+            (ir_list[i], ir_list[j]) for i, j in valid_idx_pairs
         ]
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
-            for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
+            for ir_pair, idx_pair in zip(unique_ir_pairs, valid_idx_pairs)
             if IRFold1.ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
-        for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:
-            solver.Add(variables[inc_ir_a] + variables[inc_ir_b] <= 1)
+        for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
+            ir_a_var = solver.LookupVariable(f"ir_{ir_a_idx}")
+            ir_b_var = solver.LookupVariable(f"ir_{ir_b_idx}")
+            solver.Add(
+                ir_a_var + ir_b_var <= 1,
+                f"ir_{ir_a_idx}_XOR_ir_{ir_b_idx}",
+            )
 
         # Define objective function
         obj_fn = solver.Objective()
-        for i in range(n_irs):
-            obj_fn.SetCoefficient(variables[i], ir_free_energies[i])
+        for var in variables:
+            ir_idx: int = int(re.findall(r"-?\d+\.?\d*", var.name())[0])
+            ir_db_repr: str = IRFold0.irs_to_dot_bracket([ir_list[ir_idx]], seq_len)
+            ir_free_energy: float = IRFold0.calc_free_energy(ir_db_repr, sequence, out_dir, seq_name)
+
+            obj_fn.SetCoefficient(var, ir_free_energy)
         obj_fn.SetMinimization()
 
         return solver
+
+    @staticmethod
+    def ir_has_valid_gap_size(ir):
+        left_strand_end_idx: int = ir[0][1]
+        right_strand_start_idx: int = ir[1][0]
+
+        return right_strand_start_idx - left_strand_end_idx - 1 >= 3
 
     @staticmethod
     def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:

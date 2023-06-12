@@ -1,7 +1,12 @@
+import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 
 from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+from irfold import IRFold0
 
 DATA_DIR = str(Path(__file__).parent.parent / "data")
 
@@ -9,6 +14,19 @@ if __name__ == "__main__":
     irfold0_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "IRFold0_performance.csv")
     irfold1_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "IRFold1_performance.csv")
     rnalib_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "RNAlib_performance.csv")
+
+    # irfold0_res_df = irfold0_res_df.assign(
+    #     dot_bracket_repr_mfe=[
+    #         IRFold0.calc_free_energy(db_repr, seq, DATA_DIR)
+    #         for db_repr, seq in zip(irfold0_res_df.dot_bracket_repr, irfold0_res_df.seq)
+    #     ]
+    # )
+    # irfold1_res_df = irfold0_res_df.assign(
+    #     dot_bracket_repr_mfe=[
+    #         IRFold0.calc_free_energy(db_repr, seq, DATA_DIR)
+    #         for db_repr, seq in zip(irfold1_res_df.dot_bracket_repr, irfold1_res_df.seq)
+    #     ]
+    # )
 
     plt.rcParams["figure.figsize"] = (12, 4)
 
@@ -54,6 +72,7 @@ if __name__ == "__main__":
 
     # Compare IRFold versions: True MFE of IRFold solutions vs. MFE IRFold returns
     # This is to show the effect of additivity assumption inconsistency
+
     plt.subplot(1, 2, 1)
     plt.plot(
         irfold0_res_df.seq_len.unique(),
@@ -62,7 +81,7 @@ if __name__ == "__main__":
     )
     plt.plot(
         irfold1_res_df.seq_len.unique(),
-        irfold0_avg_df.dot_bracket_mfe,
+        irfold0_avg_df.dot_bracket_repr_mfe,
         label="IRFold0 True MFE",
     )
     plt.legend()
@@ -79,7 +98,7 @@ if __name__ == "__main__":
     )
     plt.plot(
         irfold1_res_df.seq_len.unique(),
-        irfold1_avg_df.dot_bracket_mfe,
+        irfold1_avg_df.dot_bracket_repr_mfe,
         label="IRFold1 True MFE",
     )
 
