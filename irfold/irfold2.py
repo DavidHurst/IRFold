@@ -73,19 +73,16 @@ class IRFold2(IRFold1):
             obj_fn.SetCoefficient(var, ir_free_energy)
 
         # Add variable for each IR pair that forms an invalid loop which corrects the pairs additive free energy
-        ir_pair_fe_correction_indicator_vars = IRFold2.__get_correction_variables(
-            valid_idx_pairs, valid_ir_pairs, solver
-        )
-        for correction_var in ir_pair_fe_correction_indicator_vars:
-            ir_idxs: List[str] = re.findall(r"-?\d+\.?\d*", correction_var.name())
-            ir_a_idx: int = int(ir_idxs[0])
-            ir_b_idx: int = int(ir_idxs[1])
-
+        ir_pair_fe_correction_indicator_vars = []
+        for (ir_a_idx, ir_b_idx), (ir_a, ir_b) in zip(valid_idx_pairs, valid_ir_pairs):
+            if IRFold1.ir_pair_incompatible(ir_a, ir_b):
+                continue
             ir_a_db_repr: str = IRFold0.irs_to_dot_bracket([ir_list[ir_a_idx]], seq_len)
             ir_b_db_repr: str = IRFold0.irs_to_dot_bracket([ir_list[ir_b_idx]], seq_len)
             ir_pair_db_repr: str = IRFold0.irs_to_dot_bracket(
                 [ir_list[ir_a_idx], ir_list[ir_b_idx]], seq_len
             )
+            print(f'ir_{ir_a_idx} and ir_{ir_b_idx} form invalid loop, adding correction variable')
 
             ir_pair_additive_free_energy: float = sum(
                 [
@@ -101,7 +98,13 @@ class IRFold2(IRFold1):
                 ir_pair_additive_free_energy - ir_pair_db_repr_free_energy
             )
 
-            obj_fn.SetCoefficient(correction_var, -free_energy_difference)
+            if free_energy_difference > 0:
+                correction_var = solver.IntVar(
+                    0, 1, f"ir_{ir_a_idx}_ir_{ir_b_idx}_fe_corrector"
+                )
+                ir_pair_fe_correction_indicator_vars.append(correction_var)
+
+                obj_fn.SetCoefficient(correction_var, -free_energy_difference)
 
         # Add XOR constraint between incompatible IR pairs
         for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
@@ -114,6 +117,7 @@ class IRFold2(IRFold1):
 
         # Add constraints that only activate correction variables when the IR pair they represent is active
         for correction_var in ir_pair_fe_correction_indicator_vars:
+            print(f"Adding activate {correction_var.name()}")
             ir_idxs: List[str] = re.findall(r"-?\d+\.?\d*", correction_var.name())
             ir_a_idx: int = int(ir_idxs[0])
             ir_b_idx: int = int(ir_idxs[1])
@@ -122,9 +126,13 @@ class IRFold2(IRFold1):
             ir_b_var = solver.LookupVariable(f"ir_{ir_b_idx}")
 
             # ir_pair_is_active_var == (ir_a + ir_b >= 2)
-            ir_pair_is_active_var = solver.BoolVar(f'ir_{ir_a_idx}_ir_{ir_b_idx}_both_1')
+            ir_pair_is_active_var = solver.BoolVar(
+                f"ir_{ir_a_idx}_ir_{ir_b_idx}_both_1"
+            )
             solver.Add(ir_a_var + ir_b_var >= 2).OnlyEnforceIf(ir_pair_is_active_var)
-            solver.Add(ir_a_var + ir_b_var < 2).OnlyEnforceIf(ir_pair_is_active_var.Not())
+            solver.Add(ir_a_var + ir_b_var < 2).OnlyEnforceIf(
+                ir_pair_is_active_var.Not()
+            )
 
             # ir_pair_is_active_var implies correction_var == 1
             solver.Add(correction_var == 1).OnlyEnforceIf(ir_pair_is_active_var)
@@ -135,19 +143,3 @@ class IRFold2(IRFold1):
         obj_fn.SetMinimization()
 
         return solver
-
-    @staticmethod
-    def __get_correction_variables(
-        valid_idx_pairs: List[Tuple[int, int]],
-        valid_ir_pairs: List[Tuple[IR, IR]],
-        solver: pywraplp.Solver,
-    ):
-        correction_variables = []
-
-        for (ir_a_idx, ir_b_idx), (ir_a, ir_b) in zip(valid_idx_pairs, valid_ir_pairs):
-            if not IRFold1.ir_pair_forms_valid_loop(ir_a, ir_b):
-                correction_variables.append(
-                    solver.IntVar(0, 1, f"ir_{ir_a_idx}_ir_{ir_b_idx}_fe_corrector")
-                )
-
-        return correction_variables
