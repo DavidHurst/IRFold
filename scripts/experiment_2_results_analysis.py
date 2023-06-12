@@ -6,27 +6,12 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from irfold import IRFold0
-
 DATA_DIR = str(Path(__file__).parent.parent / "data")
 
 if __name__ == "__main__":
     irfold0_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "IRFold0_performance.csv")
     irfold1_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "IRFold1_performance.csv")
     rnalib_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "RNAlib_performance.csv")
-
-    # irfold0_res_df = irfold0_res_df.assign(
-    #     dot_bracket_repr_mfe=[
-    #         IRFold0.calc_free_energy(db_repr, seq, DATA_DIR)
-    #         for db_repr, seq in zip(irfold0_res_df.dot_bracket_repr, irfold0_res_df.seq)
-    #     ]
-    # )
-    # irfold1_res_df = irfold0_res_df.assign(
-    #     dot_bracket_repr_mfe=[
-    #         IRFold0.calc_free_energy(db_repr, seq, DATA_DIR)
-    #         for db_repr, seq in zip(irfold1_res_df.dot_bracket_repr, irfold1_res_df.seq)
-    #     ]
-    # )
 
     plt.rcParams["figure.figsize"] = (12, 4)
 
@@ -66,13 +51,13 @@ if __name__ == "__main__":
     plt.grid()
     plt.ylabel("Mean Num. Solver Constraints")
     plt.xlabel("Sequence Length")
+    plt.suptitle('Constraints Over Time')
     plt.tight_layout()
     plt.savefig(f"{DATA_DIR}/experiment_2_solver_performance_comparison.png")
     plt.show()
 
     # Compare IRFold versions: True MFE of IRFold solutions vs. MFE IRFold returns
     # This is to show the effect of additivity assumption inconsistency
-
     plt.subplot(1, 2, 1)
     plt.plot(
         irfold0_res_df.seq_len.unique(),
@@ -106,6 +91,7 @@ if __name__ == "__main__":
     plt.grid()
     plt.ylabel("Mean MFE")
     plt.xlabel("Sequence Length")
+    plt.suptitle('Additive IR MFE vs True IR MFE Over Time')
     plt.tight_layout()
     plt.savefig(f"{DATA_DIR}/experiment_2_solver_performance_comparison.png")
     plt.show()
@@ -124,6 +110,7 @@ if __name__ == "__main__":
 
     ax.title.set_text("MFE of Final Solution")
     plt.ylabel("MFE (kcal/mol)")
+    plt.suptitle('SSP Program\'s Solution MFEs')
     plt.tight_layout()
     plt.savefig(f"{DATA_DIR}/experiment_2_mfe_comparison.png")
     plt.show()
@@ -144,6 +131,7 @@ if __name__ == "__main__":
     plt.grid()
     plt.ylabel("Mean MFE of Final Solution")
     plt.xlabel("Sequence Length")
+    plt.suptitle('IRFold Variant\'s MFEs over Time')
     plt.tight_layout()
     plt.savefig(f"{DATA_DIR}/experiment_2_mfe_over_time_comparison.png")
     plt.show()

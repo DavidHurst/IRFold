@@ -38,6 +38,7 @@ class IRFold1(IRFold0):
             if i not in invalid_gap_ir_idxs
         ]
 
+        # If 1 or fewer variables, trivial or impossible optimisation problem
         if len(variables) <= 1:
             return solver
 
@@ -45,7 +46,7 @@ class IRFold1(IRFold0):
         unique_possible_idx_pairs: List[Tuple[int, int]] = list(
             itertools.combinations([i for i in range(n_irs)], 2)
         )
-        valid_idx_pairs: List[Tuple[int, int]]  = [
+        valid_idx_pairs: List[Tuple[int, int]] = [
             pair
             for pair in unique_possible_idx_pairs
             if pair[0] not in invalid_gap_ir_idxs and pair[1] not in invalid_gap_ir_idxs
@@ -73,7 +74,9 @@ class IRFold1(IRFold0):
         for var in variables:
             ir_idx: int = int(re.findall(r"-?\d+\.?\d*", var.name())[0])
             ir_db_repr: str = IRFold0.irs_to_dot_bracket([ir_list[ir_idx]], seq_len)
-            ir_free_energy: float = IRFold0.calc_free_energy(ir_db_repr, sequence, out_dir, seq_name)
+            ir_free_energy: float = IRFold0.calc_free_energy(
+                ir_db_repr, sequence, out_dir, seq_name
+            )
 
             obj_fn.SetCoefficient(var, ir_free_energy)
         obj_fn.SetMinimization()
