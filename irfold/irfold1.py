@@ -38,7 +38,7 @@ class IRFold1(IRFold0):
             if i not in invalid_gap_ir_idxs
         ]
 
-        # If 1 or fewer variables, trivial or impossible optimisation problem
+        # If 1 or fewer variables, trivial or impossible optimisation problem, will be handled by ortools
         if len(variables) <= 1:
             return solver
 
@@ -52,12 +52,12 @@ class IRFold1(IRFold0):
             if pair[0] not in invalid_gap_ir_idxs and pair[1] not in invalid_gap_ir_idxs
         ]
 
-        unique_ir_pairs: List[Tuple[IR, IR]] = [
+        valid_ir_pairs: List[Tuple[IR, IR]] = [
             (ir_list[i], ir_list[j]) for i, j in valid_idx_pairs
         ]
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
-            for ir_pair, idx_pair in zip(unique_ir_pairs, valid_idx_pairs)
+            for ir_pair, idx_pair in zip(valid_ir_pairs, valid_idx_pairs)
             if IRFold1.ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
@@ -97,7 +97,7 @@ class IRFold1(IRFold0):
         ) or not IRFold1.ir_pair_forms_valid_loop(ir_a, ir_b)
 
     @staticmethod
-    def ir_pair_forms_valid_loop(ir_a, ir_b):
+    def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
         if IRFold1.ir_pair_wholly_nested(ir_a, ir_b) or IRFold1.ir_pair_wholly_nested(
             ir_b, ir_a
         ):
@@ -130,7 +130,7 @@ class IRFold1(IRFold0):
         return True
 
     @staticmethod
-    def ir_pair_disjoint(ir_a, ir_b):
+    def ir_pair_disjoint(ir_a: IR, ir_b: IR) -> bool:
         # ir_a comes entirely before ir_b
         ir_a_strictly_before_ir_b = ir_a[1][1] < ir_b[0][0]
 
@@ -140,5 +140,6 @@ class IRFold1(IRFold0):
         return ir_a_strictly_before_ir_b or ir_b_strictly_before_ir_a
 
     @staticmethod
-    def ir_pair_wholly_nested(outer_ir, nested_ir):
+    def ir_pair_wholly_nested(outer_ir: IR, nested_ir: IR) -> bool:
+        # ToDo: Make this return true for nesting of A in B or B in A
         return outer_ir[0][0] < nested_ir[0][0] and nested_ir[1][1] < outer_ir[1][0]
