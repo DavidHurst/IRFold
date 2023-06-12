@@ -113,7 +113,24 @@ class IRFold2(IRFold1):
             )
 
         # Add constraints that only activate correction variables when the IR pair they represent is active
+        for correction_var in ir_pair_fe_correction_indicator_vars:
+            ir_idxs: List[str] = re.findall(r"-?\d+\.?\d*", correction_var.name())
+            ir_a_idx: int = int(ir_idxs[0])
+            ir_b_idx: int = int(ir_idxs[1])
 
+            ir_a_var = solver.LookupVariable(f"ir_{ir_a_idx}")
+            ir_b_var = solver.LookupVariable(f"ir_{ir_b_idx}")
+
+            # ir_pair_is_active_var == (ir_a + ir_b >= 2)
+            ir_pair_is_active_var = solver.BoolVar(f'ir_{ir_a_idx}_ir_{ir_b_idx}_both_1')
+            solver.Add(ir_a_var + ir_b_var >= 2).OnlyEnforceIf(ir_pair_is_active_var)
+            solver.Add(ir_a_var + ir_b_var < 2).OnlyEnforceIf(ir_pair_is_active_var.Not())
+
+            # ir_pair_is_active_var implies correction_var == 1
+            solver.Add(correction_var == 1).OnlyEnforceIf(ir_pair_is_active_var)
+
+            # not(ir_pair_is_active_var) implies correction_var == 0
+            solver.Add(correction_var == 0).OnlyEnforceIf(ir_pair_is_active_var.Not())
 
         obj_fn.SetMinimization()
 
