@@ -25,7 +25,14 @@ def list_of_valid_and_invalid_ir_pairs(entirely_disjoint_ir_pairs):
     )
 
 
-# Test irs pair same bases
+def test_ir_pair_matches_same_bases(
+    list_of_ir_pairs_with_expected_value_for_base_overpairing,
+):
+    for ir_pair, expected in list_of_ir_pairs_with_expected_value_for_base_overpairing:
+        print(ir_pair, expected)
+        actual = IRFold0.ir_pair_match_same_bases(ir_pair[0], ir_pair[1])
+        assert actual == expected
+
 
 # Test irs are disjoint
 

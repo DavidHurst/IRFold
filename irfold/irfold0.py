@@ -32,6 +32,9 @@ class IRFold0:
         *,
         save_performance: bool = False,
     ) -> Tuple[str, float]:
+        """Returns the MFE computed by simply adding the free energies of IRs which is incorrect but
+        is illustrative of the IR free energy assumption additivity not holding consistently which is corrected
+        for in class IRFold2."""
 
         # Find IRs in sequence
         found_irs: List[IR] = IRFold0.find_irs(
@@ -51,6 +54,7 @@ class IRFold0:
             if save_performance:
                 cls.__write_performance_to_file(
                     db_repr,
+                    0.0,
                     mfe,
                     seq_len,
                     n_irs_found,
@@ -80,9 +84,23 @@ class IRFold0:
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
             solution_mfe: float = solver.Objective().Value()
+            print(f">>>> Before evaluating mfe of {cls.__name__}'s final solution")
+            print(
+                f"   Solver vars: {[var.solution_value() for var in solver.variables()]}"
+            )
+            print(f"   Active ir idxs: {active_ir_idxs}:")
+            for idx in active_ir_idxs:
+                print("     ", found_irs[idx])
+
+            print(f"   db_repr: {db_repr}")
+            db_repr_mfe: float = IRFold0.calc_free_energy(
+                db_repr, sequence, out_dir, seq_name
+            )
+            print(f">>>> Before evaluating mfe of {cls.__name__}'s final solution")
             if save_performance:
                 cls.__write_performance_to_file(
                     db_repr,
+                    db_repr_mfe,
                     solution_mfe,
                     seq_len,
                     n_irs_found,
@@ -100,6 +118,7 @@ class IRFold0:
             if save_performance:
                 cls.__write_performance_to_file(
                     db_repr,
+                    0.0,
                     mfe,
                     seq_len,
                     n_irs_found,
@@ -281,8 +300,14 @@ class IRFold0:
             if IRFold0.ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
-        for inc_ir_a, inc_ir_b in incompatible_ir_pair_idxs:
-            solver.Add(variables[inc_ir_a] + variables[inc_ir_b] <= 1)
+        for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
+            print(
+                f"Adding constraint {variables[ir_a_idx].name()} XOR {variables[ir_b_idx].name()}"
+            )
+            solver.Add(
+                variables[ir_a_idx] + variables[ir_b_idx] <= 1,
+                f"ir_{ir_a_idx}_XOR_ir_{ir_b_idx}",
+            )
 
         # Define objective function
         obj_fn = solver.Objective()
@@ -305,10 +330,9 @@ class IRFold0:
             idx for idx in range(ir_b_left_strand[0], ir_b_left_strand[1] + 1)
         ] + [idx for idx in range(ir_b_right_strand[0], ir_b_right_strand[1] + 1)]
 
-        any_shared_base_pairs: bool = any(
+        return any(
             [ir_b_bases in paired_base_idxs_a for ir_b_bases in paired_base_idxs_b]
         )
-        return any_shared_base_pairs
 
     @staticmethod
     def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
@@ -318,6 +342,7 @@ class IRFold0:
     def __write_performance_to_file(
         cls,
         dot_bracket_repr: str,
+        dot_bracket_repr_mfe: float,
         solution_mfe: float,
         seq_len: int,
         n_irs_found: int,
@@ -341,6 +366,7 @@ class IRFold0:
             performance_file_path = (out_dir_path / performance_file_name).resolve()
             column_names = [
                 "dot_bracket_repr",
+                "dot_bracket_repr_mfe",
                 "solution_mfe",
                 "seq_len",
                 "n_irs_found",
@@ -357,6 +383,7 @@ class IRFold0:
                 writer.writerow(
                     [
                         dot_bracket_repr,
+                        dot_bracket_repr_mfe,
                         solution_mfe,
                         seq_len,
                         n_irs_found,
@@ -367,19 +394,13 @@ class IRFold0:
                         solver_num_branch_bound_nodes,
                     ]
                 )
-            #     print(f'\n >>>>>> {cls.__name__} <<<<<')
-            # with open(str(performance_file_path), "r") as perf_file:
-            #     print(f'File contents after create and write:')
-            #     lines = perf_file.readlines()
-            #     for l in lines:
-            #         print(l)
-
         else:
             with open(str(performance_file_path), "a") as perf_file:
                 writer = csv.writer(perf_file)
                 writer.writerow(
                     [
                         dot_bracket_repr,
+                        dot_bracket_repr_mfe,
                         solution_mfe,
                         seq_len,
                         n_irs_found,
@@ -390,10 +411,3 @@ class IRFold0:
                         solver_num_branch_bound_nodes,
                     ]
                 )
-            #     print(f'\n >>>>>> {cls.__name__} <<<<<')
-            #
-            # with open(str(performance_file_path), "r") as perf_file:
-            #     print(f'File contents after append:')
-            #     lines = perf_file.readlines()
-            #     for l in lines:
-            #         print(l)

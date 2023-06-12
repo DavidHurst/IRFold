@@ -38,6 +38,7 @@ def plot_pair_analysis(pairs_df, pair_type):
 if __name__ == "__main__":
     results_df = pd.read_csv(f"{DATA_DIR}/experiment_1_results.csv")
 
+    # Show how the additivity assumption holds for pairs that form different structures e.g. wholly nested, disjoint...
     pairs_dfs = [
         results_df[results_df.irs_disjoint == 1],
         results_df[results_df.irs_wholly_nested == 1],

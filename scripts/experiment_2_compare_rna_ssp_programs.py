@@ -18,7 +18,7 @@ if __name__ == "__main__":
         writer.writerow(["dot_bracket_repr", "solution_mfe", "seq_len"])
 
     n_runs_per_seq_length = 10
-    for seq_len in tqdm(range(10, 11), desc=f"Running trials"):
+    for seq_len in tqdm(range(10, 100), desc=f"Running trials"):
         for _ in range(n_runs_per_seq_length):
             seq = "".join(random.choice("ACGU") for _ in range(seq_len))
             seq_name = "random_seq_for_ssp_program_comparison"
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
             irfold1_secondary_structure, irfold1_mfe = IRFold1.fold(**fold_params)
 
-            irfold2_secondary_structure, irfold2_mfe = IRFold2.fold(**fold_params)
+            # irfold2_secondary_structure, irfold2_mfe = IRFold2.fold(**fold_params)
 
             rnalib_secondary_structure, rnalib_mfe = RNA.fold(seq, "")
 

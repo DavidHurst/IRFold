@@ -45,6 +45,41 @@ def list_of_irs(rna_seq_15_bases_3_irs):
     return [((2, 3), (11, 12)), ((5, 6), (11, 12)), ((10, 11), (13, 14))]
 
 
+@pytest.fixture
+def list_of_ir_pairs_not_matching_same_bases():
+    return [
+        (((0, 1), (5, 6)), ((10, 12), (15, 17))),
+        (((3, 4), (16, 17)), ((9, 10), (19, 20))),
+    ]
+
+
+@pytest.fixture
+def list_of_ir_pairs_matching_same_bases():
+    return [
+        (((0, 1), (5, 6)), ((5, 6), (10, 12))),
+        (((3, 4), (16, 17)), ((14, 16), (22, 24))),
+    ]
+
+
+@pytest.fixture
+def list_of_ir_pairs_with_expected_value_for_base_overpairing(
+    list_of_ir_pairs_matching_same_bases, list_of_ir_pairs_not_matching_same_bases
+):
+    pairs_overmatching_with_expected = list(
+        zip(
+            list_of_ir_pairs_matching_same_bases,
+            [True for _ in range(len(list_of_ir_pairs_matching_same_bases))],
+        )
+    )
+    pairs_not_overmatching_with_expected = list(
+        zip(
+            list_of_ir_pairs_not_matching_same_bases,
+            [False for _ in range(len(list_of_ir_pairs_not_matching_same_bases))],
+        )
+    )
+    return pairs_not_overmatching_with_expected + pairs_overmatching_with_expected
+
+
 @pytest.fixture(scope="module")
 def expected_dot_bracket_reprs(rna_seq_15_bases_3_irs):
     return ["..((.......))..", ".....((....))..", "..........((.))"]

@@ -52,6 +52,45 @@ if __name__ == "__main__":
     plt.savefig(f"{DATA_DIR}/experiment_2_solver_performance_comparison.png")
     plt.show()
 
+    # Compare IRFold versions: True MFE of IRFold solutions vs. MFE IRFold returns
+    # This is to show the effect of additivity assumption inconsistency
+    plt.subplot(1, 2, 1)
+    plt.plot(
+        irfold0_res_df.seq_len.unique(),
+        irfold0_avg_df.solution_mfe,
+        label="IRFold0 MFE",
+    )
+    plt.plot(
+        irfold1_res_df.seq_len.unique(),
+        irfold0_avg_df.dot_bracket_mfe,
+        label="IRFold0 True MFE",
+    )
+    plt.legend()
+    plt.grid()
+    plt.ylabel("Mean MFE")
+    plt.xlabel("Sequence Length")
+
+    irfold1_true_mfe_values = []
+    plt.subplot(1, 2, 2)
+    plt.plot(
+        irfold0_res_df.seq_len.unique(),
+        irfold0_avg_df.solution_mfe,
+        label="IRFold1 MFE",
+    )
+    plt.plot(
+        irfold1_res_df.seq_len.unique(),
+        irfold1_avg_df.dot_bracket_mfe,
+        label="IRFold1 True MFE",
+    )
+
+    plt.legend()
+    plt.grid()
+    plt.ylabel("Mean MFE")
+    plt.xlabel("Sequence Length")
+    plt.tight_layout()
+    plt.savefig(f"{DATA_DIR}/experiment_2_solver_performance_comparison.png")
+    plt.show()
+
     plt.rcParams["figure.figsize"] = (6, 4)
 
     # MFEs of final solutions
