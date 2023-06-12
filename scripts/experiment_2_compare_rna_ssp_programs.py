@@ -17,7 +17,7 @@ if __name__ == "__main__":
         writer = csv.writer(perf_file)
         writer.writerow(["dot_bracket_repr", "solution_mfe", "seq_len"])
 
-    n_runs_per_seq_length = 3
+    n_runs_per_seq_length = 10
     for seq_len in tqdm(range(10, 11), desc=f"Running trials"):
         for _ in range(n_runs_per_seq_length):
             seq = "".join(random.choice("ACGU") for _ in range(seq_len))
