@@ -100,13 +100,12 @@ if __name__ == "__main__":
 
     # MFEs of final solutions
     mfe_data = [
-        irfold0_res_df.solution_mfe,
-        irfold1_res_df.solution_mfe,
+        irfold1_res_df.dot_bracket_repr_mfe,
         rnalib_res_df.solution_mfe,
     ]
     fig, ax = plt.subplots()
 
-    ax.boxplot(mfe_data, labels=["IRFold0", "IRFold1", "RNAlib"])
+    ax.boxplot(mfe_data, labels=["IRFold1", "RNAlib"])
 
     ax.title.set_text("MFE of Final Solution")
     plt.ylabel("MFE (kcal/mol)")
