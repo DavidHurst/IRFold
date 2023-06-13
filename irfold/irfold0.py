@@ -1,7 +1,5 @@
 __all__ = ["IRFold0"]
 
-import csv
-import subprocess
 import itertools
 import re
 
@@ -15,6 +13,7 @@ from ortools.sat.python.cp_model import (
     OPTIMAL,
     FEASIBLE,
 )
+from typing_extensions import override
 
 from irfold.util import (
     ir_pair_match_same_bases,
@@ -50,7 +49,7 @@ class IRFold0:
         for in class IRFold2."""
 
         # Find IRs in sequence
-        found_irs: List[IR] = IRFold0.find_irs(
+        found_irs: List[IR] = cls.find_irs(
             sequence=sequence,
             seq_name=seq_name,
             min_len=min_len,
@@ -108,10 +107,9 @@ class IRFold0:
             # The optimisation problem does not have an optimal solution
             db_repr, obj_fn_value = "".join(["." for _ in range(seq_len)]), 0
             if save_performance:
-                if save_performance:
-                    write_performance_to_file(
-                        db_repr, obj_fn_value, 0.0, seq_len, out_dir, cls.__name__
-                    )
+                write_performance_to_file(
+                    db_repr, obj_fn_value, 0.0, seq_len, out_dir, cls.__name__
+                )
             return db_repr, obj_fn_value
 
     @staticmethod
@@ -194,22 +192,8 @@ class IRFold0:
         seq_name: str,
         backend: str = "SCIP",
     ) -> Tuple[CpModel, List[IntVar]]:
-        # Create solver
         model: CpModel = CpModel()
-
         n_irs: int = len(ir_list)
-
-        # Evaluate free energy of each IR respectively
-        db_reprs: List[str] = [
-            irs_to_dot_bracket([ir_list[i]], seq_len) for i in range(n_irs)
-        ]
-        ir_free_energies: List[float] = [
-            calc_free_energy(db_repr, sequence, out_dir, seq_name)
-            for db_repr in db_reprs
-        ]
-
-        # Create binary indicator variables for IRs
-        variables = [model.NewIntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
 
         unique_idx_pairs: List[Tuple[int, int]] = list(
             itertools.combinations([i for i in range(n_irs)], 2)
@@ -223,6 +207,9 @@ class IRFold0:
             if IRFold0.ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
+        # Create binary indicator variables for IRs
+        variables = [model.NewIntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
+
         # All constraints and the objective must have integer coefficients for CP-SAT solver
 
         # Add XOR between IRs that match the same bases
@@ -230,7 +217,13 @@ class IRFold0:
             model.Add(variables[ir_a_idx] + variables[ir_b_idx] <= 1)
 
         # Define objective function
-        variable_coefficients = [round(free_energy) for free_energy in ir_free_energies]
+        db_reprs: List[str] = [
+            irs_to_dot_bracket([ir_list[i]], seq_len) for i in range(n_irs)
+        ]
+        variable_coefficients: List[int] = [
+            round(calc_free_energy(db_repr, sequence, out_dir, seq_name))
+            for db_repr in db_reprs
+        ]
         obj_fn_expr = LinearExpr.WeightedSum(variables, variable_coefficients)
 
         model.Minimize(obj_fn_expr)

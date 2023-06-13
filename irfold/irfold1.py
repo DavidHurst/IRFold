@@ -3,11 +3,17 @@ __all__ = ["IRFold1"]
 import itertools
 import re
 
-from irfold import IRFold0
+from ortools.sat.python.cp_model import CpModel, IntVar, LinearExpr
 from typing import Tuple, List
-from ortools.linear_solver import pywraplp
-
-IR = Tuple[Tuple[int, int], Tuple[int, int]]
+from irfold import IRFold0
+from irfold.util import (
+    ir_has_valid_gap_size,
+    IR,
+    irs_to_dot_bracket,
+    calc_free_energy,
+    ir_pair_match_same_bases,
+    ir_pair_forms_valid_loop,
+)
 
 
 class IRFold1(IRFold0):
@@ -21,28 +27,24 @@ class IRFold1(IRFold0):
         out_dir: str,
         seq_name: str,
         backend: str = "SCIP",
-    ) -> pywraplp.Solver:
-        # Create solver
-        solver: pywraplp.Solver = pywraplp.Solver.CreateSolver(backend)
-        if solver is None:
-            raise Exception("Failed to create solver.")
+    ) -> Tuple[CpModel, List[IntVar]]:
+        model: CpModel = CpModel()
         n_irs: int = len(ir_list)
 
         # Create binary indicator variables for IRs
         invalid_gap_ir_idxs: List[int] = [
-            i for i in range(n_irs) if not IRFold1.ir_has_valid_gap_size(ir_list[i])
+            i for i in range(n_irs) if not ir_has_valid_gap_size(ir_list[i])
         ]
-        variables = [
-            solver.IntVar(0, 1, f"ir_{i}")
+        ir_variables = [
+            model.NewIntVar(0, 1, f"ir_{i}")
             for i in range(n_irs)
             if i not in invalid_gap_ir_idxs
         ]
 
-        # If 1 or fewer variables, trivial or impossible optimisation problem, will be handled by ortools
-        if len(variables) <= 1:
-            return solver
+        # If 1 or fewer variables, trivial or impossible optimisation problem, will be trivially handled by solver
+        if len(ir_variables) <= 1:
+            return model, ir_variables
 
-        # Add XOR between IRs that match the same bases
         unique_possible_idx_pairs: List[Tuple[int, int]] = list(
             itertools.combinations([i for i in range(n_irs)], 2)
         )
@@ -51,7 +53,6 @@ class IRFold1(IRFold0):
             for pair in unique_possible_idx_pairs
             if pair[0] not in invalid_gap_ir_idxs and pair[1] not in invalid_gap_ir_idxs
         ]
-
         valid_ir_pairs: List[Tuple[IR, IR]] = [
             (ir_list[i], ir_list[j]) for i, j in valid_idx_pairs
         ]
@@ -61,85 +62,38 @@ class IRFold1(IRFold0):
             if IRFold1.ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
+        # Add XOR between IRs that are incompatible
         for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
-            ir_a_var = solver.LookupVariable(f"ir_{ir_a_idx}")
-            ir_b_var = solver.LookupVariable(f"ir_{ir_b_idx}")
-            solver.Add(
-                ir_a_var + ir_b_var <= 1,
-                f"ir_{ir_a_idx}_XOR_ir_{ir_b_idx}",
-            )
+            # Search required as some IR variables might not have had variables created as they were invalid so
+            # list ordering of variables cannot be relied upon
+            ir_a_var: IntVar = [
+                var for var in ir_variables if str(ir_a_idx) in var.Name()
+            ][0]
+            ir_b_var: IntVar = [
+                var for var in ir_variables if str(ir_b_idx) in var.Name()
+            ][0]
+
+            model.Add(ir_a_var + ir_b_var <= 1)
+
+        # All constraints and the objective must have integer coefficients for CP-SAT solver
 
         # Define objective function
-        obj_fn = solver.Objective()
-        for var in variables:
-            ir_idx: int = int(re.findall(r"-?\d+\.?\d*", var.name())[0])
-            ir_db_repr: str = IRFold0.irs_to_dot_bracket([ir_list[ir_idx]], seq_len)
-            ir_free_energy: float = IRFold0.calc_free_energy(
+        variable_coefficients: List[int] = []
+        for var in ir_variables:
+            ir_idx: int = int(re.findall(r"-?\d+\.?\d*", var.Name())[0])
+            ir_db_repr: str = irs_to_dot_bracket([ir_list[ir_idx]], seq_len)
+            ir_free_energy: float = calc_free_energy(
                 ir_db_repr, sequence, out_dir, seq_name
             )
+            variable_coefficients.append(round(ir_free_energy))
 
-            obj_fn.SetCoefficient(var, ir_free_energy)
-        obj_fn.SetMinimization()
+        obj_fn_expr = LinearExpr.WeightedSum(ir_variables, variable_coefficients)
+        model.Minimize(obj_fn_expr)
 
-        return solver
-
-    @staticmethod
-    def ir_has_valid_gap_size(ir):
-        left_strand_end_idx: int = ir[0][1]
-        right_strand_start_idx: int = ir[1][0]
-
-        return right_strand_start_idx - left_strand_end_idx - 1 >= 3
+        return model, ir_variables
 
     @staticmethod
     def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
-        return IRFold0.ir_pair_match_same_bases(
+        return ir_pair_match_same_bases(ir_a, ir_b) or not ir_pair_forms_valid_loop(
             ir_a, ir_b
-        ) or not IRFold1.ir_pair_forms_valid_loop(ir_a, ir_b)
-
-    @staticmethod
-    def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
-        if IRFold1.ir_pair_wholly_nested(ir_a, ir_b) or IRFold1.ir_pair_wholly_nested(
-            ir_b, ir_a
-        ):
-            return True
-
-        ir_a_left_strand: Tuple[int, int]
-        ir_b_left_strand: Tuple[int, int]
-
-        ir_a_left_strand, ir_b_left_strand = ir_a[0], ir_b[0]
-
-        latest_left_string_base_idx = (
-            ir_a_left_strand[1]
-            if ir_a_left_strand[1] > ir_b_left_strand[1]
-            else ir_b_left_strand[1]
         )
-        earliest_right_string_base_idx = (
-            ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
-        )
-
-        if IRFold1.ir_pair_disjoint(ir_a, ir_b):
-            return True
-
-        # Invalid loop
-        bases_inbetween_parens = (
-            earliest_right_string_base_idx - latest_left_string_base_idx - 1
-        )
-        if bases_inbetween_parens < 3:
-            return False
-
-        return True
-
-    @staticmethod
-    def ir_pair_disjoint(ir_a: IR, ir_b: IR) -> bool:
-        # ir_a comes entirely before ir_b
-        ir_a_strictly_before_ir_b = ir_a[1][1] < ir_b[0][0]
-
-        # ir_b comes entirely before ir_a
-        ir_b_strictly_before_ir_a = ir_b[1][1] < ir_a[0][0]
-
-        return ir_a_strictly_before_ir_b or ir_b_strictly_before_ir_a
-
-    @staticmethod
-    def ir_pair_wholly_nested(outer_ir: IR, nested_ir: IR) -> bool:
-        # ToDo: Make this return true for nesting of A in B or B in A
-        return outer_ir[0][0] < nested_ir[0][0] and nested_ir[1][1] < outer_ir[1][0]
