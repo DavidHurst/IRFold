@@ -138,7 +138,7 @@ if __name__ == "__main__":
     )
     irfold2_ax.title.set_text("IRFold2")
 
-    for ax in [irfold1_ax, irfold2_ax]:
+    for ax in [irfold0_ax, irfold1_ax, irfold2_ax]:
         ax.legend()
         ax.grid()
         ax.set_ylabel("Mean Value (kcal/mol)")
