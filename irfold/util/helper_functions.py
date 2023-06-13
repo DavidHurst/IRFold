@@ -1,3 +1,5 @@
+import csv
+import subprocess
 from typing import List, Tuple
 
 from pathlib import Path
@@ -57,3 +59,81 @@ def create_seq_file(seq: str, seq_name: str, file_name: str) -> None:
     with open(file_name, "w") as file:
         file.write(f">{seq_name}\n")
         file.write(seq)
+
+
+def run_cmd(cmd):
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = proc.communicate()
+    return proc.returncode, stdout, stderr
+
+
+def write_performance_to_file(
+    dot_bracket_repr: str,
+    solution_mfe: float,
+    dot_bracket_repr_mfe: float,
+    seq_len: int,
+    out_dir: str,
+    class_name: str,
+    n_irs_found: int = None,
+    solver_num_variables: int = None,
+    solver_num_constraints: int = None,
+    solver_solve_time: float = None,
+    solver_iterations: int = None,
+    solver_num_branch_bound_nodes: int = None,
+):
+    out_dir_path: Path = Path(out_dir).resolve()
+    if not out_dir_path.exists():
+        out_dir_path = Path.cwd().resolve()
+
+    performance_file_name: str = f"{class_name}_performance.csv"
+    performance_file_path: Path = (Path(out_dir_path) / performance_file_name).resolve()
+
+    if not performance_file_path.exists():
+        performance_file_path = (out_dir_path / performance_file_name).resolve()
+        column_names = [
+            "dot_bracket_repr",
+            "solution_mfe",
+            "dot_bracket_repr_mfe",
+            "seq_len",
+            "n_irs_found",
+            "solver_num_variables",
+            "solver_num_constraints",
+            "solver_solve_time",
+            "solver_iterations",
+            "solver_num_branch_bound_nodes",
+        ]
+
+        with open(str(performance_file_path), "w") as perf_file:
+            writer = csv.writer(perf_file)
+            writer.writerow(column_names)
+            writer.writerow(
+                [
+                    dot_bracket_repr,
+                    solution_mfe,
+                    dot_bracket_repr_mfe,
+                    seq_len,
+                    n_irs_found,
+                    solver_num_variables,
+                    solver_num_constraints,
+                    solver_solve_time,
+                    solver_iterations,
+                    solver_num_branch_bound_nodes,
+                ]
+            )
+    else:
+        with open(str(performance_file_path), "a") as perf_file:
+            writer = csv.writer(perf_file)
+            writer.writerow(
+                [
+                    dot_bracket_repr,
+                    solution_mfe,
+                    dot_bracket_repr_mfe,
+                    seq_len,
+                    n_irs_found,
+                    solver_num_variables,
+                    solver_num_constraints,
+                    solver_solve_time,
+                    solver_iterations,
+                    solver_num_branch_bound_nodes,
+                ]
+            )

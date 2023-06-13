@@ -22,6 +22,8 @@ from irfold.util import (
     calc_free_energy,
     IR,
     create_seq_file,
+    write_performance_to_file,
+    run_cmd,
 )
 
 
@@ -63,12 +65,8 @@ class IRFold0:
         if n_irs_found == 0:  # Return sequence if no IRs found
             db_repr, obj_fn_value = "".join(["." for _ in range(seq_len)]), 0
             if save_performance:
-                cls.__write_performance_to_file(
-                    db_repr,
-                    obj_fn_value,
-                    0.0,
-                    seq_len,
-                    out_dir,
+                write_performance_to_file(
+                    db_repr, obj_fn_value, 0.0, seq_len, out_dir, cls.__name__
                 )
             return db_repr, obj_fn_value
 
@@ -97,12 +95,13 @@ class IRFold0:
             )
 
             if save_performance:
-                cls.__write_performance_to_file(
+                write_performance_to_file(
                     db_repr,
                     obj_fn_value,
                     dot_bracket_repr_mfe,
                     seq_len,
                     out_dir,
+                    cls.__name__,
                 )
             return db_repr, obj_fn_value
         else:
@@ -110,12 +109,8 @@ class IRFold0:
             db_repr, obj_fn_value = "".join(["." for _ in range(seq_len)]), 0
             if save_performance:
                 if save_performance:
-                    cls.__write_performance_to_file(
-                        db_repr,
-                        obj_fn_value,
-                        0.0,
-                        seq_len,
-                        out_dir,
+                    write_performance_to_file(
+                        db_repr, obj_fn_value, 0.0, seq_len, out_dir, cls.__name__
                     )
             return db_repr, obj_fn_value
 
@@ -144,7 +139,7 @@ class IRFold0:
         irs_output_file: str = str(out_dir_path / f"{seq_name}_found_irs.txt")
 
         # ToDo: Refactor this to capture stdout of running IUPACpal instead of writing to file then extracting
-        _, out, _ = IRFold0.__run_cmd(
+        _, out, _ = run_cmd(
             [
                 str(iupacpal_exe),
                 "-f",
@@ -189,12 +184,6 @@ class IRFold0:
         else:
             print(str(out.decode("utf-8")))
             return []
-
-    @staticmethod
-    def __run_cmd(cmd):
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = proc.communicate()
-        return proc.returncode, stdout, stderr
 
     @staticmethod
     def get_solver(
@@ -251,77 +240,3 @@ class IRFold0:
     @staticmethod
     def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
         return ir_pair_match_same_bases(ir_a, ir_b)
-
-    @classmethod
-    def __write_performance_to_file(
-        cls,
-        dot_bracket_repr: str,
-        solution_mfe: float,
-        dot_bracket_repr_mfe: float,
-        seq_len: int,
-        out_dir: str,
-        n_irs_found: int = None,
-        solver_num_variables: int = None,
-        solver_num_constraints: int = None,
-        solver_solve_time: float = None,
-        solver_iterations: int = None,
-        solver_num_branch_bound_nodes: int = None,
-    ):
-        out_dir_path: Path = Path(out_dir).resolve()
-        if not out_dir_path.exists():
-            out_dir_path = Path.cwd().resolve()
-
-        performance_file_name: str = f"{cls.__name__}_performance.csv"
-        performance_file_path: Path = (
-            Path(out_dir_path) / performance_file_name
-        ).resolve()
-
-        if not performance_file_path.exists():
-            performance_file_path = (out_dir_path / performance_file_name).resolve()
-            column_names = [
-                "dot_bracket_repr",
-                "solution_mfe",
-                "dot_bracket_repr_mfe",
-                "seq_len",
-                "n_irs_found",
-                "solver_num_variables",
-                "solver_num_constraints",
-                "solver_solve_time",
-                "solver_iterations",
-                "solver_num_branch_bound_nodes",
-            ]
-
-            with open(str(performance_file_path), "w") as perf_file:
-                writer = csv.writer(perf_file)
-                writer.writerow(column_names)
-                writer.writerow(
-                    [
-                        dot_bracket_repr,
-                        solution_mfe,
-                        dot_bracket_repr_mfe,
-                        seq_len,
-                        n_irs_found,
-                        solver_num_variables,
-                        solver_num_constraints,
-                        solver_solve_time,
-                        solver_iterations,
-                        solver_num_branch_bound_nodes,
-                    ]
-                )
-        else:
-            with open(str(performance_file_path), "a") as perf_file:
-                writer = csv.writer(perf_file)
-                writer.writerow(
-                    [
-                        dot_bracket_repr,
-                        solution_mfe,
-                        dot_bracket_repr_mfe,
-                        seq_len,
-                        n_irs_found,
-                        solver_num_variables,
-                        solver_num_constraints,
-                        solver_solve_time,
-                        solver_iterations,
-                        solver_num_branch_bound_nodes,
-                    ]
-                )
