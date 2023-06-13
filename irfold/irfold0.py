@@ -70,7 +70,7 @@ class IRFold0:
 
         # Define ILP and solve
         model, ir_variables = cls.get_solver(
-            found_irs, seq_len, sequence, out_dir, seq_name, solver_backend
+            found_irs, seq_len, sequence, out_dir, seq_name
         )
 
         solver: CpSolver = CpSolver()
@@ -194,7 +194,6 @@ class IRFold0:
         sequence: str,
         out_dir: str,
         seq_name: str,
-        backend: str = "SCIP",
     ) -> Tuple[CpModel, List[IntVar]]:
         model: CpModel = CpModel()
         n_irs: int = len(ir_list)
@@ -212,13 +211,17 @@ class IRFold0:
         ]
 
         # Create binary indicator variables for IRs
-        variables = [model.NewIntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
+        ir_indicator_variables = [
+            model.NewIntVar(0, 1, f"ir_{i}") for i in range(n_irs)
+        ]
 
         # All constraints and the objective must have integer coefficients for CP-SAT solver
 
         # Add XOR between IRs that match the same bases
         for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
-            model.Add(variables[ir_a_idx] + variables[ir_b_idx] <= 1)
+            model.Add(
+                ir_indicator_variables[ir_a_idx] + ir_indicator_variables[ir_b_idx] <= 1
+            )
 
         # Define objective function
         db_reprs: List[str] = [
@@ -228,11 +231,13 @@ class IRFold0:
             round(calc_free_energy(db_repr, sequence, out_dir, seq_name))
             for db_repr in db_reprs
         ]
-        obj_fn_expr = LinearExpr.WeightedSum(variables, variable_coefficients)
+        obj_fn_expr = LinearExpr.WeightedSum(
+            ir_indicator_variables, variable_coefficients
+        )
 
         model.Minimize(obj_fn_expr)
 
-        return model, variables
+        return model, ir_indicator_variables
 
     @staticmethod
     def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:

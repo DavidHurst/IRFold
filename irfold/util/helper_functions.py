@@ -91,7 +91,7 @@ def write_performance_to_file(
         performance_file_path = (out_dir_path / performance_file_name).resolve()
         column_names = [
             "dot_bracket_repr",
-            "solution_mfe",
+            "obj_fn_final_value",
             "dot_bracket_repr_mfe",
             "seq_len",
             "n_irs_found",
