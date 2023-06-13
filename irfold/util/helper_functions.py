@@ -69,17 +69,16 @@ def run_cmd(cmd):
 
 def write_performance_to_file(
     dot_bracket_repr: str,
-    solution_mfe: float,
+    obj_fn_final_value: float,
     dot_bracket_repr_mfe: float,
     seq_len: int,
     out_dir: str,
     class_name: str,
     n_irs_found: int = None,
-    solver_num_variables: int = None,
-    solver_num_constraints: int = None,
+    solver_num_booleans: int = None,
     solver_solve_time: float = None,
-    solver_iterations: int = None,
-    solver_num_branch_bound_nodes: int = None,
+    solver_num_branches_explored: int = None,
+    solver_num_conflicts: int = None,
 ):
     out_dir_path: Path = Path(out_dir).resolve()
     if not out_dir_path.exists():
@@ -96,11 +95,11 @@ def write_performance_to_file(
             "dot_bracket_repr_mfe",
             "seq_len",
             "n_irs_found",
-            "solver_num_variables",
-            "solver_num_constraints",
+            "solver_num_booleans",
             "solver_solve_time",
             "solver_iterations",
-            "solver_num_branch_bound_nodes",
+            "solver_num_branches_explored",
+            "solver_num_conflicts",
         ]
 
         with open(str(performance_file_path), "w") as perf_file:
@@ -109,15 +108,14 @@ def write_performance_to_file(
             writer.writerow(
                 [
                     dot_bracket_repr,
-                    solution_mfe,
+                    obj_fn_final_value,
                     dot_bracket_repr_mfe,
                     seq_len,
                     n_irs_found,
-                    solver_num_variables,
-                    solver_num_constraints,
+                    solver_num_booleans,
                     solver_solve_time,
-                    solver_iterations,
-                    solver_num_branch_bound_nodes,
+                    solver_num_branches_explored,
+                    solver_num_conflicts,
                 ]
             )
     else:
@@ -126,14 +124,13 @@ def write_performance_to_file(
             writer.writerow(
                 [
                     dot_bracket_repr,
-                    solution_mfe,
+                    obj_fn_final_value,
                     dot_bracket_repr_mfe,
                     seq_len,
                     n_irs_found,
-                    solver_num_variables,
-                    solver_num_constraints,
+                    solver_num_booleans,
                     solver_solve_time,
-                    solver_iterations,
-                    solver_num_branch_bound_nodes,
+                    solver_num_branches_explored,
+                    solver_num_conflicts,
                 ]
             )

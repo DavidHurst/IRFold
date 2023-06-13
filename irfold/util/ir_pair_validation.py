@@ -34,28 +34,31 @@ def ir_pair_wholly_nested(outer_ir: IR, nested_ir: IR) -> bool:
 
 
 def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
-    if ir_pair_wholly_nested(ir_a, ir_b) or ir_pair_wholly_nested(ir_b, ir_a) or ir_pair_disjoint(ir_a, ir_b):
+    if (
+        ir_pair_wholly_nested(ir_a, ir_b)
+        or ir_pair_wholly_nested(ir_b, ir_a)
+        or ir_pair_disjoint(ir_a, ir_b)
+    ):
         return True
 
-    ir_a_left_strand: Tuple[int, int]
-    ir_b_left_strand: Tuple[int, int]
-
-    ir_a_left_strand, ir_b_left_strand = ir_a[0], ir_b[0]
+    ir_a_left_strand: Tuple[int, int] = ir_a[0]
+    ir_b_left_strand: Tuple[int, int] = ir_b[0]
 
     latest_left_string_base_idx: int = (
         ir_a_left_strand[1]
         if ir_a_left_strand[1] > ir_b_left_strand[1]
         else ir_b_left_strand[1]
     )
+    # ToDo: Introduce variables here for clarity
     earliest_right_string_base_idx: int = (
         ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
     )
 
     # Invalid loop
-    bases_inbetween_parens = (
+    bases_inbetween_latest_left_and_earliest_right_bases: int = (
         earliest_right_string_base_idx - latest_left_string_base_idx - 1
     )
-    if bases_inbetween_parens < 3:
+    if bases_inbetween_latest_left_and_earliest_right_bases < 3:
         return False
 
     return True

@@ -13,7 +13,6 @@ from ortools.sat.python.cp_model import (
     OPTIMAL,
     FEASIBLE,
 )
-from typing_extensions import override
 
 from irfold.util import (
     ir_pair_match_same_bases,
@@ -101,6 +100,11 @@ class IRFold0:
                     seq_len,
                     out_dir,
                     cls.__name__,
+                    n_irs_found,
+                    solver.NumBooleans(),
+                    solver.WallTime(),
+                    solver.NumBranches(),
+                    solver.NumConflicts(),
                 )
             return db_repr, obj_fn_value
         else:

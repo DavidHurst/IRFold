@@ -19,79 +19,77 @@ if __name__ == "__main__":
     irfold1_avg_df = irfold1_res_df.groupby("seq_len").mean(numeric_only=True)
 
     # Solver performance comparison
-    plt.subplot(1, 2, 1)
-    plt.plot(
-        irfold0_res_df.seq_len.unique(),
-        irfold0_avg_df.solver_num_variables,
-        label="IRFold0",
-    )
-    plt.plot(
-        irfold1_res_df.seq_len.unique(),
-        irfold1_avg_df.solver_num_variables,
-        label="IRFold1",
-    )
-    plt.legend()
-    plt.grid()
-    plt.ylabel("Mean Num. Solver Variables")
-    plt.xlabel("Sequence Length")
-
-    plt.subplot(1, 2, 2)
-    plt.plot(
-        irfold0_res_df.seq_len.unique(),
-        irfold0_avg_df.solver_num_constraints,
-        label="IRFold0",
-    )
-    plt.plot(
-        irfold1_res_df.seq_len.unique(),
-        irfold1_avg_df.solver_num_constraints,
-        label="IRFold1",
-    )
-
-    plt.legend()
-    plt.grid()
-    plt.ylabel("Mean Num. Solver Constraints")
-    plt.xlabel("Sequence Length")
-    plt.suptitle("Constraints Over Time")
-    plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/experiment_2_solver_performance_comparison.png")
-    plt.show()
+    # plt.subplot(1, 2, 1)
+    # plt.plot(
+    #     irfold0_res_df.seq_len.unique(),
+    #     irfold0_avg_df.solver_num_variables,
+    #     label="IRFold0",
+    # )
+    # plt.plot(
+    #     irfold1_res_df.seq_len.unique(),
+    #     irfold1_avg_df.solver_num_variables,
+    #     label="IRFold1",
+    # )
+    # plt.legend()
+    # plt.grid()
+    # plt.ylabel("Mean Num. Solver Variables")
+    # plt.xlabel("Sequence Length")
+    #
+    # plt.subplot(1, 2, 2)
+    # plt.plot(
+    #     irfold0_res_df.seq_len.unique(),
+    #     irfold0_avg_df.solver_num_constraints,
+    #     label="IRFold0",
+    # )
+    # plt.plot(
+    #     irfold1_res_df.seq_len.unique(),
+    #     irfold1_avg_df.solver_num_constraints,
+    #     label="IRFold1",
+    # )
+    #
+    # plt.legend()
+    # plt.grid()
+    # plt.ylabel("Mean Num. Solver Constraints")
+    # plt.xlabel("Sequence Length")
+    # plt.suptitle("Constraints Over Time")
+    # plt.tight_layout()
+    # plt.savefig(f"{DATA_DIR}/experiment_2_solver_performance_comparison.png")
+    # plt.show()
 
     # Compare IRFold versions: True MFE of IRFold solutions vs. MFE IRFold returns
     # This is to show the effect of additivity assumption inconsistency
-    plt.subplot(1, 2, 1)
-    plt.plot(
+    irfold0_ax = plt.subplot(1, 2, 1)
+    irfold0_ax.plot(
         irfold0_res_df.seq_len.unique(),
         irfold0_avg_df.solution_mfe,
-        label="IRFold0 MFE",
+        label="Objective Function Value",
     )
-    plt.plot(
-        irfold1_res_df.seq_len.unique(),
+    irfold0_ax.plot(
+        irfold0_res_df.seq_len.unique(),
         irfold0_avg_df.dot_bracket_repr_mfe,
-        label="IRFold0 True MFE",
+        label="Solution MFE",
     )
-    plt.legend()
-    plt.grid()
-    plt.ylabel("Mean MFE")
-    plt.xlabel("Sequence Length")
+    irfold0_ax.title.set_text("IRFold0")
 
-    irfold1_true_mfe_values = []
-    plt.subplot(1, 2, 2)
-    plt.plot(
-        irfold0_res_df.seq_len.unique(),
-        irfold0_avg_df.solution_mfe,
-        label="IRFold1 MFE",
+    irfold1_ax = plt.subplot(1, 2, 2, sharex=irfold0_ax)
+    irfold1_ax.plot(
+        irfold1_res_df.seq_len.unique(),
+        irfold1_avg_df.solution_mfe,
+        label="Objective Function Value",
     )
-    plt.plot(
+    irfold1_ax.plot(
         irfold1_res_df.seq_len.unique(),
         irfold1_avg_df.dot_bracket_repr_mfe,
-        label="IRFold1 True MFE",
+        label="Solution MFE",
     )
+    irfold1_ax.title.set_text("IRFold1")
 
-    plt.legend()
-    plt.grid()
-    plt.ylabel("Mean MFE")
-    plt.xlabel("Sequence Length")
-    plt.suptitle("Additive IR MFE vs True IR MFE Over Time")
+    for ax in [irfold0_ax, irfold1_ax]:
+        ax.legend()
+        ax.grid()
+        ax.set_ylabel("Mean Value (kcal/mol)")
+        ax.set_xlabel("Sequence Length")
+    plt.suptitle("Solver Objective Function Final Value vs. Solution MFE")
     plt.tight_layout()
     plt.savefig(f"{DATA_DIR}/experiment_2_solver_performance_comparison.png")
     plt.show()
@@ -107,30 +105,30 @@ if __name__ == "__main__":
 
     ax.boxplot(mfe_data, labels=["IRFold1", "RNAlib"])
 
-    ax.title.set_text("MFE of Final Solution")
+    ax.title.set_text("MFE of Solution")
     plt.ylabel("MFE (kcal/mol)")
-    plt.suptitle("SSP Program's Solution MFEs")
+    plt.suptitle("SSP Program Solution MFE Comparison")
     plt.tight_layout()
     plt.savefig(f"{DATA_DIR}/experiment_2_mfe_comparison.png")
     plt.show()
 
     # Compare IRFold versions' MFE's as sequence length increases
-    plt.plot(
-        irfold0_res_df.seq_len.unique(),
-        irfold0_avg_df.solution_mfe,
-        label="IRFold0",
-    )
-    plt.plot(
-        irfold1_res_df.seq_len.unique(),
-        irfold1_avg_df.solution_mfe,
-        label="IRFold1",
-    )
-
-    plt.legend()
-    plt.grid()
-    plt.ylabel("Mean MFE of Final Solution")
-    plt.xlabel("Sequence Length")
-    plt.suptitle("IRFold Variant's MFEs over Time")
-    plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/experiment_2_mfe_over_time_comparison.png")
-    plt.show()
+    # plt.plot(
+    #     irfold0_res_df.seq_len.unique(),
+    #     irfold0_avg_df.solution_mfe,
+    #     label="IRFold0",
+    # )
+    # plt.plot(
+    #     irfold1_res_df.seq_len.unique(),
+    #     irfold1_avg_df.solution_mfe,
+    #     label="IRFold1",
+    # )
+    #
+    # plt.legend()
+    # plt.grid()
+    # plt.ylabel("Mean MFE of Final Solution")
+    # plt.xlabel("Sequence Length")
+    # plt.suptitle("IRFold Variant's MFEs over Time")
+    # plt.tight_layout()
+    # plt.savefig(f"{DATA_DIR}/experiment_2_mfe_over_time_comparison.png")
+    # plt.show()
