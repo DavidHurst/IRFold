@@ -14,7 +14,7 @@ class IRFold1(IRFold0):
     """Extends base IRFold model by validating found IRs in pairs before passing them to the solver."""
 
     @staticmethod
-    def get_lp_solver(
+    def get_solver(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,

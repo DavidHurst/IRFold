@@ -23,7 +23,7 @@ def test_correct_ir_xor_constraints_generated(data_dir, irfold_variant):
         (1, 2),
     ]
 
-    solver = irfold_variant.get_lp_solver(
+    solver = irfold_variant.get_solver(
         irs,
         seq_len,
         seq,

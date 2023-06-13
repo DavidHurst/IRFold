@@ -15,7 +15,7 @@ class IRFold2(IRFold1):
     consistently"""
 
     @staticmethod
-    def get_lp_solver(
+    def get_solver(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
@@ -82,7 +82,9 @@ class IRFold2(IRFold1):
             ir_pair_db_repr: str = IRFold0.irs_to_dot_bracket(
                 [ir_list[ir_a_idx], ir_list[ir_b_idx]], seq_len
             )
-            print(f'ir_{ir_a_idx} and ir_{ir_b_idx} form invalid loop, adding correction variable')
+            print(
+                f"ir_{ir_a_idx} and ir_{ir_b_idx} form invalid loop, adding correction variable"
+            )
 
             ir_pair_additive_free_energy: float = sum(
                 [
@@ -105,6 +107,8 @@ class IRFold2(IRFold1):
                 ir_pair_fe_correction_indicator_vars.append(correction_var)
 
                 obj_fn.SetCoefficient(correction_var, -free_energy_difference)
+
+        print(f"after correction var generation")
 
         # Add XOR constraint between incompatible IR pairs
         for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:

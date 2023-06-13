@@ -38,11 +38,11 @@ if __name__ == "__main__":
                 "save_performance": True,
             }
 
-            # irfold0_secondary_structure, irfold0_mfe = IRFold0.fold(**fold_params)
+            irfold0_secondary_structure, irfold0_mfe = IRFold0.fold(**fold_params)
             #
             # irfold1_secondary_structure, irfold1_mfe = IRFold1.fold(**fold_params)
 
-            irfold2_secondary_structure, irfold2_mfe = IRFold2.fold(**fold_params)
+            # irfold2_secondary_structure, irfold2_mfe = IRFold2.fold(**fold_params)
 
             # rnalib_secondary_structure, rnalib_mfe = RNA.fold(seq, "")
             #

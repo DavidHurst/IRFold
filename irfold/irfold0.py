@@ -5,13 +5,17 @@ import subprocess
 import RNA
 import itertools
 import re
+import collections
 
 from pathlib import Path
 from typing import Tuple, List
 from ortools.linear_solver import pywraplp
+from ortools.sat.python.cp_model import CpModel, CpSolver, IntVar, LinearExpr, OPTIMAL, FEASIBLE
 
 # ((left_strand_start, left_strand_end), (right_strand_start, right_strand_end))
 IR = Tuple[Tuple[int, int], Tuple[int, int]]
+
+INFINITY = -100_000
 
 
 class IRFold0:
@@ -50,41 +54,37 @@ class IRFold0:
         n_irs_found: int = len(found_irs)
         seq_len: int = len(sequence)
         if n_irs_found == 0:  # Return sequence if no IRs found
-            db_repr, mfe = "".join(["." for _ in range(seq_len)]), 0
+            db_repr, obj_fn_value = "".join(["." for _ in range(seq_len)]), 0
             if save_performance:
                 cls.__write_performance_to_file(
                     db_repr,
-                    0.0,
+                    obj_fn_value,
                     0.0,
                     seq_len,
-                    n_irs_found,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
                     out_dir,
                 )
-            return db_repr, mfe
+            return db_repr, obj_fn_value
 
         # Define ILP and solve
-        solver = cls.get_lp_solver(
+        model, ir_variables = cls.get_solver(
             found_irs, seq_len, sequence, out_dir, seq_name, solver_backend
         )
-        status = solver.Solve()
 
-        if status == pywraplp.Solver.OPTIMAL:
+        solver: CpSolver = CpSolver()
+        status = solver.Solve(model)
+
+        if status == OPTIMAL or status == FEASIBLE:
             # Return dot bracket repr and mfe of final solution
             active_ir_idxs: List[int] = [
-                int(re.findall(r"-?\d+\.?\d*", v.name())[0])
-                for v in solver.variables()
-                if int(v.solution_value()) == 1
+                int(re.findall(r"-?\d+\.?\d*", v.Name())[0])
+                for v in ir_variables
+                if solver.Value(v) == 1
             ]
             db_repr: str = IRFold0.irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
 
-            solution_mfe: float = solver.Objective().Value()
+            obj_fn_value: float = solver.ObjectiveValue()
             dot_bracket_repr_mfe: float = cls.calc_free_energy(
                 db_repr, sequence, out_dir, seq_name
             )
@@ -92,37 +92,25 @@ class IRFold0:
             if save_performance:
                 cls.__write_performance_to_file(
                     db_repr,
-                    solution_mfe,
+                    obj_fn_value,
                     dot_bracket_repr_mfe,
                     seq_len,
-                    n_irs_found,
-                    solver.NumVariables(),
-                    solver.NumConstraints(),
-                    solver.wall_time(),
-                    solver.iterations(),
-                    solver.nodes(),
                     out_dir,
                 )
-            return db_repr, solution_mfe
+            return db_repr, obj_fn_value
         else:
             # The optimisation problem does not have an optimal solution
-            db_repr, mfe = "".join(["." for _ in range(seq_len)]), 0
+            db_repr, obj_fn_value = "".join(["." for _ in range(seq_len)]), 0
             if save_performance:
-                cls.__write_performance_to_file(
-                    db_repr,
-                    mfe,
-                    0.0,
-                    seq_len,
-                    n_irs_found,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    out_dir,
-                )
-            print("Exiting fold func".center(50, "="))
-            return db_repr, mfe
+                if save_performance:
+                    cls.__write_performance_to_file(
+                        db_repr,
+                        obj_fn_value,
+                        0.0,
+                        seq_len,
+                        out_dir,
+                    )
+            return db_repr, obj_fn_value
 
     @staticmethod
     def find_irs(
@@ -254,18 +242,17 @@ class IRFold0:
         return free_energy
 
     @staticmethod
-    def get_lp_solver(
+    def get_solver(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
         out_dir: str,
         seq_name: str,
         backend: str = "SCIP",
-    ) -> pywraplp.Solver:
+    ) -> Tuple[CpModel, List[IntVar]]:
         # Create solver
-        solver: pywraplp.Solver = pywraplp.Solver.CreateSolver(backend)
-        if solver is None:
-            raise Exception("Failed to create solver.")
+        model: CpModel = CpModel()
+
         n_irs: int = len(ir_list)
 
         # Evaluate free energy of each IR respectively
@@ -278,7 +265,7 @@ class IRFold0:
         ]
 
         # Create binary indicator variables for IRs
-        variables = [solver.IntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
+        variables = [model.NewIntVar(0, 1, f"ir_{i}") for i in range(n_irs)]
 
         # Add XOR between IRs that match the same bases
         unique_idx_pairs: List[Tuple[int, int]] = list(
@@ -293,21 +280,17 @@ class IRFold0:
             if IRFold0.ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
+        # All constraints and the objective must have integer coefficients for CP-SAT solver
         for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
-            ir_a_var = solver.LookupVariable(f"ir_{ir_a_idx}")
-            ir_b_var = solver.LookupVariable(f"ir_{ir_b_idx}")
-            solver.Add(
-                ir_a_var + ir_b_var <= 1,
-                f"ir_{ir_a_idx}_XOR_ir_{ir_b_idx}",
-            )
+            model.Add(variables[ir_a_idx] + variables[ir_b_idx] <= 1)
 
         # Define objective function
-        obj_fn = solver.Objective()
-        for i in range(n_irs):
-            obj_fn.SetCoefficient(variables[i], ir_free_energies[i])
-        obj_fn.SetMinimization()
+        variable_coefficients = [round(free_energy) for free_energy in ir_free_energies]
+        obj_fn_expr = LinearExpr.WeightedSum(variables, variable_coefficients)
 
-        return solver
+        model.Minimize(obj_fn_expr)
+
+        return model, variables
 
     @staticmethod
     def ir_pair_match_same_bases(ir_a: IR, ir_b: IR) -> bool:
@@ -337,13 +320,13 @@ class IRFold0:
         solution_mfe: float,
         dot_bracket_repr_mfe: float,
         seq_len: int,
-        n_irs_found: int,
-        solver_num_variables: int,
-        solver_num_constraints: int,
-        solver_solve_time: float,
-        solver_iterations: int,
-        solver_num_branch_bound_nodes: int,
         out_dir: str,
+        n_irs_found: int = None,
+        solver_num_variables: int = None,
+        solver_num_constraints: int = None,
+        solver_solve_time: float = None,
+        solver_iterations: int = None,
+        solver_num_branch_bound_nodes: int = None,
     ):
         out_dir_path: Path = Path(out_dir).resolve()
         if not out_dir_path.exists():
