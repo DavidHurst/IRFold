@@ -16,10 +16,10 @@ if __name__ == "__main__":
     with open(str(rnalib_performance_file_path), "w") as perf_file:
         writer = csv.writer(perf_file)
         writer.writerow(["dot_bracket_repr", "solution_mfe", "seq_len"])
-    random.seed(182)
+    # random.seed(182)
 
     n_runs_per_seq_length = 10
-    for seq_len in tqdm(range(10, 100), desc=f"Running trials"):
+    for seq_len in tqdm(range(10, 70), desc=f"Running trials"):
         for _ in range(n_runs_per_seq_length):
             seq = "".join(random.choice("ACGU") for _ in range(seq_len))
             seq_name = "random_seq_for_ssp_program_comparison"

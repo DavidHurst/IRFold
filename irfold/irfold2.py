@@ -3,7 +3,7 @@ __all__ = ["IRFold2"]
 import itertools
 import re
 
-from irfold import IRFold1, IRFold0
+from irfold import IRFold1
 from typing import Tuple, List
 from ortools.sat.python.cp_model import CpModel, IntVar, LinearExpr
 from irfold.util import (
@@ -11,8 +11,6 @@ from irfold.util import (
     IR,
     irs_to_dot_bracket,
     calc_free_energy,
-    ir_pair_match_same_bases,
-    ir_pair_forms_valid_loop,
 )
 
 
@@ -140,7 +138,7 @@ class IRFold2(IRFold1):
             LinearExpr.Sum([ir_indicators_expr, ir_pair_fe_correction_indicators_expr])
         )
 
-        return model, ir_indicator_variables
+        return model, ir_indicator_variables + ir_pair_fe_correction_indicator_vars
 
     @staticmethod
     def generate_ir_pair_correction_variables_w_coeffs(
@@ -159,40 +157,46 @@ class IRFold2(IRFold1):
             if IRFold1.ir_pair_incompatible(ir_a, ir_b):
                 continue
 
-            # print(
-            #     f"ir_{ir_a_idx} and ir_{ir_b_idx} form invalid loop, adding correction variable"
-            # )
-
             ir_a_db_repr: str = irs_to_dot_bracket([ir_list[ir_a_idx]], seq_len)
             ir_b_db_repr: str = irs_to_dot_bracket([ir_list[ir_b_idx]], seq_len)
             ir_pair_db_repr: str = irs_to_dot_bracket(
                 [ir_list[ir_a_idx], ir_list[ir_b_idx]], seq_len
             )
 
-            ir_pair_additive_free_energy: float = sum(
-                [
-                    calc_free_energy(ir_db_repr, sequence, out_dir, seq_name)
-                    for ir_db_repr in [ir_a_db_repr, ir_b_db_repr]
-                ]
+            ir_pair_additive_free_energy: float = round(
+                sum(
+                    [
+                        calc_free_energy(ir_db_repr, sequence, out_dir, seq_name)
+                        for ir_db_repr in [ir_a_db_repr, ir_b_db_repr]
+                    ]
+                ),
+                4,
             )
-            ir_pair_db_repr_free_energy: float = calc_free_energy(
-                ir_pair_db_repr, sequence, out_dir, seq_name
+            ir_pair_db_repr_free_energy: float = round(
+                calc_free_energy(ir_pair_db_repr, sequence, out_dir, seq_name), 4
             )
 
-            free_energy_difference: float = (
-                ir_pair_additive_free_energy - ir_pair_db_repr_free_energy
+            free_energy_difference: float = round(
+                ir_pair_additive_free_energy - ir_pair_db_repr_free_energy, 4
             )
 
             # If additivity assumption does not hold, add correction variable
             # ToDo: Use experiment 1 data to more efficiently add correction variables e.g. those pairs that form invalid loops
-            if free_energy_difference > 0:
+            if abs(free_energy_difference) > 0:
                 correction_var = model.NewIntVar(
                     0, 1, f"ir_{ir_a_idx}_ir_{ir_b_idx}_fe_corrector"
                 )
                 ir_pair_fe_correction_indicator_vars.append(correction_var)
-                ir_pair_fe_correction_indicator_vars_coeffs.append(
-                    round(free_energy_difference)
-                )
+
+                if ir_pair_additive_free_energy > ir_pair_db_repr_free_energy:
+
+                    ir_pair_fe_correction_indicator_vars_coeffs.append(
+                        -round(abs(free_energy_difference))
+                    )
+                else:
+                    ir_pair_fe_correction_indicator_vars_coeffs.append(
+                        round(abs(free_energy_difference))
+                    )
 
         return (
             ir_pair_fe_correction_indicator_vars,

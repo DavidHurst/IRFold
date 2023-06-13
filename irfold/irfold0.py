@@ -12,6 +12,7 @@ from ortools.sat.python.cp_model import (
     LinearExpr,
     OPTIMAL,
     FEASIBLE,
+    CpSolverSolutionCallback,
 )
 
 from irfold.util import (
@@ -23,6 +24,23 @@ from irfold.util import (
     write_performance_to_file,
     run_cmd,
 )
+
+# class VarArraySolutionPrinter(CpSolverSolutionCallback):
+#     """Print intermediate solutions."""
+#
+#     def __init__(self, variables):
+#         CpSolverSolutionCallback.__init__(self)
+#         self.__variables = variables
+#         self.__solution_count = 0
+#
+#     def on_solution_callback(self):
+#         self.__solution_count += 1
+#         for v in self.__variables:
+#             print('%s=%i' % (v, self.Value(v)), end=' ')
+#         print()
+#
+#     def solution_count(self):
+#         return self.__solution_count
 
 
 class IRFold0:
@@ -69,19 +87,22 @@ class IRFold0:
             return db_repr, obj_fn_value
 
         # Define ILP and solve
-        model, ir_variables = cls.get_solver(
+        model, variables = cls.get_solver(
             found_irs, seq_len, sequence, out_dir, seq_name
         )
 
         solver: CpSolver = CpSolver()
-        status = solver.Solve(model)
+        # solver.parameters.enumerate_all_solutions = True
+        # solution_printer = VarArraySolutionPrinter(variables)
+
+        status = solver.Solve(model)  # , solution_printer)
 
         if status == OPTIMAL or status == FEASIBLE:
-            # Return dot bracket repr and mfe of final solution
+            # Return dot bracket repr and objective function's final value
             active_ir_idxs: List[int] = [
                 int(re.findall(r"-?\d+\.?\d*", v.Name())[0])
-                for v in ir_variables
-                if solver.Value(v) == 1
+                for v in variables
+                if solver.Value(v) == 1 and "corrector" not in v.Name()
             ]
             db_repr: str = irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
