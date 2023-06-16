@@ -1,9 +1,9 @@
-__all__ = ["IRFold2"]
+__all__ = ["IRFoldCor2"]
 
 import itertools
 import re
 
-from irfold import IRFold1
+from irfold import IRFoldVal1
 from typing import Tuple, List
 from ortools.sat.python.cp_model import CpModel, IntVar, LinearExpr
 from irfold.util import (
@@ -14,7 +14,7 @@ from irfold.util import (
 )
 
 
-class IRFold2(IRFold1):
+class IRFoldCor2(IRFoldVal1):
     """Extends IRFold1 by adding solver variables to correct for the additivity of free energy IRs not holding
     consistently"""
 
@@ -58,7 +58,7 @@ class IRFold2(IRFold1):
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(valid_ir_pairs, valid_idx_pairs)
-            if IRFold1.ir_pair_incompatible(ir_pair[0], ir_pair[1])
+            if IRFoldVal1.ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
         # Add XOR between IRs that are incompatible
@@ -88,7 +88,7 @@ class IRFold2(IRFold1):
         (
             ir_pair_fe_correction_indicator_vars,
             ir_pair_fe_correction_indicator_vars_coeffs,
-        ) = IRFold2.generate_ir_pair_correction_variables_w_coeffs(
+        ) = IRFoldCor2.generate_ir_pair_correction_variables_w_coeffs(
             model,
             ir_list,
             seq_len,
@@ -154,7 +154,7 @@ class IRFold2(IRFold1):
         ir_pair_fe_correction_indicator_vars = []
         ir_pair_fe_correction_indicator_vars_coeffs = []
         for (ir_a_idx, ir_b_idx), (ir_a, ir_b) in zip(valid_idx_pairs, valid_ir_pairs):
-            if IRFold1.ir_pair_incompatible(ir_a, ir_b):
+            if IRFoldVal1.ir_pair_incompatible(ir_a, ir_b):
                 continue
 
             ir_a_db_repr: str = irs_to_dot_bracket([ir_list[ir_a_idx]], seq_len)

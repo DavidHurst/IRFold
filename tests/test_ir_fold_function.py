@@ -2,7 +2,7 @@ import random
 
 import pytest
 
-from irfold import IRFold0
+from irfold import IRFoldBase
 
 
 @pytest.mark.xfail
@@ -26,8 +26,8 @@ def test_ir_free_energy_additivity_irfold0(data_dir):
                 "seq_name": seq_name,
                 "save_performance": True,
             }
-            irfold0_secondary_structure, irfold0_mfe = IRFold0.fold(**fold_params)
-            mfe_of_dot_bracket = IRFold0.calc_free_energy(
+            irfold0_secondary_structure, irfold0_mfe = IRFoldBase.fold(**fold_params)
+            mfe_of_dot_bracket = IRFoldBase.calc_free_energy(
                 irfold0_secondary_structure, seq, data_dir, seq_name
             )
 

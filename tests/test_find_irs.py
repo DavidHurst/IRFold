@@ -1,12 +1,12 @@
 from pathlib import Path
-from irfold import IRFold0
+from irfold import IRFoldBase
 
 # ToDo: Write test for not having iupacpal compiled
 # ToDo: Parametrise tests below to run multiple sequences with varying ir counts
 
 
 def test_irs_found(find_irs_params):
-    assert IRFold0.find_irs(**find_irs_params) is not None
+    assert IRFoldBase.find_irs(**find_irs_params) is not None
 
 
 def test_irs_out_files_created(list_of_irs, find_irs_params, data_dir):

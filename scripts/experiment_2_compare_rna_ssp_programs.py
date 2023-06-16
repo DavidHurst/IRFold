@@ -9,7 +9,7 @@ from tqdm import tqdm
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 DATA_DIR = str(Path(__file__).parent.parent / "data")
 
-from irfold import IRFold0, IRFold1, IRFold2
+from irfold import IRFoldBase, IRFoldVal1, IRFoldCor2, IRFoldVal2
 
 if __name__ == "__main__":
     rnalib_performance_file_path = (Path(DATA_DIR) / "RNAlib_performance.csv").resolve()
@@ -18,8 +18,8 @@ if __name__ == "__main__":
         writer.writerow(["dot_bracket_repr", "solution_mfe", "seq_len"])
     # random.seed(182)
 
-    n_runs_per_seq_length = 10
-    for seq_len in tqdm(range(10, 70), desc=f"Running trials"):
+    n_runs_per_seq_length = 5
+    for seq_len in tqdm(range(10, 100), desc=f"Running trials"):
         for _ in range(n_runs_per_seq_length):
             seq = "".join(random.choice("ACGU") for _ in range(seq_len))
             seq_name = "random_seq_for_ssp_program_comparison"
@@ -38,11 +38,13 @@ if __name__ == "__main__":
                 "save_performance": True,
             }
 
-            irfold0_secondary_structure, irfold0_mfe = IRFold0.fold(**fold_params)
+            irfold_base_secondary_structure, irfold_base_obj_fn_val = IRFoldBase.fold(**fold_params)
 
-            irfold1_secondary_structure, irfold1_mfe = IRFold1.fold(**fold_params)
+            irfold_val1_secondary_structure, irfold_val1_obj_fn_val = IRFoldVal1.fold(**fold_params)
 
-            irfold2_secondary_structure, irfold2_mfe = IRFold2.fold(**fold_params)
+            irfold_val2_secondary_structure, irfold_val2_obj_fn_val = IRFoldVal2.fold(**fold_params)
+
+            irfold_cor2_secondary_structure, irfold_cor2_obj_fn_val = IRFoldCor2.fold(**fold_params)
 
             rnalib_secondary_structure, rnalib_mfe = RNA.fold(seq, "")
 

@@ -1,4 +1,4 @@
-__all__ = ["IRFold0"]
+__all__ = ["IRFoldBase"]
 
 import itertools
 import re
@@ -43,7 +43,7 @@ from irfold.util import (
 #         return self.__solution_count
 
 
-class IRFold0:
+class IRFoldBase:
     """Base IRFold Model: RNA secondary structure prediction based on extracting optimal
     inverted repeat configurations from the primary sequence"""
 
@@ -228,7 +228,7 @@ class IRFold0:
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if IRFold0.ir_pair_incompatible(ir_pair[0], ir_pair[1])
+            if IRFoldBase.ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
         # Create binary indicator variables for IRs
