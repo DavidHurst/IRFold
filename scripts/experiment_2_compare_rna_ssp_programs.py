@@ -18,8 +18,8 @@ if __name__ == "__main__":
         writer.writerow(["dot_bracket_repr", "solution_mfe", "seq_len"])
     # random.seed(182)
 
-    n_runs_per_seq_length = 5
-    for seq_len in tqdm(range(10, 100), desc=f"Running trials"):
+    n_runs_per_seq_length = 10
+    for seq_len in tqdm(range(10, 60), desc=f"Running trials"):
         for _ in range(n_runs_per_seq_length):
             seq = "".join(random.choice("ACGU") for _ in range(seq_len))
             seq_name = "random_seq_for_ssp_program_comparison"

@@ -6,9 +6,11 @@ from math import comb
 
 from pathlib import Path
 
+
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from irfold import IRFoldBase
+from irfold.util import irs_to_dot_bracket, calc_free_energy, ir_pair_match_same_bases
 
 DATA_DIR = str(Path(__file__).parent.parent / "data")
 
@@ -30,16 +32,16 @@ def irs_disjoint(ir_a, ir_b):
 
 def irs_fe_union_fe_sum(ir_a, ir_b, sequence_len, out_dir):
     # FE(IR_a) + FE(IR_b)
-    ir_a_db_repr = IRFoldBase.irs_to_dot_bracket([ir_a], sequence_len)
-    ir_b_db_repr = IRFoldBase.irs_to_dot_bracket([ir_b], sequence_len)
+    ir_a_db_repr = irs_to_dot_bracket([ir_a], sequence_len)
+    ir_b_db_repr = irs_to_dot_bracket([ir_b], sequence_len)
 
-    ir_a_fe = round(IRFoldBase.calc_free_energy(ir_a_db_repr, seq, out_dir), 4)
-    ir_b_fe = round(IRFoldBase.calc_free_energy(ir_b_db_repr, seq, out_dir), 4)
+    ir_a_fe = round(calc_free_energy(ir_a_db_repr, seq, out_dir), 4)
+    ir_b_fe = round(calc_free_energy(ir_b_db_repr, seq, out_dir), 4)
     fe_sum = round(ir_a_fe + ir_b_fe, 4)
 
     # FE(IR_a U IR_b)
-    ir_a_b_db_repr = IRFoldBase.irs_to_dot_bracket([ir_a, ir_b], sequence_len)
-    fe_union = round(IRFoldBase.calc_free_energy(ir_a_b_db_repr, seq, out_dir), 4)
+    ir_a_b_db_repr = irs_to_dot_bracket([ir_a, ir_b], sequence_len)
+    fe_union = round(calc_free_energy(ir_a_b_db_repr, seq, out_dir), 4)
 
     return (ir_a_fe, ir_b_fe), fe_union, fe_sum
 
@@ -78,7 +80,7 @@ def get_all_ir_pairs_not_matching_same_bases_valid_gap_sz(all_irs):
     return [
         ir_pair
         for ir_pair in unique_ir_pairs
-        if not IRFoldBase.ir_pair_match_same_bases(ir_pair[0], ir_pair[1])
+        if not ir_pair_match_same_bases(ir_pair[0], ir_pair[1])
     ]
 
 
@@ -107,7 +109,7 @@ def eval_ir_pair_structure_and_mfe(ir_a, ir_b, seq_len, print_out=True):
     additivity_assumption_held = fe_sum == fe_union
     valid_loop_formed = irs_form_valid_loop(ir_a, ir_b)
 
-    db_repr = IRFoldBase.irs_to_dot_bracket([ir_a, ir_b], seq_len)
+    db_repr = irs_to_dot_bracket([ir_a, ir_b], seq_len)
     db_repr_id_assigned = id_base_pairs(db_repr, [ir_a, ir_b])
 
     if print_out:
@@ -116,8 +118,8 @@ def eval_ir_pair_structure_and_mfe(ir_a, ir_b, seq_len, print_out=True):
 
         print_space = " " * 4
         print(f"A = {ir_a_fmt}, B = {ir_b_fmt}")
-        print(print_space, f"A    : {IRFoldBase.irs_to_dot_bracket([ir_a], seq_len)}")
-        print(print_space, f"B    : {IRFoldBase.irs_to_dot_bracket([ir_b], seq_len)}")
+        print(print_space, f"A    : {irs_to_dot_bracket([ir_a], seq_len)}")
+        print(print_space, f"B    : {irs_to_dot_bracket([ir_b], seq_len)}")
         print(print_space, f"A U B: {db_repr}")
         print(print_space, f"A U B: {db_repr_id_assigned}")
         print()
@@ -142,7 +144,7 @@ def eval_ir_pair_structure_and_mfe(ir_a, ir_b, seq_len, print_out=True):
 
 
 if __name__ == "__main__":
-    # random.seed(1232)
+    random.seed(223332)
     experiment_results = {
         "seq": [],
         "seq_len": [],
@@ -163,7 +165,7 @@ if __name__ == "__main__":
 
     evaluated_pair_index = 0
     for _ in range(2):
-        sequence_len = 35
+        sequence_len = 30
         seq = "".join(random.choice("ACGU") for _ in range(sequence_len))
 
         print(f"Seq. length: {sequence_len}")

@@ -121,6 +121,8 @@ if __name__ == "__main__":
 
     # Compare IRFold versions: True MFE of IRFold solutions vs. MFE IRFold returns
     # This is to show the effect of additivity assumption inconsistency
+    # ToDo: Set x axis to be true free energy and y to be absolute value of objective function
+    #           to show deviation from true and compounding of error over time
 
     # IRFoldBase
     irfold_base_ax = plt.subplot(321)
