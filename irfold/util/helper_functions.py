@@ -73,7 +73,7 @@ def write_performance_to_file(
     dot_bracket_repr_mfe: float,
     seq_len: int,
     out_dir: str,
-    class_name: str,
+    ssp_model_name: str,
     n_irs_found: int = None,
     solver_num_booleans: int = None,
     solver_solve_time: float = None,
@@ -84,10 +84,12 @@ def write_performance_to_file(
     if not out_dir_path.exists():
         out_dir_path = Path.cwd().resolve()
 
-    performance_file_name: str = f"{class_name}_performance.csv"
+    performance_file_name: str = f"{ssp_model_name}_performance.csv"
     performance_file_path: Path = (Path(out_dir_path) / performance_file_name).resolve()
 
-    if not performance_file_path.exists():
+    if (
+        not performance_file_path.exists()
+    ):  # First performance sample being written, make new file
         performance_file_path = (out_dir_path / performance_file_name).resolve()
         column_names = [
             "dot_bracket_repr",
@@ -118,7 +120,7 @@ def write_performance_to_file(
                     solver_num_conflicts,
                 ]
             )
-    else:
+    else:  # Add new performance sample to existing file
         with open(str(performance_file_path), "a") as perf_file:
             writer = csv.writer(perf_file)
             writer.writerow(

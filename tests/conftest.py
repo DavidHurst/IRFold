@@ -4,8 +4,10 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
+
 def setup_module():
     print("setup_module")
+
 
 @pytest.fixture(scope="module")
 def data_dir():

@@ -29,4 +29,6 @@ def test_output_written_to_file(irfold, find_irs_params, data_dir):
 
     _, _ = irfold.fold(**find_irs_params)
 
-    assert (Path(data_dir) / f"{irfold.__name__}_performance.csv").exists()  # Performance file for IRFold variant created
+    assert (
+        Path(data_dir) / f"{irfold.__name__}_performance.csv"
+    ).exists()  # Performance file for IRFold variant created
