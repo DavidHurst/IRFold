@@ -1,6 +1,6 @@
 import pytest
 
-from irfold import IRFoldBase, IRFoldVal1
+from irfold.util import ir_has_valid_gap_size, ir_pair_match_same_bases
 
 
 @pytest.fixture(scope="module")
@@ -39,10 +39,10 @@ def test_ir_gap_size_check():
     ]
 
     for ir in invalid_gap_size_irs:
-        assert IRFoldVal1.ir_has_valid_gap_size(ir) == False
+        assert ir_has_valid_gap_size(ir) == False
 
     for ir in valid_gap_size_irs:
-        assert IRFoldVal1.ir_has_valid_gap_size(ir) == True
+        assert ir_has_valid_gap_size(ir) == True
 
 
 def test_ir_pair_matches_same_bases(
@@ -50,7 +50,7 @@ def test_ir_pair_matches_same_bases(
 ):
     for ir_pair, expected in list_of_ir_pairs_with_expected_value_for_base_overpairing:
         print(ir_pair, expected)
-        actual = IRFoldBase.ir_pair_match_same_bases(ir_pair[0], ir_pair[1])
+        actual = ir_pair_match_same_bases(ir_pair[0], ir_pair[1])
         assert actual == expected
 
 
