@@ -38,13 +38,21 @@ if __name__ == "__main__":
                 "save_performance": True,
             }
 
-            irfold_base_secondary_structure, irfold_base_obj_fn_val = IRFoldBase.fold(**fold_params)
+            irfold_base_secondary_structure, irfold_base_obj_fn_val = IRFoldBase.fold(
+                **fold_params
+            )
 
-            irfold_val1_secondary_structure, irfold_val1_obj_fn_val = IRFoldVal1.fold(**fold_params)
+            irfold_val1_secondary_structure, irfold_val1_obj_fn_val = IRFoldVal1.fold(
+                **fold_params
+            )
 
-            irfold_val2_secondary_structure, irfold_val2_obj_fn_val = IRFoldVal2.fold(**fold_params)
+            irfold_val2_secondary_structure, irfold_val2_obj_fn_val = IRFoldVal2.fold(
+                **fold_params
+            )
 
-            irfold_cor2_secondary_structure, irfold_cor2_obj_fn_val = IRFoldCor2.fold(**fold_params)
+            irfold_cor2_secondary_structure, irfold_cor2_obj_fn_val = IRFoldCor2.fold(
+                **fold_params
+            )
 
             rnalib_secondary_structure, rnalib_mfe = RNA.fold(seq, "")
 

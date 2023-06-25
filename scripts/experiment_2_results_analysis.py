@@ -9,10 +9,18 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 DATA_DIR = str(Path(__file__).parent.parent / "data")
 
 if __name__ == "__main__":
-    irfold_base_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "IRFoldBase_performance.csv")
-    irfold_val1_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "IRFoldVal1_performance.csv")
-    irfold_val2_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "IRFoldVal2_performance.csv")
-    irfold_cor2_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "IRFoldCor2_performance.csv")
+    irfold_base_res_df = pd.read_csv(
+        Path(DATA_DIR).resolve() / "IRFoldBase_performance.csv"
+    )
+    irfold_val1_res_df = pd.read_csv(
+        Path(DATA_DIR).resolve() / "IRFoldVal1_performance.csv"
+    )
+    irfold_val2_res_df = pd.read_csv(
+        Path(DATA_DIR).resolve() / "IRFoldVal2_performance.csv"
+    )
+    irfold_cor2_res_df = pd.read_csv(
+        Path(DATA_DIR).resolve() / "IRFoldCor2_performance.csv"
+    )
     rnalib_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "RNAlib_performance.csv")
 
     plt.rcParams["figure.figsize"] = (12, 6)

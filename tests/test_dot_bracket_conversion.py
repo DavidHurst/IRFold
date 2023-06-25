@@ -1,4 +1,3 @@
-from irfold import IRFoldBase
 from irfold.util import irs_to_dot_bracket
 
 

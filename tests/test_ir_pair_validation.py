@@ -49,7 +49,6 @@ def test_ir_pair_matches_same_bases(
     list_of_ir_pairs_with_expected_value_for_base_overpairing,
 ):
     for ir_pair, expected in list_of_ir_pairs_with_expected_value_for_base_overpairing:
-        print(ir_pair, expected)
         actual = ir_pair_match_same_bases(ir_pair[0], ir_pair[1])
         assert actual == expected
 
