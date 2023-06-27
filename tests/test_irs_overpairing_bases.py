@@ -1,4 +1,3 @@
-import pytest
 from irfold.util import ir_pair_match_same_bases
 
 

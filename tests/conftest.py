@@ -20,11 +20,6 @@ def rna_seq_15_bases_3_irs():
 
 
 @pytest.fixture(scope="module")
-def rna_seq_15_bases_1_irs():
-    pass
-
-
-@pytest.fixture(scope="module")
 def rna_seq_15_bases_0_irs():
     return "AAAAAAAAAAAAAAA", 0
 
@@ -78,6 +73,8 @@ def not_matching_same_bases_ir_pair(request):
     params=[
         (((0, 1), (5, 6)), ((5, 6), (10, 12))),  # Both match 5-6
         (((3, 4), (16, 17)), ((14, 16), (22, 24))),  # Both match 16
+        (((1, 7), (16, 22)), ((2, 6), (12, 16))),  # Both match 2-6
+        (((1, 7), (16, 22)), ((8, 11), (17, 20))),  # Both match 17-20
     ],
 )
 def matching_same_bases_ir_pair(request):
@@ -87,9 +84,9 @@ def matching_same_bases_ir_pair(request):
 @pytest.fixture(
     scope="module",
     params=[
-        ((0, 1), (2, 3)), # Gap size = 0
-        ((0, 1), (3, 4)), # Gap size = 1
-        ((0, 1), (4, 5)), # Gap size = 2
+        ((0, 1), (2, 3)),  # Gap size = 0
+        ((0, 1), (3, 4)),  # Gap size = 1
+        ((0, 1), (4, 5)),  # Gap size = 2
     ],
 )
 def invalid_gap_size_ir(request):
