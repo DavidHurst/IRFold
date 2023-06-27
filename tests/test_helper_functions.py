@@ -53,12 +53,11 @@ def test_write_performance_to_file(data_dir):
     )
 
     # Check only one line written
-    with open(perf_file, 'r') as file:
+    with open(perf_file, "r") as file:
         lines = file.readlines()
 
     assert len(lines) == 2
-    assert lines[1].split(',')[0] == 'first_sample'
-
+    assert lines[1].split(",")[0] == "first_sample"
 
     # Check the next write is added to the same file
     write_performance_to_file(
@@ -75,8 +74,8 @@ def test_write_performance_to_file(data_dir):
         solver_num_conflicts=0,
     )
 
-    with open(perf_file, 'r') as file:
+    with open(perf_file, "r") as file:
         lines = file.readlines()
 
     assert len(lines) == 3
-    assert lines[2].split(',')[0] == 'second_sample'
+    assert lines[2].split(",")[0] == "second_sample"
