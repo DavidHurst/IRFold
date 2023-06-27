@@ -62,32 +62,37 @@ def list_of_irs(rna_seq_15_bases_3_irs):
     return [((2, 3), (11, 12)), ((5, 6), (11, 12)), ((10, 11), (13, 14))]
 
 
-@pytest.fixture(scope="module")
-def list_of_ir_pairs_not_matching_same_bases():
-    return [
+@pytest.fixture(
+    scope="module",
+    params=[
         (((0, 1), (5, 6)), ((10, 12), (15, 17))),
         (((3, 4), (16, 17)), ((9, 10), (19, 20))),
-    ]
-
-
-@pytest.fixture(scope="module")
-def list_of_ir_pairs_matching_same_bases():
-    return [
-        (((0, 1), (5, 6)), ((5, 6), (10, 12))),
-        (((3, 4), (16, 17)), ((14, 16), (22, 24))),
-    ]
+    ],
+)
+def not_matching_same_bases_ir_pair(request):
+    return request.param
 
 
 @pytest.fixture(
     scope="module",
     params=[
-        ((0, 1), (2, 3)),
-        ((0, 1), (3, 4)),
-        ((0, 1), (4, 5)),
+        (((0, 1), (5, 6)), ((5, 6), (10, 12))),  # Both match 5-6
+        (((3, 4), (16, 17)), ((14, 16), (22, 24))),  # Both match 16
+    ],
+)
+def matching_same_bases_ir_pair(request):
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        ((0, 1), (2, 3)), # Gap size = 0
+        ((0, 1), (3, 4)), # Gap size = 1
+        ((0, 1), (4, 5)), # Gap size = 2
     ],
 )
 def invalid_gap_size_ir(request):
-    # Valid means IR has a >= 3 bases in hairpin
     return request.param
 
 
@@ -100,7 +105,6 @@ def invalid_gap_size_ir(request):
     ],
 )
 def valid_gap_size_ir(request):
-    # Valid means IR has a >= 3 bases in hairpin
     return request.param
 
 
@@ -124,17 +128,3 @@ def wholly_nested_ir_pair(request):
 )
 def entirely_disjoint_ir_pair(request):
     return request.param
-
-
-@pytest.fixture(scope="module")
-def list_of_valid_and_invalid_ir_pairs(entirely_disjoint_ir_pair):
-    # Valid: pair does not match same bases or form invalid loop
-    valid_pairs = entirely_disjoint_ir_pair
-    invalid_pairs = [
-        (((2, 3), (7, 8)), ((2, 3), (16, 18))),  # Match same bases
-        (((2, 3), (12, 13)), ((10, 11), (18, 19))),  # Invalid loop
-    ]
-
-    return zip(valid_pairs, [True for _ in range(len(valid_pairs))]) + zip(
-        invalid_pairs, [False for _ in range(len(invalid_pairs))]
-    )
