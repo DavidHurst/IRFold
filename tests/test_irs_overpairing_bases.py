@@ -1,40 +1,24 @@
 import pytest
+from irfold.util import ir_pair_match_same_bases
 
-from irfold.util import ir_has_valid_gap_size, ir_pair_match_same_bases
 
-
-@pytest.fixture(scope="module")
-def list_of_valid_and_invalid_ir_pairs(entirely_disjoint_ir_pairs):
-    # Valid: pair does not match same bases or form invalid loop
-    valid_pairs = entirely_disjoint_ir_pairs
-    invalid_pairs = [
-        (((2, 3), (7, 8)), ((2, 3), (16, 18))),  # Match same bases
-        (((2, 3), (12, 13)), ((10, 11), (18, 19))),  # Invalid loop
-    ]
-
-    return zip(valid_pairs, [True for _ in range(len(valid_pairs))]) + zip(
-        invalid_pairs, [False for _ in range(len(invalid_pairs))]
+@pytest.fixture
+def list_of_ir_pairs_with_expected_value_for_base_overpairing(
+    list_of_ir_pairs_matching_same_bases, list_of_ir_pairs_not_matching_same_bases
+):
+    pairs_overmatching_with_expected = list(
+        zip(
+            list_of_ir_pairs_matching_same_bases,
+            [True for _ in range(len(list_of_ir_pairs_matching_same_bases))],
+        )
     )
-
-
-def test_ir_gap_size_check():
-    invalid_gap_size_irs = [
-        ((0, 1), (2, 3)),
-        ((0, 1), (3, 4)),
-        ((0, 1), (4, 5)),
-    ]
-
-    valid_gap_size_irs = [
-        ((0, 1), (5, 6)),
-        ((2, 5), (10, 13)),
-        ((3, 6), (12, 15)),
-    ]
-
-    for ir in invalid_gap_size_irs:
-        assert ir_has_valid_gap_size(ir) == False
-
-    for ir in valid_gap_size_irs:
-        assert ir_has_valid_gap_size(ir) == True
+    pairs_not_overmatching_with_expected = list(
+        zip(
+            list_of_ir_pairs_not_matching_same_bases,
+            [False for _ in range(len(list_of_ir_pairs_not_matching_same_bases))],
+        )
+    )
+    return pairs_not_overmatching_with_expected + pairs_overmatching_with_expected
 
 
 def test_ir_pair_matches_same_bases(
@@ -43,7 +27,3 @@ def test_ir_pair_matches_same_bases(
     for ir_pair, expected in list_of_ir_pairs_with_expected_value_for_base_overpairing:
         actual = ir_pair_match_same_bases(ir_pair[0], ir_pair[1])
         assert actual == expected
-
-
-
-
