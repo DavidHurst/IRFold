@@ -28,9 +28,27 @@ def ir_pair_disjoint(ir_a: IR, ir_b: IR) -> bool:
     return ir_a_strictly_before_ir_b or ir_b_strictly_before_ir_a
 
 
-def ir_pair_wholly_nested(outer_ir: IR, nested_ir: IR) -> bool:
-    # ToDo: Make this return true for nesting of A in B or B in A
-    return outer_ir[0][0] < nested_ir[0][0] and nested_ir[1][1] < outer_ir[1][0]
+def ir_pair_wholly_nested(ir_a: IR, ir_b: IR) -> bool:
+    ir_a_left_strand_start_idx: int = ir_a[0][0]
+    ir_a_left_strand_end_idx: int = ir_a[0][1]
+    ir_a_right_strand_end_idx: int = ir_a[1][1]
+    ir_a_right_strand_start_idx: int = ir_a[1][0]
+
+    ir_b_left_strand_start_idx: int = ir_b[0][0]
+    ir_b_right_strand_end_idx: int = ir_b[1][1]
+    ir_b_left_strand_end_idx: int = ir_b[0][1]
+    ir_b_right_strand_start_idx: int = ir_b[1][0]
+
+    ir_a_in_ir_b: bool = (
+        ir_b_left_strand_end_idx < ir_a_left_strand_start_idx
+        and ir_b_right_strand_start_idx > ir_a_right_strand_end_idx
+    )
+    ir_b_in_ir_a: bool = (
+        ir_a_left_strand_end_idx < ir_b_left_strand_start_idx
+        and ir_a_right_strand_start_idx > ir_b_right_strand_end_idx
+    )
+
+    return ir_b_in_ir_a or ir_a_in_ir_b
 
 
 def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
@@ -62,6 +80,7 @@ def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
         return False
 
     return True
+
 
 def ir_has_valid_gap_size(ir):
     left_strand_end_idx: int = ir[0][1]
