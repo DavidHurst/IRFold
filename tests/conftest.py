@@ -40,6 +40,11 @@ def find_irs_params(rna_seq_15_bases_3_irs, data_dir):
 
 
 @pytest.fixture(scope="module")
+def list_of_irs(rna_seq_15_bases_3_irs):
+    return [((2, 3), (11, 12)), ((5, 6), (11, 12)), ((10, 11), (13, 14))]
+
+
+@pytest.fixture(scope="module")
 def expected_dot_bracket_reprs(rna_seq_15_bases_3_irs):
     return ["..((.......))..", ".....((....))..", "..........((.))"]
 
@@ -50,35 +55,6 @@ def sequence_lengths(expected_dot_bracket_reprs):
 
 
 # ====================  IR sample definitions   ====================
-
-
-@pytest.fixture(scope="module")
-def list_of_irs(rna_seq_15_bases_3_irs):
-    return [((2, 3), (11, 12)), ((5, 6), (11, 12)), ((10, 11), (13, 14))]
-
-
-@pytest.fixture(
-    scope="module",
-    params=[
-        (((0, 1), (5, 6)), ((10, 12), (15, 17))),
-        (((3, 4), (16, 17)), ((9, 10), (19, 20))),
-    ],
-)
-def not_matching_same_bases_ir_pair(request):
-    return request.param
-
-
-@pytest.fixture(
-    scope="module",
-    params=[
-        (((0, 1), (5, 6)), ((5, 6), (10, 12))),  # Both match 5-6
-        (((3, 4), (16, 17)), ((14, 16), (22, 24))),  # Both match 16
-        (((1, 7), (16, 22)), ((2, 6), (12, 16))),  # Both match 2-6
-        (((1, 7), (16, 22)), ((8, 11), (17, 20))),  # Both match 17-20
-    ],
-)
-def matching_same_bases_ir_pair(request):
-    return request.param
 
 
 @pytest.fixture(
@@ -108,6 +84,30 @@ def valid_gap_size_ir(request):
 @pytest.fixture(
     scope="module",
     params=[
+        (((0, 1), (5, 6)), ((10, 12), (15, 17))),
+        (((3, 4), (16, 17)), ((9, 10), (19, 20))),
+    ],
+)
+def not_matching_same_bases_ir_pair(request):
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        (((0, 1), (5, 6)), ((5, 6), (10, 12))),  # Both match 5-6
+        (((3, 4), (16, 17)), ((14, 16), (22, 24))),  # Both match 16
+        (((1, 7), (16, 22)), ((2, 6), (12, 16))),  # Both match 2-6
+        (((1, 7), (16, 22)), ((8, 11), (17, 20))),  # Both match 17-20
+    ],
+)
+def matching_same_bases_ir_pair(request):
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
         (((7, 8), (10, 12)), ((2, 3), (16, 18))),  # First ir nested in second
         (((1, 3), (15, 18)), ((5, 7), (11, 13))),  # Second ir nested in first
     ],
@@ -124,4 +124,46 @@ def wholly_nested_ir_pair(request):
     ],
 )
 def entirely_disjoint_ir_pair(request):
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        (
+            ((0, 2), (20, 22)),
+            ((14, 16), (30, 32)),
+        ),  # Num bases between IR1 right and IR2 left = 3
+    ],
+)
+def valid_num_bases_in_pair_intersection_ir_pair(request):
+    """Invalid loop empirically determined to be when the
+    number of bases enclosed by left_a & right_b or right_a & left_b
+    is less than 3. Similarly to gap size validation.
+    """
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        (
+            ((0, 2), (20, 22)),
+            ((17, 19), (30, 32)),
+        ),  # Num bases between IR1 right and IR2 left = 0
+        (
+            ((0, 2), (20, 22)),
+            ((16, 18), (30, 32)),
+        ),  # Num bases between IR1 right and IR2 left = 1
+        (
+            ((0, 2), (20, 22)),
+            ((15, 17), (30, 32)),
+        ),  # Num bases between IR1 right and IR2 left = 2
+    ],
+)
+def invalid_num_bases_in_pair_intersection_ir_pair(request):
+    """Invalid loop empirically determined to be when the
+    number of bases enclosed by left_a & right_b or right_a & left_b
+    is less than 3. Similarly to gap size validation.
+    """
     return request.param

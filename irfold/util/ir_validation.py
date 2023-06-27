@@ -63,16 +63,16 @@ def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
         if ir_a_left_strand[1] > ir_b_left_strand[1]
         else ir_b_left_strand[1]
     )
-    # ToDo: Introduce variables here for clarity
+
     earliest_right_string_base_idx: int = (
         ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
     )
 
     # Invalid loop
-    bases_inbetween_latest_left_and_earliest_right_bases: int = (
+    num_bases_inbetween_latest_left_and_earliest_right_bases: int = (
         earliest_right_string_base_idx - latest_left_string_base_idx - 1
     )
-    if bases_inbetween_latest_left_and_earliest_right_bases < 3:
+    if num_bases_inbetween_latest_left_and_earliest_right_bases < 3:
         return False
 
     return True
