@@ -4,14 +4,6 @@ from irfold.util import ir_has_valid_gap_size, ir_pair_match_same_bases
 
 
 @pytest.fixture(scope="module")
-def entirely_disjoint_ir_pairs():
-    return [
-        (((2, 3), (7, 8)), ((10, 12), (16, 18))),  # Entirely disjoint
-        (((2, 3), (7, 8)), ((9, 12), (16, 19))),  # Entirely disjoint
-    ]
-
-
-@pytest.fixture(scope="module")
 def list_of_valid_and_invalid_ir_pairs(entirely_disjoint_ir_pairs):
     # Valid: pair does not match same bases or form invalid loop
     valid_pairs = entirely_disjoint_ir_pairs
@@ -53,6 +45,5 @@ def test_ir_pair_matches_same_bases(
         assert actual == expected
 
 
-# Test irs are disjoint
 
-# Test
+
