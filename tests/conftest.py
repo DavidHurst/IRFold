@@ -54,7 +54,7 @@ def sequence_lengths(expected_dot_bracket_reprs):
     return [len(db_repr) for db_repr in expected_dot_bracket_reprs]
 
 
-# ====================  IR group definitions   ====================
+# ====================  IR sample definitions   ====================
 
 
 @pytest.fixture(scope="module")
@@ -78,46 +78,58 @@ def list_of_ir_pairs_matching_same_bases():
     ]
 
 
-@pytest.fixture(scope="module")
-def list_of_ir_pairs_invalid_gap_sizes():
-    # Valid means IR has a >= 3 bases in hairpin
-    return [
+@pytest.fixture(
+    scope="module",
+    params=[
         ((0, 1), (2, 3)),
         ((0, 1), (3, 4)),
         ((0, 1), (4, 5)),
-    ]
-
-
-@pytest.fixture(scope="module")
-def list_of_ir_pairs_valid_gap_sizes():
+    ],
+)
+def invalid_gap_size_ir(request):
     # Valid means IR has a >= 3 bases in hairpin
-    return [
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
         ((0, 1), (5, 6)),
         ((2, 5), (10, 13)),
         ((3, 6), (12, 15)),
-    ]
+    ],
+)
+def valid_gap_size_ir(request):
+    # Valid means IR has a >= 3 bases in hairpin
+    return request.param
 
 
-@pytest.fixture(scope="module")
-def list_of_ir_pairs_wholly_nested():
-    return [
+@pytest.fixture(
+    scope="module",
+    params=[
         (((7, 8), (10, 12)), ((2, 3), (16, 18))),  # First ir nested in second
         (((1, 3), (15, 18)), ((5, 7), (11, 13))),  # Second ir nested in first
-    ]
+    ],
+)
+def wholly_nested_ir_pair(request):
+    return request.param
 
 
-@pytest.fixture(scope="module")
-def list_of_ir_pairs_entirely_disjoint():
-    return [
+@pytest.fixture(
+    scope="module",
+    params=[
         (((2, 3), (7, 8)), ((10, 12), (16, 18))),  # Entirely disjoint
         (((2, 3), (7, 8)), ((9, 12), (16, 19))),  # Entirely disjoint
-    ]
+    ],
+)
+def entirely_disjoint_ir_pair(request):
+    return request.param
 
 
 @pytest.fixture(scope="module")
-def list_of_valid_and_invalid_ir_pairs(list_of_ir_pairs_entirely_disjoint):
+def list_of_valid_and_invalid_ir_pairs(entirely_disjoint_ir_pair):
     # Valid: pair does not match same bases or form invalid loop
-    valid_pairs = list_of_ir_pairs_entirely_disjoint
+    valid_pairs = entirely_disjoint_ir_pair
     invalid_pairs = [
         (((2, 3), (7, 8)), ((2, 3), (16, 18))),  # Match same bases
         (((2, 3), (12, 13)), ((10, 11), (18, 19))),  # Invalid loop

@@ -1,11 +1,8 @@
 from irfold.util import ir_pair_wholly_nested
 
 
-def test_irs_wholly_nested(
-    list_of_ir_pairs_entirely_disjoint, list_of_ir_pairs_wholly_nested
-):
-    for ir_a, ir_b in list_of_ir_pairs_entirely_disjoint:
-        assert ir_pair_wholly_nested(ir_a, ir_b) == False
+def test_irs_wholly_nested(wholly_nested_ir_pair):
+    ir_a = wholly_nested_ir_pair[0]
+    ir_b = wholly_nested_ir_pair[1]
 
-    for ir_a, ir_b in list_of_ir_pairs_wholly_nested:
-        assert ir_pair_wholly_nested(ir_a, ir_b) == True
+    assert ir_pair_wholly_nested(ir_a, ir_b) == True

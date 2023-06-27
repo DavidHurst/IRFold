@@ -52,11 +52,7 @@ def ir_pair_wholly_nested(ir_a: IR, ir_b: IR) -> bool:
 
 
 def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
-    if (
-        ir_pair_wholly_nested(ir_a, ir_b)
-        or ir_pair_wholly_nested(ir_b, ir_a)
-        or ir_pair_disjoint(ir_a, ir_b)
-    ):
+    if ir_pair_wholly_nested(ir_a, ir_b) or ir_pair_disjoint(ir_a, ir_b):
         return True
 
     ir_a_left_strand: Tuple[int, int] = ir_a[0]
