@@ -1,7 +1,7 @@
-from irfold.util import ir_pair_forms_valid_loop, irs_to_dot_bracket, calc_free_energy
+from irfold.util import ir_pair_forms_valid_loop
 
 
-# Note: Not checking if IRs have valid gap sizes, probably should check fixtures for this
+# Note: These tests don't check if IRs have valid gap sizes, probably should check fixtures for this
 
 
 def test_ir_pairs_forming_valid_loop_wholly_nested(wholly_nested_ir_pair):
@@ -34,5 +34,6 @@ def test_ir_pairs_forming_invalid_loop_invalid_num_bases_in_intersection(
     ir_b = invalid_num_bases_in_pair_intersection_ir_pair[1]
 
     assert ir_pair_forms_valid_loop(ir_a, ir_b) == False
+
 
 # ToDo: Add test calculating free energy of invalid loop forming IR pair, should be close to 100,000
