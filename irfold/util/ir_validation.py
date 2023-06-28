@@ -1,4 +1,5 @@
-from typing import Tuple
+import itertools
+from typing import Tuple, List
 
 from .helper_functions import IR
 
@@ -18,6 +19,16 @@ def ir_pair_match_same_bases(ir_a: IR, ir_b: IR) -> bool:
     return any([ir_b_bases in paired_base_idxs_a for ir_b_bases in paired_base_idxs_b])
 
 
+def irs_match_same_bases(ir_list: List[IR]) -> bool:
+    """Returns true if any IRs in the given list match the same bases"""
+    return any(
+        [
+            ir_pair_match_same_bases(ir_a, ir_b)
+            for ir_a, ir_b in list(itertools.combinations(ir_list, 2))
+        ]
+    )
+
+
 def ir_pair_disjoint(ir_a: IR, ir_b: IR) -> bool:
     # ir_a comes entirely before ir_b
     ir_a_strictly_before_ir_b = ir_a[1][1] < ir_b[0][0]
@@ -28,16 +39,47 @@ def ir_pair_disjoint(ir_a: IR, ir_b: IR) -> bool:
     return ir_a_strictly_before_ir_b or ir_b_strictly_before_ir_a
 
 
+def ir_a_precedes_ir_b(ir_a: IR, ir_b: IR) -> bool:
+    return ir_a[1][1] < ir_b[0][0]  # ir_a comes entirely before ir_b
+
+
+def irs_disjoint(ir_list: List[IR]) -> bool:
+    print(f"Checking disjoint")
+    # Sort IRs by left strand start
+    sorted_irs: List[IR] = sorted(ir_list, key=lambda ir: ir[0][0])
+
+    print(f"IRs:")
+    for ir in ir_list:
+        print(ir)
+
+    print(f"Sorted IRs:")
+    for ir in sorted_irs:
+        print(ir)
+
+    # Check that first IR starts and ends before second IR which starts and ends before third IR...
+    for i in range(len(ir_list) - 1):
+        preceding_ir: IR = sorted_irs[i]
+        succeeding_ir: IR = sorted_irs[i + 1]
+
+        if not ir_a_precedes_ir_b(preceding_ir, succeeding_ir):
+            print(f"IRs {i} and {i + 1} are not disjoint.")
+            return False
+
+        print(f"IRs {i} and {i + 1} are disjoint.")
+
+    return True
+
+
 def ir_pair_wholly_nested(ir_a: IR, ir_b: IR) -> bool:
     ir_a_left_strand_start_idx: int = ir_a[0][0]
     ir_a_left_strand_end_idx: int = ir_a[0][1]
-    ir_a_right_strand_end_idx: int = ir_a[1][1]
     ir_a_right_strand_start_idx: int = ir_a[1][0]
+    ir_a_right_strand_end_idx: int = ir_a[1][1]
 
     ir_b_left_strand_start_idx: int = ir_b[0][0]
-    ir_b_right_strand_end_idx: int = ir_b[1][1]
     ir_b_left_strand_end_idx: int = ir_b[0][1]
     ir_b_right_strand_start_idx: int = ir_b[1][0]
+    ir_b_right_strand_end_idx: int = ir_b[1][1]
 
     ir_a_in_ir_b: bool = (
         ir_b_left_strand_end_idx < ir_a_left_strand_start_idx
@@ -49,6 +91,39 @@ def ir_pair_wholly_nested(ir_a: IR, ir_b: IR) -> bool:
     )
 
     return ir_b_in_ir_a or ir_a_in_ir_b
+
+
+def ir_a_subsumes_ir_b(ir_a: IR, ir_b: IR) -> bool:
+    ir_a_left_strand_end_idx: int = ir_a[0][1]
+    ir_a_right_strand_start_idx: int = ir_a[1][0]
+
+    ir_b_left_strand_start_idx: int = ir_b[0][0]
+    ir_b_right_strand_end_idx: int = ir_b[1][1]
+
+    return (
+        ir_a_left_strand_end_idx < ir_b_left_strand_start_idx
+        and ir_a_right_strand_start_idx > ir_b_right_strand_end_idx
+    )
+
+
+def irs_wholly_nested(ir_list: List[IR]) -> bool:
+    """Checks for one IR at each nesting level only i.e. first IR subsumes second which subsumes third IR etc."""
+    print("Checking wholly nested")
+    # Sort IRs by left strand start
+    sorted_irs: List[IR] = sorted(ir_list, key=lambda ir: ir[0][0])
+
+    # Check that first IR subsumes second IR which subsumes third IR which subsumes fourth IR...
+    for i in range(len(ir_list) - 1):
+        preceding_ir: IR = sorted_irs[i]
+        succeeding_ir: IR = sorted_irs[i + 1]
+
+        if not ir_a_subsumes_ir_b(preceding_ir, succeeding_ir):
+            print(f"IRs {i} and {i + 1} are not nested.")
+            return False
+
+        print(f"IRs {i} and {i + 1} are nested.")
+
+    return True
 
 
 def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
@@ -76,6 +151,13 @@ def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
         return False
 
     return True
+
+
+def irs_form_valid_loop(ir_list: List[IR]) -> bool:
+    if irs_disjoint(ir_list) or irs_wholly_nested(ir_list):
+        return True
+    else:
+        raise NotImplementedError("IRs not disjoint or wholly nested")
 
 
 def ir_has_valid_gap_size(ir):
