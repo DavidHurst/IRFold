@@ -54,28 +54,17 @@ def ir_a_precedes_ir_b(ir_a: IR, ir_b: IR) -> bool:
 
 
 def irs_disjoint(ir_list: List[IR]) -> bool:
-    print(f"Checking disjoint")
     # Sort IRs by left strand start
     sorted_irs: List[IR] = sorted(ir_list, key=lambda ir: ir[0][0])
 
-    print(f"IRs:")
-    for ir in ir_list:
-        print(ir)
-
-    print(f"Sorted IRs:")
-    for ir in sorted_irs:
-        print(ir)
-
     # Check that first IR starts and ends before second IR which starts and ends before third IR...
+    # ToDo: List comprehension-ify this
     for i in range(len(ir_list) - 1):
         preceding_ir: IR = sorted_irs[i]
         succeeding_ir: IR = sorted_irs[i + 1]
 
         if not ir_a_precedes_ir_b(preceding_ir, succeeding_ir):
-            print(f"IRs {i} and {i + 1} are not disjoint.")
             return False
-
-        print(f"IRs {i} and {i + 1} are disjoint.")
 
     return True
 
@@ -121,20 +110,17 @@ def ir_a_subsumes_ir_b(ir_a: IR, ir_b: IR) -> bool:
 
 def irs_wholly_nested(ir_list: List[IR]) -> bool:
     """Checks for one IR at each nesting level only i.e. first IR subsumes second which subsumes third IR etc."""
-    print("Checking wholly nested")
     # Sort IRs by left strand start
     sorted_irs: List[IR] = sorted(ir_list, key=lambda ir: ir[0][0])
 
     # Check that first IR subsumes second IR which subsumes third IR which subsumes fourth IR...
+    # ToDo: List comprehension-ify this
     for i in range(len(ir_list) - 1):
         preceding_ir: IR = sorted_irs[i]
         succeeding_ir: IR = sorted_irs[i + 1]
 
         if not ir_a_subsumes_ir_b(preceding_ir, succeeding_ir):
-            print(f"IRs {i} and {i + 1} are not nested.")
             return False
-
-        print(f"IRs {i} and {i + 1} are nested.")
 
     return True
 
@@ -159,28 +145,29 @@ def ir_pair_intersection_has_valid_base_count(ir_a: IR, ir_b: IR) -> bool:
     num_bases_inbetween_latest_left_and_earliest_right_bases: int = (
         earliest_right_string_base_idx - latest_left_string_base_idx - 1
     )
-    if num_bases_inbetween_latest_left_and_earliest_right_bases < 3:
-        return False
 
-    return True
+    return num_bases_inbetween_latest_left_and_earliest_right_bases >= 3
 
 
 # =================== Valid loop checks ===================
 
 
 def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
-    if (
+    return (
         ir_pair_wholly_nested(ir_a, ir_b)
         or ir_pair_disjoint(ir_a, ir_b)
         or ir_pair_intersection_has_valid_base_count(ir_a, ir_b)
-    ):
-        return True
-
-    return False
+    )
 
 
 def irs_form_valid_loop(ir_list: List[IR]) -> bool:
-    if irs_disjoint(ir_list) or irs_wholly_nested(ir_list):
-        return True
-    else:
-        raise NotImplementedError("IRs not disjoint or wholly nested")
+    return (
+        irs_disjoint(ir_list)
+        or irs_wholly_nested(ir_list)
+        or all(
+            [
+                ir_pair_intersection_has_valid_base_count(ir_a, ir_b)
+                for ir_a, ir_b in list(itertools.combinations(ir_list, 2))
+            ]
+        )
+    )
