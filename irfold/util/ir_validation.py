@@ -4,6 +4,13 @@ from typing import Tuple, List
 from .helper_functions import IR
 
 
+def ir_has_valid_gap_size(ir):
+    left_strand_end_idx: int = ir[0][1]
+    right_strand_start_idx: int = ir[1][0]
+
+    return right_strand_start_idx - left_strand_end_idx - 1 >= 3
+
+
 def ir_pair_match_same_bases(ir_a: IR, ir_b: IR) -> bool:
     # Check if IRs match the same bases
     ir_a_left_strand, ir_a_right_strand = ir_a[0], ir_a[1]
@@ -27,6 +34,9 @@ def irs_match_same_bases(ir_list: List[IR]) -> bool:
             for ir_a, ir_b in list(itertools.combinations(ir_list, 2))
         ]
     )
+
+
+# =================== Disjoint checks ===================
 
 
 def ir_pair_disjoint(ir_a: IR, ir_b: IR) -> bool:
@@ -68,6 +78,9 @@ def irs_disjoint(ir_list: List[IR]) -> bool:
         print(f"IRs {i} and {i + 1} are disjoint.")
 
     return True
+
+
+# =================== Wholly nested checks ===================
 
 
 def ir_pair_wholly_nested(ir_a: IR, ir_b: IR) -> bool:
@@ -126,10 +139,10 @@ def irs_wholly_nested(ir_list: List[IR]) -> bool:
     return True
 
 
-def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
-    if ir_pair_wholly_nested(ir_a, ir_b) or ir_pair_disjoint(ir_a, ir_b):
-        return True
+# =================== Bases in intersection(s) checks ===================
 
+
+def ir_pair_intersection_has_valid_base_count(ir_a: IR, ir_b: IR) -> bool:
     ir_a_left_strand: Tuple[int, int] = ir_a[0]
     ir_b_left_strand: Tuple[int, int] = ir_b[0]
 
@@ -143,7 +156,6 @@ def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
         ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
     )
 
-    # Invalid loop
     num_bases_inbetween_latest_left_and_earliest_right_bases: int = (
         earliest_right_string_base_idx - latest_left_string_base_idx - 1
     )
@@ -153,15 +165,22 @@ def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
     return True
 
 
+# =================== Valid loop checks ===================
+
+
+def ir_pair_forms_valid_loop(ir_a: IR, ir_b: IR) -> bool:
+    if (
+        ir_pair_wholly_nested(ir_a, ir_b)
+        or ir_pair_disjoint(ir_a, ir_b)
+        or ir_pair_intersection_has_valid_base_count(ir_a, ir_b)
+    ):
+        return True
+
+    return False
+
+
 def irs_form_valid_loop(ir_list: List[IR]) -> bool:
     if irs_disjoint(ir_list) or irs_wholly_nested(ir_list):
         return True
     else:
         raise NotImplementedError("IRs not disjoint or wholly nested")
-
-
-def ir_has_valid_gap_size(ir):
-    left_strand_end_idx: int = ir[0][1]
-    right_strand_start_idx: int = ir[1][0]
-
-    return right_strand_start_idx - left_strand_end_idx - 1 >= 3
