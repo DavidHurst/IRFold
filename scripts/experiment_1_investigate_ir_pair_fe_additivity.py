@@ -17,6 +17,7 @@ from irfold.util import (
     ir_pair_forms_valid_loop,
     ir_pair_wholly_nested,
     ir_pair_disjoint,
+    ir_has_valid_gap_size,
 )
 
 DATA_DIR = str(Path(__file__).parent.parent / "data")
@@ -39,7 +40,7 @@ def ir_pair_free_energy_calculation_variations(ir_a, ir_b, sequence_len, out_dir
 
 
 def get_all_ir_pairs_not_matching_same_bases_valid_gap_sz(all_irs):
-    valid_irs = [ir for ir in all_irs if ir[1][0] - ir[0][1] - 1 >= 3]
+    valid_irs = [ir for ir in all_irs if ir_has_valid_gap_size(ir)]
 
     unique_idx_pairs = list(
         itertools.combinations([i for i in range(len(valid_irs))], 2)
@@ -120,6 +121,7 @@ if __name__ == "__main__":
     experiment_results = {
         "seq": [],
         "seq_len": [],
+        "ir_pair_index": [],
         "ir_a": [],
         "ir_b": [],
         "ir_a_fe": [],
@@ -134,7 +136,7 @@ if __name__ == "__main__":
     }
 
     sequence_len = 30
-    seq = "".join(random.choice("ACGU") for _ in range(sequence_len))
+    seq = "UGAUGACAAAUGCUUAACCCAAGCACGGCA"  # "".join(random.choice("ACGU") for _ in range(sequence_len))
 
     print(f"Seq. length: {sequence_len}")
     print(f"Seq.       : {seq}")
@@ -172,6 +174,7 @@ if __name__ == "__main__":
         ) = eval_ir_pair_structure_and_mfe(i, ir_i, ir_j, sequence_len, print_out=True)
         experiment_results["seq"].append(seq)
         experiment_results["seq_len"].append(sequence_len)
+        experiment_results["ir_pair_index"].append(i)
         experiment_results["ir_a"].append(ir_i)
         experiment_results["ir_b"].append(ir_j)
         experiment_results["ir_a_fe"].append(ir_a_fe)
@@ -220,9 +223,11 @@ if __name__ == "__main__":
     print(f"Num. partially nested pairs       : {len(partially_nested_ir_pairs)}")
     print(f"Num. disjoint pairs               : {len(disjoint_ir_pairs)}")
 
-    print("IRs".center(60, "="))
-    for ir in found_irs:
-        print(ir)
+    print("All IRs".center(60, "="))
+    for i, ir in enumerate(found_irs):
+        print(
+            f'IR#{str(i).zfill(2)}: {str(ir).ljust(20, " ")}, Valid Gap Sz.: {ir_has_valid_gap_size(ir)}'
+        )
 
     # Save results
     df = pd.DataFrame(experiment_results)

@@ -42,9 +42,9 @@ if __name__ == "__main__":
 
     # Show how the additivity assumption holds for pairs that form different structures e.g. wholly nested, disjoint...
     pairs_dfs = [
-        results_df[results_df.irs_disjoint == 1],
-        results_df[results_df.irs_wholly_nested == 1],
-        results_df[results_df.irs_partially_nested == 1],
+        results_df[results_df.ir_pair_disjoint == 1],
+        results_df[results_df.ir_pair_wholly_nested == 1],
+        results_df[results_df.ir_pair_partially_nested == 1],
     ]
     pair_type_names = ["Disjoint", "Wholly Nested", "Partially Nested"]
     for pairs_df, pair_name in zip(pairs_dfs, pair_type_names):
