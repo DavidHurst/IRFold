@@ -12,7 +12,6 @@ def ir_has_valid_gap_size(ir):
 
 
 def ir_pair_match_same_bases(ir_a: IR, ir_b: IR) -> bool:
-    # Check if IRs match the same bases
     ir_a_left_strand, ir_a_right_strand = ir_a[0], ir_a[1]
     paired_base_idxs_a = [
         idx for idx in range(ir_a_left_strand[0], ir_a_left_strand[1] + 1)
