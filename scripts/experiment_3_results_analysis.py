@@ -50,7 +50,9 @@ def plot_analysis(df, name):
 
     plt.tight_layout()
     # plt.suptitle(name)
-    plt.savefig(f"{DATA_DIR}/experiment_3/ir_triplets_fe_corrections_{name.lower()}.png")
+    plt.savefig(
+        f"{DATA_DIR}/experiment_3/ir_triplets_fe_corrections_{name.lower()}.png"
+    )
     plt.show()
 
 
