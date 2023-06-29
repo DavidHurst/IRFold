@@ -91,15 +91,30 @@ def eval_ir_triplet_structure_and_mfe(pair_idx, ir_a, ir_b, ir_c, seq_len, print
     )
 
     additivity_assumption_held = triplet_fe_sum == triplet_fe_union
-    valid_loop_formed = irs_form_valid_loop([ir_a, ir_b, ir_c])
 
     db_repr = irs_to_dot_bracket([ir_a, ir_b, ir_c], seq_len)
     db_repr_ir_labelled = label_irs_in_db_repr(db_repr, [ir_a, ir_b, ir_c])
 
+    contains_invalid_loop_pair = any(
+        [
+            not ir_pair_forms_valid_loop(ir_i, ir_j)
+            for ir_i, ir_j in itertools.combinations([ir_a, ir_b, ir_c], 2)
+        ]
+    )
+
     if print_out:
-        ir_a_fmt = f"[{str(ir_a[0][0]).zfill(2)}->{str(ir_a[0][1]).zfill(2)} {str(ir_a[1][0]).zfill(2)}->{str(ir_a[1][1]).zfill(2)}]"
-        ir_b_fmt = f"[{str(ir_b[0][0]).zfill(2)}->{str(ir_b[0][1]).zfill(2)} {str(ir_b[1][0]).zfill(2)}->{str(ir_b[1][1]).zfill(2)}]"
-        ir_c_fmt = f"[{str(ir_c[0][0]).zfill(2)}->{str(ir_c[0][1]).zfill(2)} {str(ir_c[1][0]).zfill(2)}->{str(ir_c[1][1]).zfill(2)}]"
+        ir_a_fmt = (
+            f"[{str(ir_a[0][0]).zfill(2)}->{str(ir_a[0][1]).zfill(2)} "
+            f"{str(ir_a[1][0]).zfill(2)}->{str(ir_a[1][1]).zfill(2)}]"
+        )
+        ir_b_fmt = (
+            f"[{str(ir_b[0][0]).zfill(2)}->{str(ir_b[0][1]).zfill(2)} "
+            f"{str(ir_b[1][0]).zfill(2)}->{str(ir_b[1][1]).zfill(2)}]"
+        )
+        ir_c_fmt = (
+            f"[{str(ir_c[0][0]).zfill(2)}->{str(ir_c[0][1]).zfill(2)} "
+            f"{str(ir_c[1][0]).zfill(2)}->{str(ir_c[1][1]).zfill(2)}]"
+        )
 
         print_space = " " * 4
         print(f"Triplet #{pair_idx}: A = {ir_a_fmt}, B = {ir_b_fmt}, C = {ir_c_fmt}")
@@ -128,12 +143,11 @@ def eval_ir_triplet_structure_and_mfe(pair_idx, ir_a, ir_b, ir_c, seq_len, print
         print(print_space, f"FE(A) + FE(B) + FE(C): {triplet_fe_sum:.4f}")
         print(print_space, f"FE(A U B U C)        : {triplet_fe_union:.4f}")
         print()
-        print(print_space, f"Valid loop      : {valid_loop_formed}")
         print(print_space, f"Assumption holds: {additivity_assumption_held}")
 
     return (
         additivity_assumption_held,
-        valid_loop_formed,
+        contains_invalid_loop_pair,
         ir_a_fe,
         ir_b_fe,
         ir_c_fe,
@@ -153,16 +167,14 @@ if __name__ == "__main__":
         "ir_a": [],
         "ir_b": [],
         "ir_c": [],
+        "ir_pairs": [],
         "ir_a_fe": [],
         "ir_b_fe": [],
         "ir_c_fe": [],
         "ir_triplet_fe_sum": [],
         "ir_triplet_fe_union": [],
         "fe_additivity_assumption_held": [],
-        "ir_triplet_forms_valid_loop": [],
-        "ir_triplet_wholly_nested": [],
-        "ir_triplet_partially_nested": [],
-        "ir_triplet_disjoint": [],
+        "ir_triplet_contains_invalid_loop_forming_pair": [],
     }
 
     sequence_len = 30
@@ -188,15 +200,11 @@ if __name__ == "__main__":
     ir_triplets_not_matching_same_bases = (
         get_all_ir_triplets_not_matching_same_bases_valid_gap_sz(found_irs)
     )
-    wholly_nested_ir_triplets = []
-    disjoint_ir_triplets = []
-    partially_nested_ir_triplets = []
 
-    # Evaluate IR pairs and group pairs into three groups: wholly nested, partially nested or disjoint
     for i, (ir_i, ir_j, ir_k) in enumerate(ir_triplets_not_matching_same_bases):
         (
             assumption_held,
-            valid_loop_formed,
+            contains_invalid_loop_pair,
             ir_a_fe,
             ir_b_fe,
             ir_c_fe,
@@ -211,37 +219,17 @@ if __name__ == "__main__":
         experiment_results["ir_a"].append(ir_i)
         experiment_results["ir_b"].append(ir_j)
         experiment_results["ir_c"].append(ir_j)
+        experiment_results["ir_pairs"].append(
+            list(itertools.combinations([ir_i, ir_j, ir_k], 2))
+        )
         experiment_results["ir_a_fe"].append(ir_a_fe)
         experiment_results["ir_b_fe"].append(ir_b_fe)
         experiment_results["ir_c_fe"].append(ir_b_fe)
         experiment_results["ir_triplet_fe_sum"].append(fe_sum)
         experiment_results["ir_triplet_fe_union"].append(fe_union)
         experiment_results["fe_additivity_assumption_held"].append(assumption_held)
-        experiment_results["ir_triplet_forms_valid_loop"].append(valid_loop_formed)
-
-        pair_type_indicator_binary_repr = [
-            0,
-            0,
-            0,
-        ]  # Wholly nested, partially nested, disjoint
-        if ir_pair_wholly_nested(ir_i, ir_j):
-            pair_type_indicator_binary_repr[0] = 1
-            wholly_nested_ir_triplets.append((ir_i, ir_j))
-        if not ir_pair_wholly_nested(ir_i, ir_j) and not ir_pair_disjoint(ir_i, ir_j):
-            pair_type_indicator_binary_repr[1] = 1
-            partially_nested_ir_triplets.append((ir_i, ir_j))
-        if ir_pair_disjoint(ir_i, ir_j):
-            pair_type_indicator_binary_repr[2] = 1
-            disjoint_ir_triplets.append((ir_i, ir_j))
-
-        experiment_results["ir_triplet_wholly_nested"].append(
-            pair_type_indicator_binary_repr[0]
-        )
-        experiment_results["ir_triplet_partially_nested"].append(
-            pair_type_indicator_binary_repr[1]
-        )
-        experiment_results["ir_triplet_disjoint"].append(
-            pair_type_indicator_binary_repr[2]
+        experiment_results["ir_triplet_contains_invalid_loop_forming_pair"].append(
+            contains_invalid_loop_pair
         )
 
     print("=" * 60)
@@ -254,10 +242,12 @@ if __name__ == "__main__":
     print(
         f"Num. triplets not matching same bases: {len(ir_triplets_not_matching_same_bases)}"
     )
-    print(f"Num. wholly nested triplets          : {len(wholly_nested_ir_triplets)}")
-    print(f"Num. partially nested triplets       : {len(partially_nested_ir_triplets)}")
-    print(f"Num. disjoint triplets               : {len(disjoint_ir_triplets)}")
+    print(
+        f'Num triplets containing invalid loop forming pairs: {len([val for val in experiment_results["ir_triplet_contains_invalid_loop_forming_pair"] if val is True])}'
+    )
 
     # Save results
     df = pd.DataFrame(experiment_results)
-    df.to_csv(f"{DATA_DIR}/experiment_1_triplets_results.csv")
+    df.to_csv(
+        f"{DATA_DIR}/experiment_2_results_ir_pair_validation_validating_triplets.csv"
+    )
