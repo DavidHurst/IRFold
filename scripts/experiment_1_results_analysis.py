@@ -42,9 +42,15 @@ if __name__ == "__main__":
 
     # Show free energy value of pairs, highlight pairs that form valid loops and those that don't
     form_valid_loop_highlighted_df = results_df.assign(
-        colour=['green' if val else 'red' for val in results_df.ir_pair_forms_valid_loop])
-    form_valid_loop_highlighted_df.ir_pair_fe_union = form_valid_loop_highlighted_df.ir_pair_fe_union.apply(
-        lambda x: x if x < 50_000 else 100)
+        colour=[
+            "green" if val else "red" for val in results_df.ir_pair_forms_valid_loop
+        ]
+    )
+    form_valid_loop_highlighted_df.ir_pair_fe_union = (
+        form_valid_loop_highlighted_df.ir_pair_fe_union.apply(
+            lambda x: x if x < 50_000 else 100
+        )
+    )
     bar_plot_ax = form_valid_loop_highlighted_df.plot.bar(
         x="ir_pair_index",
         y="ir_pair_fe_union",
@@ -68,4 +74,3 @@ if __name__ == "__main__":
     pair_type_names = ["Disjoint", "Wholly Nested", "Partially Nested"]
     for pairs_df, pair_name in zip(pairs_dfs, pair_type_names):
         plot_pair_analysis(pairs_df, pair_name)
-
