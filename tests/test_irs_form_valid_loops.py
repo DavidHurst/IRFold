@@ -78,4 +78,3 @@ def test_ir_pairs_with_valid_num_bases_in_intersection_being_assigned_infinite_f
     assert (
         pairs_free_energy >= 90_000
     )  # Test for 90k as valid loops will bring total FE down but not by 10k
-
