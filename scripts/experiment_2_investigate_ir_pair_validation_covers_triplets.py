@@ -144,7 +144,9 @@ def eval_ir_triplet_structure_and_mfe(pair_idx, ir_a, ir_b, ir_c, seq_len, print
         print(print_space, f"FE(A U B U C)        : {triplet_fe_union:.4f}")
         print()
         print(print_space, f"Assumption holds: {additivity_assumption_held}")
-        print(print_space, f"Triplet contains invalid pair: {contains_invalid_loop_pair}")
+        print(
+            print_space, f"Triplet contains invalid pair: {contains_invalid_loop_pair}"
+        )
 
     return (
         additivity_assumption_held,
