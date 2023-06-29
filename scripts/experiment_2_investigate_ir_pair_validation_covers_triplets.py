@@ -227,7 +227,7 @@ if __name__ == "__main__":
         )
         experiment_results["ir_a_fe"].append(ir_a_fe)
         experiment_results["ir_b_fe"].append(ir_b_fe)
-        experiment_results["ir_c_fe"].append(ir_b_fe)
+        experiment_results["ir_c_fe"].append(ir_c_fe)
         experiment_results["ir_triplet_fe_sum"].append(fe_sum)
         experiment_results["ir_triplet_fe_union"].append(fe_union)
         experiment_results["fe_additivity_assumption_held"].append(assumption_held)
