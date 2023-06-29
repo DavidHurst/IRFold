@@ -31,7 +31,7 @@ def ir_triplet_free_energy_calculation_variations(
     # FE(IR_a) + FE(IR_b) + FE(IR_c)
     ir_a_db_repr = irs_to_dot_bracket([ir_a], sequence_len)
     ir_b_db_repr = irs_to_dot_bracket([ir_b], sequence_len)
-    ir_c_db_repr = irs_to_dot_bracket([ir_b], sequence_len)
+    ir_c_db_repr = irs_to_dot_bracket([ir_c], sequence_len)
 
     ir_a_fe = round(calc_free_energy(ir_a_db_repr, seq, out_dir), 4)
     ir_b_fe = round(calc_free_energy(ir_b_db_repr, seq, out_dir), 4)
@@ -144,6 +144,7 @@ def eval_ir_triplet_structure_and_mfe(pair_idx, ir_a, ir_b, ir_c, seq_len, print
         print(print_space, f"FE(A U B U C)        : {triplet_fe_union:.4f}")
         print()
         print(print_space, f"Assumption holds: {additivity_assumption_held}")
+        print(print_space, f"Triplet contains invalid pair: {contains_invalid_loop_pair}")
 
     return (
         additivity_assumption_held,
