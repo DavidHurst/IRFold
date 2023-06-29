@@ -132,18 +132,29 @@ if __name__ == "__main__":
         print(print_space, f"Uncorrected FE          : {fe_sum:.4f}")
         print(print_space, f"Expected FE             : {fe_union:.4f}")
         for j, val in enumerate(correction_variable_values):
-            print(print_space, f'Corrected w/ - Pair {j}   : {fe_sum + val:.4f}')
-        print(print_space, f'Corrected w/ - All pairs: {fe_sum + sum(correction_variable_values):.4f}')
+            print(print_space, f"Corrected w/ - Pair {j}   : {fe_sum + val:.4f}")
+        print(
+            print_space,
+            f"Corrected w/ - All pairs: {fe_sum + sum(correction_variable_values):.4f}",
+        )
 
         experiment_results["seq"].append(seq)
         experiment_results["seq_len"].append(sequence_len)
         experiment_results["ir_triplet_index"].append(i)
         experiment_results["triplet_additive_fe"].append(fe_sum)
         experiment_results["triplet_union_fe"].append(fe_union)
-        experiment_results["corrected_additive_fe_first_ir_pair"].append(fe_sum + correction_variable_values[0])
-        experiment_results["corrected_additive_fe_second_ir_pair"].append(fe_sum + correction_variable_values[1])
-        experiment_results["corrected_additive_fe_third_ir_pair"].append(fe_sum + correction_variable_values[2])
-        experiment_results["corrected_additive_fe_all_pairs"].append(fe_sum + sum(correction_variable_values))
+        experiment_results["corrected_additive_fe_first_ir_pair"].append(
+            fe_sum + correction_variable_values[0]
+        )
+        experiment_results["corrected_additive_fe_second_ir_pair"].append(
+            fe_sum + correction_variable_values[1]
+        )
+        experiment_results["corrected_additive_fe_third_ir_pair"].append(
+            fe_sum + correction_variable_values[2]
+        )
+        experiment_results["corrected_additive_fe_all_pairs"].append(
+            fe_sum + sum(correction_variable_values)
+        )
 
     df = pd.DataFrame(experiment_results)
     df.to_csv(f"{DATA_DIR}/experiment_3/results.csv")

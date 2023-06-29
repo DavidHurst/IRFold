@@ -33,7 +33,9 @@ def plot_pair_analysis(pairs_df, pair_type):
             padding=8,
         )
     plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/experiment_1/ir_pairs_fe_sorted_abs_diff_{pair_type.lower()}.png")
+    plt.savefig(
+        f"{DATA_DIR}/experiment_1/ir_pairs_fe_sorted_abs_diff_{pair_type.lower()}.png"
+    )
     plt.show()
 
 
@@ -62,7 +64,9 @@ if __name__ == "__main__":
         legend=False,  # ToDo: Add legend
     )
     plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/experiment_1/ir_pairs_forming_valid_loops_vs_free_energy.png")
+    plt.savefig(
+        f"{DATA_DIR}/experiment_1/ir_pairs_forming_valid_loops_vs_free_energy.png"
+    )
     plt.show()
 
     # Show how the additivity assumption holds for pairs that form different structures e.g. wholly nested, disjoint...
