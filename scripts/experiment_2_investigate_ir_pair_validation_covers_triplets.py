@@ -73,7 +73,7 @@ if __name__ == "__main__":
             fe_sum,
             fe_union,
         ) = eval_ir_triplet_structure_and_mfe(
-            i, ir_i, ir_j, ir_k, sequence_len, seq, print_out=True
+            i, ir_i, ir_j, ir_k, sequence_len, seq, DATA_DIR, print_out=True
         )
         experiment_results["seq"].append(seq)
         experiment_results["seq_len"].append(sequence_len)

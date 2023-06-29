@@ -16,8 +16,6 @@ from irfold.util import (
     irs_match_same_bases,
 )
 
-DATA_DIR = str(Path(__file__).parent.parent / "data")
-
 
 def label_irs_in_db_repr(db_repr, irs):
     """Assigns the index value of IRs in the list provided to each base that
@@ -67,13 +65,13 @@ def get_all_ir_pairs_not_matching_same_bases_valid_gap_sz(all_irs):
     ]
 
 
-def eval_ir_pair_structure_and_mfe(pair_idx, ir_a, ir_b, seq_len, seq, print_out):
+def eval_ir_pair_structure_and_mfe(pair_idx, ir_a, ir_b, seq_len, seq, out_dir, print_out):
     (
         ir_a_fe,
         ir_b_fe,
         pairs_fe_union,
         pairs_fe_sum,
-    ) = ir_pair_free_energy_calculation_variations(ir_a, ir_b, seq_len, seq, DATA_DIR)
+    ) = ir_pair_free_energy_calculation_variations(ir_a, ir_b, seq_len, seq, out_dir)
 
     additivity_assumption_held = pairs_fe_sum == pairs_fe_union
     valid_loop_formed = ir_pair_forms_valid_loop(ir_a, ir_b)
@@ -148,7 +146,7 @@ def get_all_ir_triplets_not_matching_same_bases_valid_gap_sz(all_irs):
 
 
 def eval_ir_triplet_structure_and_mfe(
-    pair_idx, ir_a, ir_b, ir_c, seq_len, seq, print_out
+    pair_idx, ir_a, ir_b, ir_c, seq_len, seq, out_dir, print_out
 ):
     (
         ir_a_fe,
@@ -157,7 +155,7 @@ def eval_ir_triplet_structure_and_mfe(
         triplet_fe_union,
         triplet_fe_sum,
     ) = ir_triplet_free_energy_calculation_variations(
-        ir_a, ir_b, ir_c, seq_len, seq, DATA_DIR
+        ir_a, ir_b, ir_c, seq_len, seq, out_dir
     )
 
     additivity_assumption_held = triplet_fe_sum == triplet_fe_union
@@ -269,7 +267,7 @@ def get_all_ir_quadruplets_not_matching_same_bases_valid_gap_sz(all_irs):
 
 
 def eval_ir_quadruplet_structure_and_mfe(
-    pair_idx, ir_a, ir_b, ir_c, ir_d, seq_len, seq, print_out
+    pair_idx, ir_a, ir_b, ir_c, ir_d, seq_len, seq, out_dir, print_out
 ):
     (
         ir_a_fe,
@@ -279,7 +277,7 @@ def eval_ir_quadruplet_structure_and_mfe(
         quadruplet_fe_union,
         quadruplet_fe_sum,
     ) = ir_quadruplet_free_energy_calculation_variations(
-        ir_a, ir_b, ir_c, ir_d, seq_len, seq, DATA_DIR
+        ir_a, ir_b, ir_c, ir_d, seq_len, seq, out_dir
     )
 
     additivity_assumption_held = quadruplet_fe_sum == quadruplet_fe_union
