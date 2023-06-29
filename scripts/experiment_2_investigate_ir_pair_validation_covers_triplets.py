@@ -111,5 +111,5 @@ if __name__ == "__main__":
     # Save results
     df = pd.DataFrame(experiment_results)
     df.to_csv(
-        f"{DATA_DIR}/experiment_2/experiment_2_results_ir_pair_validation_validating_triplets.csv"
+        f"{DATA_DIR}/experiment_2/results_triplets.csv"
     )

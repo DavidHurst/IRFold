@@ -146,4 +146,4 @@ if __name__ == "__main__":
         experiment_results["corrected_additive_fe_all_pairs"].append(fe_sum + sum(correction_variable_values))
 
     df = pd.DataFrame(experiment_results)
-    df.to_csv(f"{DATA_DIR}/experiment_3/experiment_3_results.csv")
+    df.to_csv(f"{DATA_DIR}/experiment_3/results.csv")

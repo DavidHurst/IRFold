@@ -18,7 +18,7 @@ def plot_pair_analysis(pairs_df, pair_type):
         x="ir_pair_index",
         y="assumption_error",
         kind="bar",
-        title=f"MFE {pair_type} Pairs \n Difference From Added MFE to Pair's Union MFE",
+        title=f"MFE {pair_type.replace('_', ' ')} Pairs \n Difference From Added MFE to Pair's Union MFE",
         xticks=[],
         xlabel="IR Pair",
         ylabel="Sorted, Absolute FE Difference",
@@ -33,12 +33,12 @@ def plot_pair_analysis(pairs_df, pair_type):
             padding=8,
         )
     plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/experiment_1/experiment_1_{pair_type}.png")
+    plt.savefig(f"{DATA_DIR}/experiment_1/ir_pairs_fe_sorted_abs_diff_{pair_type.lower()}.png")
     plt.show()
 
 
 if __name__ == "__main__":
-    results_df = pd.read_csv(f"{DATA_DIR}/experiment_1/experiment_1_results.csv")
+    results_df = pd.read_csv(f"{DATA_DIR}/experiment_1/results.csv")
 
     # Show free energy value of pairs, highlight pairs that form valid loops and those that don't
     form_valid_loop_highlighted_df = results_df.assign(
@@ -62,7 +62,7 @@ if __name__ == "__main__":
         legend=False,  # ToDo: Add legend
     )
     plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/experiment_1/experiment_1_valid_loop_formed.png")
+    plt.savefig(f"{DATA_DIR}/experiment_1/ir_pairs_forming_valid_loops_vs_free_energy.png")
     plt.show()
 
     # Show how the additivity assumption holds for pairs that form different structures e.g. wholly nested, disjoint...
@@ -71,6 +71,6 @@ if __name__ == "__main__":
         results_df[results_df.ir_pair_wholly_nested == 1],
         results_df[results_df.ir_pair_partially_nested == 1],
     ]
-    pair_type_names = ["Disjoint", "Wholly Nested", "Partially Nested"]
+    pair_type_names = ["Disjoint", "Wholly_Nested", "Partially_Nested"]
     for pairs_df, pair_name in zip(pairs_dfs, pair_type_names):
         plot_pair_analysis(pairs_df, pair_name)

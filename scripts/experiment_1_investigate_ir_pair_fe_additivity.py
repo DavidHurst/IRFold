@@ -141,4 +141,4 @@ if __name__ == "__main__":
 
     # Save results
     df = pd.DataFrame(experiment_results)
-    df.to_csv(f"{DATA_DIR}/experiment_1/experiment_1_results.csv")
+    df.to_csv(f"{DATA_DIR}/experiment_1/results.csv")
