@@ -89,7 +89,7 @@ if __name__ == "__main__":
         "seq": [],
         "seq_len": [],
         "ir_triplet_index": [],
-        "additive_fe": [],
+        "triplet_additive_fe": [],
         "triplet_union_fe": [],
         "corrected_additive_fe_first_ir_pair": [],
         "corrected_additive_fe_second_ir_pair": [],
@@ -138,7 +138,7 @@ if __name__ == "__main__":
         experiment_results["seq"].append(seq)
         experiment_results["seq_len"].append(sequence_len)
         experiment_results["ir_triplet_index"].append(i)
-        experiment_results["additive_fe"].append(fe_sum)
+        experiment_results["triplet_additive_fe"].append(fe_sum)
         experiment_results["triplet_union_fe"].append(fe_union)
         experiment_results["corrected_additive_fe_first_ir_pair"].append(fe_sum + correction_variable_values[0])
         experiment_results["corrected_additive_fe_second_ir_pair"].append(fe_sum + correction_variable_values[1])
