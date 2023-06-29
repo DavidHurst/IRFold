@@ -65,7 +65,9 @@ def get_all_ir_pairs_not_matching_same_bases_valid_gap_sz(all_irs):
     ]
 
 
-def eval_ir_pair_structure_and_mfe(pair_idx, ir_a, ir_b, seq_len, seq, out_dir, print_out):
+def eval_ir_pair_structure_and_mfe(
+    pair_idx, ir_a, ir_b, seq_len, seq, out_dir, print_out
+):
     (
         ir_a_fe,
         ir_b_fe,
