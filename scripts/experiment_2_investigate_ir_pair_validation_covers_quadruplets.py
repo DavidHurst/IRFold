@@ -101,10 +101,11 @@ def eval_ir_quadruplet_structure_and_mfe(
     db_repr = irs_to_dot_bracket([ir_a, ir_b, ir_c, ir_d], seq_len)
     db_repr_ir_labelled = label_irs_in_db_repr(db_repr, [ir_a, ir_b, ir_c, ir_d])
 
-    contains_invalid_loop_pair = any(
+    num_invalid_loop_forming_pairs = len(
         [
-            not ir_pair_forms_valid_loop(ir_i, ir_j)
+            True
             for ir_i, ir_j in itertools.combinations([ir_a, ir_b, ir_c, ir_d], 2)
+            if not ir_pair_forms_valid_loop(ir_i, ir_j)
         ]
     )
 
@@ -162,10 +163,11 @@ def eval_ir_quadruplet_structure_and_mfe(
         print(print_space, f"FE(A U B U C U D)            : {quadruplet_fe_union:.4f}")
         print()
         print(print_space, f"Assumption holds: {additivity_assumption_held}")
+        print(print_space, f"Num. invalid IR pairs: {num_invalid_loop_forming_pairs}")
 
     return (
         additivity_assumption_held,
-        contains_invalid_loop_pair,
+        num_invalid_loop_forming_pairs,
         ir_a_fe,
         ir_b_fe,
         ir_c_fe,
@@ -195,7 +197,7 @@ if __name__ == "__main__":
         "ir_quadruplet_fe_sum": [],
         "ir_quadruplet_fe_union": [],
         "fe_additivity_assumption_held": [],
-        "ir_quadruplet_contains_invalid_loop_forming_pair": [],
+        "num_invalid_loop_forming_pairs_in_quadruplet": [],
     }
 
     sequence_len = 30
@@ -227,7 +229,7 @@ if __name__ == "__main__":
     ):
         (
             assumption_held,
-            contains_invalid_loop_pair,
+            num_invalid_loop_forming_pairs,
             ir_a_fe,
             ir_b_fe,
             ir_c_fe,
@@ -254,8 +256,8 @@ if __name__ == "__main__":
         experiment_results["ir_quadruplet_fe_sum"].append(fe_sum)
         experiment_results["ir_quadruplet_fe_union"].append(fe_union)
         experiment_results["fe_additivity_assumption_held"].append(assumption_held)
-        experiment_results["ir_quadruplet_contains_invalid_loop_forming_pair"].append(
-            contains_invalid_loop_pair
+        experiment_results["num_invalid_loop_forming_pairs_in_quadruplet"].append(
+            num_invalid_loop_forming_pairs
         )
 
     print("Summary Stats.".center(60, "="))
@@ -269,7 +271,7 @@ if __name__ == "__main__":
         f"Num. quadruplets not matching same bases             : {len(ir_quadruplets_not_matching_same_bases)}"
     )
     print(
-        f'Num quadruplets containing invalid loop forming pairs: {len([val for val in experiment_results["ir_quadruplet_contains_invalid_loop_forming_pair"] if val is True])}'
+        f'Num quadruplets containing invalid loop forming pairs: {len([val for val in experiment_results["num_invalid_loop_forming_pairs_in_quadruplet"] if val > 0])}'
     )
 
     # Save results
