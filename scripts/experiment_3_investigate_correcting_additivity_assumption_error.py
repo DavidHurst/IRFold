@@ -3,6 +3,8 @@ import random
 import sys
 from pathlib import Path
 
+import pandas as pd
+
 from helper_functions import (
     get_all_ir_pairs_not_matching_same_bases_valid_gap_sz,
     ir_pair_free_energy_calculation_variations,
@@ -21,22 +23,6 @@ DATA_DIR = str(Path(__file__).parent.parent / "data")
 if __name__ == "__main__":
     # Get all valid gap IR pairs which don't match same bases
     # random.seed(223332)
-    # experiment_results = {
-    #     "seq": [],
-    #     "seq_len": [],
-    #     "ir_pair_index": [],
-    #     "ir_a": [],
-    #     "ir_b": [],
-    #     "ir_a_fe": [],
-    #     "ir_b_fe": [],
-    #     "ir_pair_fe_sum": [],
-    #     "ir_pair_fe_union": [],
-    #     "fe_additivity_assumption_held": [],
-    #     "ir_pair_forms_valid_loop": [],
-    #     "ir_pair_wholly_nested": [],
-    #     "ir_pair_partially_nested": [],
-    #     "ir_pair_disjoint": [],
-    # }
 
     sequence_len = 30
     seq = "UGAUGACAAAUGCUUAACCCAAGCACGGCA"  # "".join(random.choice("ACGU") for _ in range(sequence_len))
@@ -99,6 +85,18 @@ if __name__ == "__main__":
 
     print("IR Triplets Corrected FEs".center(60, "="))
 
+    experiment_results = {
+        "seq": [],
+        "seq_len": [],
+        "ir_triplet_index": [],
+        "additive_fe": [],
+        "triplet_union_fe": [],
+        "corrected_additive_fe_first_ir_pair": [],
+        "corrected_additive_fe_second_ir_pair": [],
+        "corrected_additive_fe_third_ir_pair": [],
+        "corrected_additive_fe_all_pairs": [],
+    }
+
     # Get all valid gap IR triplets which don't match same bases
     ir_triplets_not_matching_same_bases = (
         get_all_ir_triplets_not_matching_same_bases_valid_gap_sz(found_irs)
@@ -123,27 +121,29 @@ if __name__ == "__main__":
             f"{str(ir_k[1][0]).zfill(2)}->{str(ir_k[1][1]).zfill(2)}]"
         )
 
-        print_space = " " * 4
-        print(f"Triplet #{i}: A = {ir_a_fmt}, B = {ir_b_fmt}, C = {ir_c_fmt}")
-        print(print_space, f"Uncorrected FE: {fe_sum}")
-        print(
-            print_space,
-            f"Expected FE   : {fe_union:.4f}",
-        )
-
-        cumulative_correction_variable_values = 0
+        correction_variable_values = []
         for j, ir_pair in enumerate(itertools.combinations([ir_i, ir_j, ir_k], 2)):
-            correction_value = ir_pair_correction_variables[
-                str(ir_pair[0]) + str(ir_pair[1])
-            ]
-            print(
-                print_space,
-                f"Corrected FE using pair {j} ({correction_value:.4f}): {fe_sum + correction_value:.4f}",
+            correction_variable_values.append(
+                ir_pair_correction_variables[str(ir_pair[0]) + str(ir_pair[1])]
             )
 
-            cumulative_correction_variable_values += correction_value
+        print_space = " " * 4
+        print(f"Triplet #{i}: A = {ir_a_fmt}, B = {ir_b_fmt}, C = {ir_c_fmt}")
+        print(print_space, f"Uncorrected FE          : {fe_sum:.4f}")
+        print(print_space, f"Expected FE             : {fe_union:.4f}")
+        for j, val in enumerate(correction_variable_values):
+            print(print_space, f'Corrected w/ - Pair {j}   : {fe_sum + val:.4f}')
+        print(print_space, f'Corrected w/ - All pairs: {fe_sum + sum(correction_variable_values):.4f}')
 
-        print(
-            print_space,
-            f"Corrected FE with cumulative : {fe_sum + cumulative_correction_variable_values:.4f}",
-        )
+        experiment_results["seq"].append(seq)
+        experiment_results["seq_len"].append(sequence_len)
+        experiment_results["ir_triplet_index"].append(i)
+        experiment_results["additive_fe"].append(fe_sum)
+        experiment_results["triplet_union_fe"].append(fe_union)
+        experiment_results["corrected_additive_fe_first_ir_pair"].append(fe_sum + correction_variable_values[0])
+        experiment_results["corrected_additive_fe_second_ir_pair"].append(fe_sum + correction_variable_values[1])
+        experiment_results["corrected_additive_fe_third_ir_pair"].append(fe_sum + correction_variable_values[2])
+        experiment_results["corrected_additive_fe_all_pairs"].append(fe_sum + sum(correction_variable_values))
+
+    df = pd.DataFrame(experiment_results)
+    df.to_csv(f"{DATA_DIR}/experiment_3/experiment_3_results.csv")
