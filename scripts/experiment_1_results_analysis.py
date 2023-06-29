@@ -32,13 +32,13 @@ def plot_pair_analysis(pairs_df, pair_type):
             ],
             padding=8,
         )
-    plt.savefig(f"{DATA_DIR}/experiment_1_{pair_type}.png")
+    plt.savefig(f"{DATA_DIR}/experiment_1/experiment_1_{pair_type}.png")
     plt.tight_layout()
     plt.show()
 
 
 if __name__ == "__main__":
-    results_df = pd.read_csv(f"{DATA_DIR}/experiment_1_results.csv")
+    results_df = pd.read_csv(f"{DATA_DIR}/experiment_1/experiment_1_results.csv")
 
     # Show how the additivity assumption holds for pairs that form different structures e.g. wholly nested, disjoint...
     pairs_dfs = [
