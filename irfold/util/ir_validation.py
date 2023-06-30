@@ -34,6 +34,8 @@ def irs_match_same_bases(ir_list: List[IR]) -> bool:
         ]
     )
 
+def irs_incompatible(ir_list: List[IR]) -> bool:
+    return irs_match_same_bases(ir_list) or not irs_form_valid_loop(ir_list)
 
 # =================== Disjoint checks ===================
 
