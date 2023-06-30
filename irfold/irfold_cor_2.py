@@ -15,7 +15,7 @@ from irfold.util import (
 
 
 class IRFoldCor2(IRFoldVal2):
-    """Extends IRFold1 by adding solver variables to correct for the additivity of free energy IRs not holding
+    """Extends IRFold2 by adding solver variables to correct for the additivity of free energy IRs not holding
     consistently"""
 
     @staticmethod
