@@ -1,5 +1,5 @@
 import pytest
-from irfold import IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2
+from irfold import IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3
 from irfold.util import calc_free_energy
 
 
@@ -26,7 +26,7 @@ def test_objective_function_more_correct_with_increasing_model_version(
 
     model_outputs = [
         model.fold(**find_irs_params)
-        for model in [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2]
+        for model in [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3]
     ]
 
     true_free_energies = [
