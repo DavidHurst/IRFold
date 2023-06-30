@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from irfold import IRFoldCor2, IRFoldCor3
+from irfold import IRFoldCor2, IRFoldCor3, IRFoldCorX
 
 irs = [
     ((0, 1), (28, 29)),
@@ -20,7 +20,7 @@ irs = [
     ((10, 12), (27, 29)),
 ]
 
-ir_pair_correction_variable_names = [
+expected_ir_pair_correction_variable_names = [
     "ir_0_ir_4_fe_corrector",
     "ir_0_ir_6_fe_corrector",
     "ir_0_ir_7_fe_corrector",
@@ -46,7 +46,7 @@ ir_pair_correction_variable_names = [
     "ir_7_ir_11_fe_corrector",
     "ir_7_ir_12_fe_corrector",
 ]
-ir_triplet_correction_variable_names = [
+expected_ir_triplet_correction_variable_names = [
     "ir_0_ir_6_ir_12_fe_corrector",
     "ir_0_ir_7_ir_12_fe_corrector",
     "ir_0_ir_10_ir_12_fe_corrector",
@@ -91,9 +91,6 @@ def test_correction_triplet_variables_created(rna_seq_30_bases_19_irs, data_dir)
 
     correction_vars = [var for var in variables if "corrector" in var.Name()]
 
-    for v in correction_vars:
-        print(f'"{v.Name()}",')
-
     assert len(correction_vars) > 0
 
     for v in correction_vars:
@@ -103,7 +100,22 @@ def test_correction_triplet_variables_created(rna_seq_30_bases_19_irs, data_dir)
         )  # Correction variables have each IRs index in the name
 
 
-@pytest.mark.parametrize("irfold_cor", [IRFoldCor2, IRFoldCor3])
+@pytest.mark.parametrize("irfold_cor", [IRFoldCor2, IRFoldCorX])
+def test_number_of_pair_correction_variables_created(
+    rna_seq_30_bases_19_irs, data_dir, irfold_cor
+):
+    seq = rna_seq_30_bases_19_irs[0]
+    seq_len = len(seq)
+    _, variables = irfold_cor.get_solver(
+        irs, seq_len, seq, data_dir, str(rna_seq_30_bases_19_irs)
+    )
+
+    corrector_variables = [var for var in variables if "corrector" in var.Name()]
+
+    assert len(corrector_variables) == len(expected_ir_pair_correction_variable_names)
+
+
+@pytest.mark.parametrize("irfold_cor", [IRFoldCor2, IRFoldCor3, IRFoldCorX])
 def test_expected_pair_correction_variables_created(
     rna_seq_30_bases_19_irs, data_dir, irfold_cor
 ):
@@ -117,8 +129,8 @@ def test_expected_pair_correction_variables_created(
         v.Name() for v in variables if len(re.findall(r"-?\d+\.?\d*", v.Name())) == 2
     ]
 
-    assert set(ir_pair_corrector_variable_names) == set(
-        ir_pair_correction_variable_names
+    assert sorted(ir_pair_corrector_variable_names) == sorted(
+        expected_ir_pair_correction_variable_names
     )
 
 
@@ -136,5 +148,5 @@ def test_expected_triplet_correction_variables_created(
     ]
 
     assert set(ir_triplet_corrector_variable_names) == set(
-        ir_triplet_correction_variable_names
+        expected_ir_triplet_correction_variable_names
     )
