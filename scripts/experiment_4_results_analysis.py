@@ -307,7 +307,7 @@ if __name__ == "__main__":
     print("-" * means_table_print_width)
     print(
         "|"
-        + f"Seq. Length".center(15)
+        + f"Seq. Length->".center(15)
         + "|"
         + "".join([str(interval).center(15) + "|" for interval in seq_intervals])
     )
