@@ -9,7 +9,7 @@ from tqdm import tqdm
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 DATA_DIR = str(Path(__file__).parent.parent / "data")
 
-from irfold import IRFoldBase, IRFoldVal1, IRFoldCor2, IRFoldVal2
+from irfold import IRFoldBase, IRFoldVal1, IRFoldCor2, IRFoldVal2, IRFoldCor3
 
 if __name__ == "__main__":
     rnalib_performance_file_path = (Path(DATA_DIR) / "RNAlib_performance.csv").resolve()
@@ -19,13 +19,10 @@ if __name__ == "__main__":
     # random.seed(182)
 
     n_runs_per_seq_length = 10
-    for seq_len in tqdm(range(10, 60), desc=f"Running trials"):
+    for seq_len in tqdm(range(7, 50), desc=f"Running trials"):
         for _ in range(n_runs_per_seq_length):
             seq = "".join(random.choice("ACGU") for _ in range(seq_len))
             seq_name = "random_seq_for_ssp_program_comparison"
-
-            # print(f"Seq. length: {seq_len}")
-            # print(f"Seq.       : {seq}")
 
             fold_params = {
                 "sequence": seq,
@@ -54,6 +51,10 @@ if __name__ == "__main__":
                 **fold_params
             )
 
+            irfold_cor3_secondary_structure, irfold_cor3_obj_fn_val = IRFoldCor3.fold(
+                **fold_params
+            )
+
             rnalib_secondary_structure, rnalib_mfe = RNA.fold(seq, "")
 
             with open(str(rnalib_performance_file_path), "a") as perf_file:
@@ -65,15 +66,3 @@ if __name__ == "__main__":
                         seq_len,
                     ]
                 )
-
-            # print(f"IRFold0 Solution".center(50, "="))
-            # print(f"Dot Bracket: {irfold0_secondary_structure}")
-            # print(f"MFE        : {irfold0_mfe:.4f}")
-            #
-            # print(f"IRFold1 Solution".center(50, "="))
-            # print(f"Dot Bracket: {irfold1_secondary_structure}")
-            # print(f"MFE        : {irfold1_mfe:.4f}")
-            #
-            # print("RNAlib Solution".center(50, "="))
-            # print(f"Dot Bracket: {rnalib_secondary_structure}")
-            # print(f"MFE        : {rnalib_mfe:.4f}")
