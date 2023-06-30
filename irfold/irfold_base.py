@@ -47,6 +47,7 @@ class IRFoldBase:
     """Base IRFold Model: RNA secondary structure prediction based on extracting optimal
     inverted repeat configurations from the primary sequence"""
 
+    # ToDo: Decorate with timer which writes time to performance file
     @classmethod
     def fold(
         cls,
