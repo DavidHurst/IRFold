@@ -1,4 +1,5 @@
 import csv
+import itertools
 import subprocess
 from typing import List, Tuple
 
@@ -29,6 +30,26 @@ def irs_to_dot_bracket(irs: List[IR], seq_len: int) -> str:
         ]
 
     return "".join(paired_bases)
+
+
+def valid_ir_n_tuples(
+    n: int, n_irs: int, ir_list: List[IR], invalid_gap_sz_irs_idxs: List[int]
+) -> List[Tuple[IR, ...]]:
+    """Returns all possible and valid (valid gap size) IR n-tuples i.e. tuples of size n that can be made from the
+    provided IR list. E.g. all valid tuples of size 2 i.e. pairs that can be created from the IR list"""
+    all_unique_possible_idx_n_tuples: List[Tuple[int, ...]] = list(
+        itertools.combinations([i for i in range(n_irs)], n)
+    )
+    valid_ir_idx_n_tuples: List[Tuple[int, ...]] = [
+        ir_idx_n_tuple
+        for ir_idx_n_tuple in all_unique_possible_idx_n_tuples
+        if all([ir_idx_n_tuple[i] not in invalid_gap_sz_irs_idxs for i in range(n)])
+    ]
+
+    return [
+        tuple(ir_list[ir_idx] for ir_idx in ir_idx_n_tuple)
+        for ir_idx_n_tuple in valid_ir_idx_n_tuples
+    ]
 
 
 def calc_free_energy(
