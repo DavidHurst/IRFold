@@ -215,7 +215,12 @@ class IRFoldCor3(IRFoldVal2):
             )
         )
 
-        return model, ir_indicator_variables + ir_pair_fe_correction_indicator_vars
+        return (
+            model,
+            ir_indicator_variables
+            + ir_pair_fe_correction_indicator_vars
+            + ir_triplet_fe_correction_indicator_vars,
+        )
 
     @staticmethod
     def generate_ir_pair_correction_variables_w_coeffs(
