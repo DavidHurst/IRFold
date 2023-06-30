@@ -160,12 +160,6 @@ class IRFoldCor3(IRFoldVal2):
             valid_ir_triplets,
         )
 
-        print(
-            f"{len(ir_triplet_fe_correction_indicator_vars)} triplet correction vars created:"
-        )
-        for var in ir_triplet_fe_correction_indicator_vars:
-            print(f"{var.Name()}")
-
         # Add constraints that only activate correction variables when the IR pair they represent is active
         for correction_var in ir_triplet_fe_correction_indicator_vars:
             # print(f"Adding activate {correction_var.Name()}")
