@@ -23,6 +23,19 @@ def test_db_conversion_output_matches(
         assert generated_db_repr == expected_db_repr
 
 
+def test_db_conversion_multiple_irs():
+    ir_list = [
+        ((0, 1), (19, 20)),
+        ((3, 5), (21, 23)),
+        ((6, 8), (16, 18)),
+    ]
+
+    generated_db_repr = irs_to_dot_bracket(ir_list, 25)
+    expected_db_repr = "((.((((((.......))))))))."
+
+    assert generated_db_repr == expected_db_repr
+
+
 def test_calc_free_energy(data_dir, rna_seq_15_bases_0_irs):
     seq = rna_seq_15_bases_0_irs[0]
     free_energy = calc_free_energy("...............", seq, data_dir, "test_fe_calc_seq")
