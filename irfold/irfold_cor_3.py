@@ -188,7 +188,9 @@ class IRFoldCor3(IRFoldVal2):
             ir_triplet_is_active_var = model.NewBoolVar(
                 f"ir_{ir_a_idx}_ir_{ir_b_idx}_{ir_c_idx}_both_1"
             )
-            model.Add(ir_a_var + ir_b_var + ir_c_var == 3).OnlyEnforceIf(ir_triplet_is_active_var)
+            model.Add(ir_a_var + ir_b_var + ir_c_var == 3).OnlyEnforceIf(
+                ir_triplet_is_active_var
+            )
             model.Add(ir_a_var + ir_b_var + ir_c_var != 3).OnlyEnforceIf(
                 ir_triplet_is_active_var.Not()
             )
@@ -210,7 +212,13 @@ class IRFoldCor3(IRFoldVal2):
             ir_triplet_fe_correction_indicator_vars_coeffs,
         )
         model.Minimize(
-            LinearExpr.Sum([ir_indicators_expr, ir_pair_fe_correction_indicators_expr, ir_triplet_fe_correction_indicators_expr])
+            LinearExpr.Sum(
+                [
+                    ir_indicators_expr,
+                    ir_pair_fe_correction_indicators_expr,
+                    ir_triplet_fe_correction_indicators_expr,
+                ]
+            )
         )
 
         return model, ir_indicator_variables + ir_pair_fe_correction_indicator_vars
