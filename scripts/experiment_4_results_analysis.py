@@ -21,6 +21,9 @@ if __name__ == "__main__":
     irfold_cor2_res_df = pd.read_csv(
         Path(DATA_DIR).resolve() / "IRFoldCor2_performance.csv"
     )
+    irfold_cor3_res_df = pd.read_csv(
+        Path(DATA_DIR).resolve() / "IRFoldCor3_performance.csv"
+    )
     rnalib_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "RNAlib_performance.csv")
 
     plt.rcParams["figure.figsize"] = (12, 6)
@@ -29,6 +32,7 @@ if __name__ == "__main__":
     irfold_val1_avg_df = irfold_val1_res_df.groupby("seq_len").mean(numeric_only=True)
     irfold_val2_avg_df = irfold_val2_res_df.groupby("seq_len").mean(numeric_only=True)
     irfold_cor2_avg_df = irfold_cor2_res_df.groupby("seq_len").mean(numeric_only=True)
+    irfold_cor3_avg_df = irfold_cor3_res_df.groupby("seq_len").mean(numeric_only=True)
 
     # Solver performance comparison
     num_bool_vars_ax = plt.subplot(221)
@@ -46,6 +50,11 @@ if __name__ == "__main__":
         irfold_cor2_res_df.seq_len.unique(),
         irfold_cor2_avg_df.solver_num_booleans,
         label="IRFoldCor2",
+    )
+    num_bool_vars_ax.plot(
+        irfold_cor3_res_df.seq_len.unique(),
+        irfold_cor3_avg_df.solver_num_booleans,
+        label="IRFoldCor3",
     )
     num_bool_vars_ax.title.set_text("Num. Booleans Solver Contains")
     num_bool_vars_ax.set_ylabel("Mean Num. Booleans")
@@ -67,6 +76,11 @@ if __name__ == "__main__":
         irfold_cor2_avg_df.solver_solve_time,
         label="IRFoldCor2",
     )
+    solve_time_ax.plot(
+        irfold_cor3_res_df.seq_len.unique(),
+        irfold_cor3_avg_df.solver_solve_time,
+        label="IRFoldCor3",
+    )
     solve_time_ax.title.set_text("Solve Time")
     solve_time_ax.set_ylabel("Mean Solve Time (Milli. Secs.)")
     solve_time_ax.set_xlabel("Sequence Length")
@@ -86,6 +100,11 @@ if __name__ == "__main__":
         irfold_cor2_res_df.seq_len.unique(),
         irfold_cor2_avg_df.solver_iterations,
         label="IRFoldCor2",
+    )
+    num_iterations_ax.plot(
+        irfold_cor3_res_df.seq_len.unique(),
+        irfold_cor3_avg_df.solver_iterations,
+        label="IRFoldCor3",
     )
     num_iterations_ax.title.set_text("Num. Solver Iterations")
     num_iterations_ax.set_ylabel("Mean Iterations")
@@ -107,6 +126,11 @@ if __name__ == "__main__":
         irfold_cor2_avg_df.solver_num_branches_explored,
         label="IRFoldCor2",
     )
+    num_branches_expored_ax.plot(
+        irfold_cor3_res_df.seq_len.unique(),
+        irfold_cor3_avg_df.solver_num_branches_explored,
+        label="IRFoldCor3",
+    )
     num_branches_expored_ax.title.set_text("Num. Branches Explored")
     num_branches_expored_ax.set_ylabel("Mean Num. Branches")
     num_branches_expored_ax.set_xlabel("Sequence Length")
@@ -122,10 +146,10 @@ if __name__ == "__main__":
 
     plt.suptitle("Solver Performance Comparison")
     plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/experiment_2_solver_performance_comparison.png")
+    plt.savefig(f"{DATA_DIR}/experiment_4/solver_performance_comparison.png")
     plt.show()
 
-    plt.rcParams["figure.figsize"] = (8, 12)
+    plt.rcParams["figure.figsize"] = (16, 10)
 
     # Compare IRFold versions: True MFE of IRFold solutions vs. MFE IRFold returns
     # This is to show the effect of additivity assumption inconsistency
@@ -133,7 +157,7 @@ if __name__ == "__main__":
     #           to show deviation from true and compounding of error over time
 
     # IRFoldBase
-    irfold_base_ax = plt.subplot(321)
+    irfold_base_ax = plt.subplot(331)
     irfold_base_ax.plot(
         irfold_base_res_df.seq_len.unique(),
         irfold_base_avg_df.obj_fn_final_value,
@@ -146,9 +170,9 @@ if __name__ == "__main__":
     )
     irfold_base_ax.title.set_text("IRFoldBase")
 
-    # IRFoldValX
+    # IRFoldVal1
 
-    irfold_val1_ax = plt.subplot(323)
+    irfold_val1_ax = plt.subplot(334)
     irfold_val1_ax.plot(
         irfold_val1_res_df.seq_len.unique(),
         irfold_val1_avg_df.obj_fn_final_value,
@@ -161,7 +185,9 @@ if __name__ == "__main__":
     )
     irfold_val1_ax.title.set_text("IRFoldVal1")
 
-    irfold_val2_ax = plt.subplot(324, sharex=irfold_val1_ax)
+    # IRFoldVal2
+
+    irfold_val2_ax = plt.subplot(335, sharex=irfold_val1_ax)
     irfold_val2_ax.plot(
         irfold_val2_res_df.seq_len.unique(),
         irfold_val2_avg_df.obj_fn_final_value,
@@ -176,7 +202,7 @@ if __name__ == "__main__":
 
     # IRFoldCor2
 
-    irfold_cor2_ax = plt.subplot(326)
+    irfold_cor2_ax = plt.subplot(337)
     irfold_cor2_ax.plot(
         irfold_cor2_res_df.seq_len.unique(),
         irfold_cor2_avg_df.obj_fn_final_value,
@@ -189,14 +215,29 @@ if __name__ == "__main__":
     )
     irfold_cor2_ax.title.set_text("IRFoldCor2")
 
-    for ax in [irfold_base_ax, irfold_val1_ax, irfold_val2_ax, irfold_cor2_ax]:
+    # IRFoldCor3
+
+    irfold_cor3_ax = plt.subplot(338)
+    irfold_cor3_ax.plot(
+        irfold_cor3_res_df.seq_len.unique(),
+        irfold_cor3_avg_df.obj_fn_final_value,
+        label="Objective Function Value",
+    )
+    irfold_cor3_ax.plot(
+        irfold_cor3_res_df.seq_len.unique(),
+        irfold_cor3_avg_df.dot_bracket_repr_mfe,
+        label="True MFE",
+    )
+    irfold_cor3_ax.title.set_text("IRFoldCor3")
+
+    for ax in [irfold_base_ax, irfold_val1_ax, irfold_val2_ax, irfold_cor2_ax, irfold_cor3_ax]:
         ax.legend()
         ax.grid()
         ax.set_ylabel("Mean Value (kcal/mol)")
         ax.set_xlabel("Sequence Length")
     plt.suptitle("Solver Objective Function Final Value vs. Solution MFE")
     plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/experiment_2_mfe_vs_objective_value_comparison.png")
+    plt.savefig(f"{DATA_DIR}/experiment_4/mfe_vs_objective_value_comparison.png")
     plt.show()
 
     plt.rcParams["figure.figsize"] = (6, 4)
@@ -205,17 +246,18 @@ if __name__ == "__main__":
     mfe_data = [
         irfold_val2_res_df.dot_bracket_repr_mfe,
         irfold_cor2_res_df.dot_bracket_repr_mfe,
+        irfold_cor3_res_df.dot_bracket_repr_mfe,
         rnalib_res_df.solution_mfe,
     ]
     fig, ax = plt.subplots()
 
-    ax.boxplot(mfe_data, labels=["IRFoldVal2", "IRFoldCor2", "RNAlib"])
+    ax.boxplot(mfe_data, labels=["IRFoldVal2", "IRFoldCor2", "IRFoldCor3", "RNAlib"])
 
     ax.title.set_text("MFE of Solution")
     plt.ylabel("MFE (kcal/mol)")
     plt.suptitle("SSP Program Solution MFE Comparison")
     plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/experiment_2_mfe_comparison.png")
+    plt.savefig(f"{DATA_DIR}/experiment_4/ssp_programs_mfe_comparison.png")
     plt.show()
 
     # Compare IRFold versions' MFE's as sequence length increases
