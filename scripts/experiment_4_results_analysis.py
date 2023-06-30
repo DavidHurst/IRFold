@@ -26,6 +26,8 @@ if __name__ == "__main__":
     )
     rnalib_res_df = pd.read_csv(Path(DATA_DIR).resolve() / "RNAlib_performance.csv")
 
+    show = True
+
     plt.rcParams["figure.figsize"] = (12, 6)
 
     irfold_base_avg_df = irfold_base_res_df.groupby("seq_len").mean(numeric_only=True)
@@ -147,12 +149,12 @@ if __name__ == "__main__":
     plt.suptitle("Solver Performance Comparison")
     plt.tight_layout()
     plt.savefig(f"{DATA_DIR}/experiment_4/solver_performance_comparison.png")
-    plt.show()
+    if show:
+        plt.show()
 
     plt.rcParams["figure.figsize"] = (16, 10)
 
-    # Compare IRFold versions: True MFE of IRFold solutions vs. MFE IRFold returns
-    # This is to show the effect of additivity assumption inconsistency
+    # Compare IRFold versions' objective function error as sequence length increases
     # ToDo: Set x axis to be true free energy and y to be absolute value of objective function
     #           to show deviation from true and compounding of error over time
 
@@ -160,85 +162,72 @@ if __name__ == "__main__":
     irfold_base_ax = plt.subplot(331)
     irfold_base_ax.plot(
         irfold_base_res_df.seq_len.unique(),
-        irfold_base_avg_df.obj_fn_final_value,
-        label="Objective Function Value",
-    )
-    irfold_base_ax.plot(
-        irfold_base_res_df.seq_len.unique(),
-        irfold_base_avg_df.dot_bracket_repr_mfe,
-        label="True MFE",
+        (
+            irfold_base_avg_df.obj_fn_final_value
+            - irfold_base_avg_df.dot_bracket_repr_mfe
+        ).abs(),
     )
     irfold_base_ax.title.set_text("IRFoldBase")
 
     # IRFoldVal1
-
     irfold_val1_ax = plt.subplot(334)
     irfold_val1_ax.plot(
         irfold_val1_res_df.seq_len.unique(),
-        irfold_val1_avg_df.obj_fn_final_value,
-        label="Objective Function Value",
-    )
-    irfold_val1_ax.plot(
-        irfold_val1_res_df.seq_len.unique(),
-        irfold_val1_avg_df.dot_bracket_repr_mfe,
-        label="True MFE",
+        (
+            irfold_val1_avg_df.obj_fn_final_value
+            - irfold_val1_avg_df.dot_bracket_repr_mfe
+        ).abs(),
     )
     irfold_val1_ax.title.set_text("IRFoldVal1")
 
     # IRFoldVal2
-
     irfold_val2_ax = plt.subplot(335, sharex=irfold_val1_ax)
     irfold_val2_ax.plot(
         irfold_val2_res_df.seq_len.unique(),
-        irfold_val2_avg_df.obj_fn_final_value,
-        label="Objective Function Value",
-    )
-    irfold_val2_ax.plot(
-        irfold_val2_res_df.seq_len.unique(),
-        irfold_val2_avg_df.dot_bracket_repr_mfe,
-        label="True MFE",
+        (
+            irfold_val2_avg_df.obj_fn_final_value
+            - irfold_val2_avg_df.dot_bracket_repr_mfe
+        ).abs(),
     )
     irfold_val2_ax.title.set_text("IRFoldVal2")
 
     # IRFoldCor2
-
     irfold_cor2_ax = plt.subplot(337)
     irfold_cor2_ax.plot(
         irfold_cor2_res_df.seq_len.unique(),
-        irfold_cor2_avg_df.obj_fn_final_value,
-        label="Objective Function Value",
-    )
-    irfold_cor2_ax.plot(
-        irfold_cor2_res_df.seq_len.unique(),
-        irfold_cor2_avg_df.dot_bracket_repr_mfe,
-        label="True MFE",
+        (
+            irfold_cor2_avg_df.obj_fn_final_value
+            - irfold_cor2_avg_df.dot_bracket_repr_mfe
+        ).abs(),
     )
     irfold_cor2_ax.title.set_text("IRFoldCor2")
 
     # IRFoldCor3
-
     irfold_cor3_ax = plt.subplot(338)
     irfold_cor3_ax.plot(
         irfold_cor3_res_df.seq_len.unique(),
-        irfold_cor3_avg_df.obj_fn_final_value,
-        label="Objective Function Value",
-    )
-    irfold_cor3_ax.plot(
-        irfold_cor3_res_df.seq_len.unique(),
-        irfold_cor3_avg_df.dot_bracket_repr_mfe,
-        label="True MFE",
+        (
+            irfold_cor3_avg_df.obj_fn_final_value
+            - irfold_cor3_avg_df.dot_bracket_repr_mfe
+        ).abs(),
     )
     irfold_cor3_ax.title.set_text("IRFoldCor3")
 
-    for ax in [irfold_base_ax, irfold_val1_ax, irfold_val2_ax, irfold_cor2_ax, irfold_cor3_ax]:
-        ax.legend()
+    for ax in [
+        irfold_base_ax,
+        irfold_val1_ax,
+        irfold_val2_ax,
+        irfold_cor2_ax,
+        irfold_cor3_ax,
+    ]:
         ax.grid()
-        ax.set_ylabel("Mean Value (kcal/mol)")
+        ax.set_ylabel("Absolute Objective Function Error (kcal/mol)")
         ax.set_xlabel("Sequence Length")
-    plt.suptitle("Solver Objective Function Final Value vs. Solution MFE")
+    plt.suptitle("Solver Objective Function Error")
     plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/experiment_4/mfe_vs_objective_value_comparison.png")
-    plt.show()
+    plt.savefig(f"{DATA_DIR}/experiment_4/objective_function_error_comparison.png")
+    if show:
+        plt.show()
 
     plt.rcParams["figure.figsize"] = (6, 4)
 
@@ -258,25 +247,78 @@ if __name__ == "__main__":
     plt.suptitle("SSP Program Solution MFE Comparison")
     plt.tight_layout()
     plt.savefig(f"{DATA_DIR}/experiment_4/ssp_programs_mfe_comparison.png")
-    plt.show()
+    if show:
+        plt.show()
 
-    # Compare IRFold versions' MFE's as sequence length increases
-    # plt.plot(
-    #     irfold_val1_res_df.seq_len.unique(),
-    #     irfold_val1_avg_df.dot_bracket_repr_mfe,
-    #     label="IRFold1",
-    # )
-    # plt.plot(
-    #     irfold_val2_res_df.seq_len.unique(),
-    #     irfold_val2_avg_df.dot_bracket_repr_mfe,
-    #     label="IRFold2",
-    # )
-    #
-    # plt.legend()
-    # plt.grid()
-    # plt.ylabel("Mean MFE of Solution")
-    # plt.xlabel("Sequence Length")
-    # plt.suptitle("IRFold Variant's MFEs over Time")
-    # plt.tight_layout()
-    # plt.savefig(f"{DATA_DIR}/experiment_2_mfe_over_time_comparison.png")
-    # plt.show()
+    # Compare RNA SSP programs' performances at sequence length intervals
+    rnalib_avg_df = rnalib_res_df.groupby("seq_len").mean(numeric_only=True)
+
+    seq_interval_sz = 10
+    seq_intervals = [
+        [start, start + seq_interval_sz - 1]
+        for start in range(
+            rnalib_res_df.seq_len.unique().min(),
+            rnalib_res_df.seq_len.unique().max(),
+            seq_interval_sz,
+        )
+    ]
+    seq_intervals_means = {
+        "IRFoldVal2": [],
+        "IRFoldCor2": [],
+        "IRFoldCor3": [],
+        "RNALib": [],
+    }
+    for start, stop in seq_intervals:
+        irfold_val2_interval_mean = irfold_val2_avg_df[
+            (irfold_val2_avg_df.index >= start) & (irfold_val2_avg_df.index <= stop)
+        ].dot_bracket_repr_mfe.mean()
+        irfold_cor2_interval_mean = irfold_cor2_avg_df[
+            (irfold_cor2_avg_df.index >= start) & (irfold_cor2_avg_df.index <= stop)
+        ].dot_bracket_repr_mfe.mean()
+        irfold_cor3_interval_mean = irfold_cor3_avg_df[
+            (irfold_cor3_avg_df.index >= start) & (irfold_cor3_avg_df.index <= stop)
+        ].dot_bracket_repr_mfe.mean()
+        rnalib_interval_mean = rnalib_avg_df[
+            (rnalib_avg_df.index >= start) & (rnalib_avg_df.index <= stop)
+        ].solution_mfe.mean()
+
+        seq_intervals_means["IRFoldVal2"].append(irfold_val2_interval_mean)
+        seq_intervals_means["IRFoldCor2"].append(irfold_cor2_interval_mean)
+        seq_intervals_means["IRFoldCor3"].append(irfold_cor3_interval_mean)
+        seq_intervals_means["RNALib"].append(rnalib_interval_mean)
+
+    # See below for horrific (but dynamic!) table printing to stdout lol
+    means_table_print_width = (
+        (15 * len(seq_intervals_means["RNALib"]))
+        + 15
+        + len(seq_intervals_means["RNALib"])
+        + 2
+    )
+    print("-" * means_table_print_width)
+    print(
+        "|"
+        + " " * 15
+        + "|"
+        + "Free Energy of Solution - Mean".center(
+            15 * len(seq_intervals_means["RNALib"]) + 4
+        )
+        + "|"
+    )
+    print("-" * means_table_print_width)
+    print(
+        "|"
+        + f"Seq. Length".center(15)
+        + "|"
+        + "".join([str(interval).center(15) + "|" for interval in seq_intervals])
+    )
+    print("-" * means_table_print_width)
+    for prog_name, means in seq_intervals_means.items():
+        print(
+            "|"
+            + f"{prog_name}".ljust(15)
+            + "|"
+            + "".join(
+                [str(round(mean, 4)).ljust(7, "0").center(15) + "|" for mean in means]
+            )
+        )
+    print("-" * means_table_print_width)
