@@ -43,7 +43,7 @@ def test_number_of_irs_found(
     sequence_length,
     sequence_name,
     data_dir,
-    all_irs_in_sequence,
+    all_irs,
 ):
     found_irs = ir_fold_variant.find_irs(
         sequence,
@@ -53,8 +53,9 @@ def test_number_of_irs_found(
         seq_name=sequence_name,
         out_dir=data_dir,
     )
+    print(f"\n >>>>>>>>>>>>>>>>. Num found IRs  = {len(found_irs)}")
 
-    assert len(found_irs) == len(all_irs_in_sequence)
+    assert len(found_irs) == len(all_irs)
 
 
 @pytest.mark.parametrize(
