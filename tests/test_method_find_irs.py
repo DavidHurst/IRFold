@@ -53,7 +53,6 @@ def test_number_of_irs_found(
         seq_name=sequence_name,
         out_dir=data_dir,
     )
-    print(f"\n >>>>>>>>>>>>>>>>. Num found IRs  = {len(found_irs)}")
 
     assert len(found_irs) == len(all_irs)
 
