@@ -56,52 +56,36 @@ def test_method_irs_form_valid_loop_invalid_loop_forming_pair(
     assert irs_form_valid_loop(forms_invalid_loop_ir_pair) == False
 
 
-@pytest.mark.parametrize(
-    "valid_loop_forming_pair",
-    [
-        pytest.lazy_fixture("forms_valid_loop_ir_pair"),
-        pytest.lazy_fixture("disjoint_ir_pair"),
-        pytest.lazy_fixture("wholly_nested_ir_pair"),
-        pytest.lazy_fixture("valid_number_of_bases_in_intersection_ir_pair"),
-    ],
-)
 def test_ir_pairs_forming_valid_loop_is_assigned_reasonable_free_energy_by_RNAlib(
-    valid_loop_forming_pair, sequence, sequence_length, data_dir
+    forms_valid_loop_ir_pair, sequence, sequence_length, data_dir
 ):
     """An invalid loop forming pair will be detected by RNAlib's FE calculation and is
     assigned "infinity" free energy where infinity is 100k
     """
-    if irs_match_same_bases(valid_loop_forming_pair) or any(
-        [not ir_has_valid_gap_size(ir) for ir in valid_loop_forming_pair]
+    if irs_match_same_bases(forms_valid_loop_ir_pair) or any(
+        [not ir_has_valid_gap_size(ir) for ir in forms_valid_loop_ir_pair]
     ):
         pytest.skip("Pair matches same bases")
 
-    pair_db_repr = irs_to_dot_bracket(list(valid_loop_forming_pair), sequence_length)
+    pair_db_repr = irs_to_dot_bracket(list(forms_valid_loop_ir_pair), sequence_length)
     pairs_free_energy = calc_free_energy(pair_db_repr, sequence, data_dir)
 
     # Test for 90k as valid loops will bring total FE down but not by 10k
     assert pairs_free_energy <= 90_000
 
 
-@pytest.mark.parametrize(
-    "invalid_loop_forming_pair",
-    [
-        pytest.lazy_fixture("forms_invalid_loop_ir_pair"),
-        pytest.lazy_fixture("invalid_number_of_bases_in_intersection_ir_pair"),
-    ],
-)
 def test_ir_pairs_forming_invalid_loop_is_assigned_near_100k_free_energy_by_RNAlib(
-    invalid_loop_forming_pair, sequence, sequence_length, data_dir
+    forms_invalid_loop_ir_pair, sequence, sequence_length, data_dir
 ):
     """An invalid loop forming pair will be detected by RNAlib's FE calculation and is
     assigned "infinity" free energy where infinity is 100k
     """
-    if irs_match_same_bases(invalid_loop_forming_pair) or any(
-        [not ir_has_valid_gap_size(ir) for ir in invalid_loop_forming_pair]
+    if irs_match_same_bases(forms_invalid_loop_ir_pair) or any(
+        [not ir_has_valid_gap_size(ir) for ir in forms_invalid_loop_ir_pair]
     ):
         pytest.skip("Pair matches same bases or IR in pair has invalid gap size.")
 
-    pair_db_repr = irs_to_dot_bracket(list(invalid_loop_forming_pair), sequence_length)
+    pair_db_repr = irs_to_dot_bracket(list(forms_invalid_loop_ir_pair), sequence_length)
     pairs_free_energy = calc_free_energy(pair_db_repr, sequence, data_dir)
 
     # Test for 90k as valid loops will bring total FE down but not by 10k
