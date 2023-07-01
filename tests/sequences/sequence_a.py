@@ -1,9 +1,9 @@
-__all__ = ["TestSequence24"]
+__all__ = ["SequenceA"]
 
 
-class TestSequence24:
+class SequenceA:
 
-    sequence_name = "TestSequence24"
+    sequence_name = "TestSequenceA"
     sequence = "GAGCCGGGCAUGUCACAACCUGCG"
     sequence_length = 24
     all_irs = {
