@@ -32,10 +32,13 @@ class IRFoldCorX(IRFoldVal2):
         sequence: str,
         out_dir: str,
         seq_name: str,
+        max_n_tuple_sz_to_correct: int = 2
     ) -> Tuple[CpModel, List[IntVar]]:
         model: CpModel = CpModel()
         n_irs: int = len(ir_list)
-        max_n_tuple_sz_to_correct: int = 2
+
+        if max_n_tuple_sz_to_correct < 2 or max_n_tuple_sz_to_correct > len(ir_list):
+            raise ValueError('Cannot corrct IR groups smaller than 2 or larger than the number of IRs.')
 
         # Create binary indicator variables for IRs
         invalid_gap_sz_ir_idxs: List[int] = [

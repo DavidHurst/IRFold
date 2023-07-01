@@ -27,6 +27,7 @@ class IRFoldCor3(IRFoldVal2):
         sequence: str,
         out_dir: str,
         seq_name: str,
+        max_n_tuple_sz_to_correct: int = 2
     ) -> Tuple[CpModel, List[IntVar]]:
         model: CpModel = CpModel()
         n_irs: int = len(ir_list)
