@@ -1,80 +1,108 @@
-from irfold.util import ir_pair_forms_valid_loop, calc_free_energy, irs_to_dot_bracket
+import pytest
+
+from irfold.util import (
+    ir_pair_forms_valid_loop,
+    irs_form_valid_loop,
+    calc_free_energy,
+    irs_to_dot_bracket,
+    irs_match_same_bases,
+    ir_has_valid_gap_size,
+)
 
 
-# Note: These tests don't check if IRs have valid gap sizes, probably should check fixtures for this
-
-# ====================  Test pairs   ====================
-
-
-def test_wholly_nested_ir_pairs_forming_valid_loop(wholly_nested_ir_pair):
-    ir_a = wholly_nested_ir_pair[0]
-    ir_b = wholly_nested_ir_pair[1]
-
-    assert ir_pair_forms_valid_loop(ir_a, ir_b) == True
-
-
-def test_entirely_disjoint_ir_pairs_forming_valid_loop(entirely_disjoint_ir_pair):
-    ir_a = entirely_disjoint_ir_pair[0]
-    ir_b = entirely_disjoint_ir_pair[1]
-
-    assert ir_pair_forms_valid_loop(ir_a, ir_b) == True
-
-
-def test_ir_pairs_with_valid_num_bases_in_intersection_forming_valid_loop(
-    valid_num_bases_in_pair_intersection_ir_pair,
+@pytest.mark.parametrize(
+    "valid_loop_forming_pair",
+    [
+        pytest.lazy_fixture("forms_valid_loop_ir_pair"),
+        pytest.lazy_fixture("disjoint_ir_pair"),
+        pytest.lazy_fixture("wholly_nested_ir_pair"),
+        pytest.lazy_fixture("valid_number_of_bases_in_intersection_ir_pair"),
+    ],
+)
+def test_method_ir_pair_forms_valid_loop_valid_loop_forming_pair(
+    valid_loop_forming_pair,
 ):
-    ir_a = valid_num_bases_in_pair_intersection_ir_pair[0]
-    ir_b = valid_num_bases_in_pair_intersection_ir_pair[1]
+    ir_a = valid_loop_forming_pair[0]
+    ir_b = valid_loop_forming_pair[1]
 
     assert ir_pair_forms_valid_loop(ir_a, ir_b) == True
 
 
-def test_ir_pairs_with_valid_num_bases_in_intersection_forming_invalid_loop(
-    invalid_num_bases_in_pair_intersection_ir_pair,
+def test_method_ir_pair_forms_valid_loop_invalid_loop_forming_pair(
+    forms_invalid_loop_ir_pair,
 ):
-    ir_a = invalid_num_bases_in_pair_intersection_ir_pair[0]
-    ir_b = invalid_num_bases_in_pair_intersection_ir_pair[1]
+    ir_a = forms_invalid_loop_ir_pair[0]
+    ir_b = forms_invalid_loop_ir_pair[1]
 
     assert ir_pair_forms_valid_loop(ir_a, ir_b) == False
 
 
-def test_ir_pairs_with_valid_num_bases_in_intersection_being_assigned_reasonable_free_energy(
-    valid_num_bases_in_pair_intersection_ir_pair, rna_seq_30_bases_19_irs, data_dir
+@pytest.mark.parametrize(
+    "valid_loop_forming_pair",
+    [
+        pytest.lazy_fixture("forms_valid_loop_ir_pair"),
+        pytest.lazy_fixture("disjoint_ir_pair"),
+        pytest.lazy_fixture("wholly_nested_ir_pair"),
+        pytest.lazy_fixture("valid_number_of_bases_in_intersection_ir_pair"),
+    ],
+)
+def test_method_irs_form_valid_loop_valid_loop_forming_pair(valid_loop_forming_pair):
+    assert irs_form_valid_loop(valid_loop_forming_pair) == True
+
+
+def test_method_irs_form_valid_loop_invalid_loop_forming_pair(
+    forms_invalid_loop_ir_pair,
 ):
-    """An invalid loop forming will be detected by RNAlib's FE calculation.
-    An invalid loop is assigned "infinity" free energy where infinity is 100k
-    """
-    seq = rna_seq_30_bases_19_irs[0]
-    seq_len = len(seq)
-
-    ir_a = valid_num_bases_in_pair_intersection_ir_pair[0]
-    ir_b = valid_num_bases_in_pair_intersection_ir_pair[1]
-
-    pairs_db_repr = irs_to_dot_bracket([ir_a, ir_b], seq_len)
-
-    pairs_free_energy = calc_free_energy(pairs_db_repr, seq, data_dir)
-
-    assert (
-        pairs_free_energy <= 90_000
-    )  # Test for 90k as valid loops will bring total FE down but not by 10k
+    assert irs_form_valid_loop(forms_invalid_loop_ir_pair) == False
 
 
-def test_ir_pairs_with_valid_num_bases_in_intersection_being_assigned_infinite_free_energy(
-    invalid_num_bases_in_pair_intersection_ir_pair, rna_seq_30_bases_19_irs, data_dir
+@pytest.mark.parametrize(
+    "valid_loop_forming_pair",
+    [
+        pytest.lazy_fixture("forms_valid_loop_ir_pair"),
+        pytest.lazy_fixture("disjoint_ir_pair"),
+        pytest.lazy_fixture("wholly_nested_ir_pair"),
+        pytest.lazy_fixture("valid_number_of_bases_in_intersection_ir_pair"),
+    ],
+)
+def test_ir_pairs_forming_valid_loop_is_assigned_reasonable_free_energy_by_RNAlib(
+    valid_loop_forming_pair, sequence, sequence_length, data_dir
 ):
-    """An invalid loop forming will be detected by RNAlib's FE calculation.
-    An invalid loop is assigned "infinity" free energy where infinity is 100k
+    """An invalid loop forming pair will be detected by RNAlib's FE calculation and is
+    assigned "infinity" free energy where infinity is 100k
     """
-    seq = rna_seq_30_bases_19_irs[0]
-    seq_len = len(seq)
+    if irs_match_same_bases(valid_loop_forming_pair) or any(
+        [not ir_has_valid_gap_size(ir) for ir in valid_loop_forming_pair]
+    ):
+        pytest.skip("Pair matches same bases")
 
-    ir_a = invalid_num_bases_in_pair_intersection_ir_pair[0]
-    ir_b = invalid_num_bases_in_pair_intersection_ir_pair[1]
+    pair_db_repr = irs_to_dot_bracket(list(valid_loop_forming_pair), sequence_length)
+    pairs_free_energy = calc_free_energy(pair_db_repr, sequence, data_dir)
 
-    pairs_db_repr = irs_to_dot_bracket([ir_a, ir_b], seq_len)
+    # Test for 90k as valid loops will bring total FE down but not by 10k
+    assert pairs_free_energy <= 90_000
 
-    pairs_free_energy = calc_free_energy(pairs_db_repr, seq, data_dir)
 
-    assert (
-        pairs_free_energy >= 90_000
-    )  # Test for 90k as valid loops will bring total FE down but not by 10k
+@pytest.mark.parametrize(
+    "invalid_loop_forming_pair",
+    [
+        pytest.lazy_fixture("forms_invalid_loop_ir_pair"),
+        pytest.lazy_fixture("invalid_number_of_bases_in_intersection_ir_pair"),
+    ],
+)
+def test_ir_pairs_forming_invalid_loop_is_assigned_near_100k_free_energy_by_RNAlib(
+    invalid_loop_forming_pair, sequence, sequence_length, data_dir
+):
+    """An invalid loop forming pair will be detected by RNAlib's FE calculation and is
+    assigned "infinity" free energy where infinity is 100k
+    """
+    if irs_match_same_bases(invalid_loop_forming_pair) or any(
+        [not ir_has_valid_gap_size(ir) for ir in invalid_loop_forming_pair]
+    ):
+        pytest.skip("Pair matches same bases or IR in pair has invalid gap size.")
+
+    pair_db_repr = irs_to_dot_bracket(list(invalid_loop_forming_pair), sequence_length)
+    pairs_free_energy = calc_free_energy(pair_db_repr, sequence, data_dir)
+
+    # Test for 90k as valid loops will bring total FE down but not by 10k
+    assert pairs_free_energy >= 90_000
