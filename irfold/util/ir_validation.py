@@ -4,7 +4,7 @@ from typing import Tuple, List
 from .helper_functions import IR
 
 
-def ir_has_valid_gap_size(ir):
+def ir_has_valid_gap_size(ir: IR):
     left_strand_end_idx: int = ir[0][1]
     right_strand_start_idx: int = ir[1][0]
 
