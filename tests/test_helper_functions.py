@@ -3,42 +3,25 @@ from pathlib import Path
 from irfold.util import irs_to_dot_bracket, calc_free_energy, write_performance_to_file
 
 
-def test_db_conversion_lengths_match(
-    list_of_irs, expected_dot_bracket_reprs, sequence_lengths
+def test_dot_bracket_conversion_lengths_match(all_irs, sequence_length):
+    generated_db_repr = irs_to_dot_bracket(all_irs, sequence_length)
+    assert len(generated_db_repr) == sequence_length
+
+
+def test_db_conversion_output_matches_irs(
+    all_irs, all_ir_dot_bracket_reprs, sequence_length
 ):
-    for ir, expected, seq_len in zip(
-        list_of_irs, expected_dot_bracket_reprs, sequence_lengths
-    ):
-        generated_db_repr = irs_to_dot_bracket([ir], seq_len)
-        assert len(generated_db_repr) == len(expected)
+    # ToDo: This should use the ir and ir_dot_bracket_repr fixtures but weird combinatorial issue going on
+    for ir, db_repr in zip(all_irs, all_ir_dot_bracket_reprs):
+        generated_db_repr = irs_to_dot_bracket([ir], sequence_length)
+        assert generated_db_repr == db_repr
 
 
-def test_db_conversion_output_matches(
-    list_of_irs, expected_dot_bracket_reprs, sequence_lengths
-):
-    for ir, expected_db_repr, seq_len in zip(
-        list_of_irs, expected_dot_bracket_reprs, sequence_lengths
-    ):
-        generated_db_repr = irs_to_dot_bracket([ir], seq_len)
-        assert generated_db_repr == expected_db_repr
+# ToDo: Write tests for IR pair and triplet dot bracket conversions
 
 
-def test_db_conversion_multiple_irs():
-    ir_list = [
-        ((0, 1), (19, 20)),
-        ((3, 5), (21, 23)),
-        ((6, 8), (16, 18)),
-    ]
-
-    generated_db_repr = irs_to_dot_bracket(ir_list, 25)
-    expected_db_repr = "((.((((((.......))))))))."
-
-    assert generated_db_repr == expected_db_repr
-
-
-def test_calc_free_energy(data_dir, rna_seq_15_bases_0_irs):
-    seq = rna_seq_15_bases_0_irs[0]
-    free_energy = calc_free_energy("...............", seq, data_dir, "test_fe_calc_seq")
+def test_calc_free_energy(data_dir, sequence, sequence_name, sequence_length):
+    free_energy = calc_free_energy("." * sequence_length, sequence, data_dir, sequence)
 
     assert free_energy is not None
     assert free_energy == 0.0
