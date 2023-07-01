@@ -21,7 +21,9 @@ def test_db_conversion_output_matches_irs(
 
 
 def test_calc_free_energy(data_dir, sequence, sequence_name, sequence_length):
-    free_energy = calc_free_energy("." * sequence_length, sequence, data_dir, sequence_name)
+    free_energy = calc_free_energy(
+        "." * sequence_length, sequence, data_dir, sequence_name
+    )
 
     assert free_energy is not None
     assert free_energy == 0.0
