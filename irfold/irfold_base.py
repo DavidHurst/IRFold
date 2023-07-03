@@ -12,7 +12,6 @@ from ortools.sat.python.cp_model import (
     LinearExpr,
     OPTIMAL,
     FEASIBLE,
-    CpSolverSolutionCallback,
 )
 
 from irfold.util import (
@@ -24,23 +23,6 @@ from irfold.util import (
     write_performance_to_file,
     run_cmd,
 )
-
-# class VarArraySolutionPrinter(CpSolverSolutionCallback):
-#     """Print intermediate solutions."""
-#
-#     def __init__(self, variables):
-#         CpSolverSolutionCallback.__init__(self)
-#         self.__variables = variables
-#         self.__solution_count = 0
-#
-#     def on_solution_callback(self):
-#         self.__solution_count += 1
-#         for v in self.__variables:
-#             print('%s=%i' % (v, self.Value(v)), end=' ')
-#         print()
-#
-#     def solution_count(self):
-#         return self.__solution_count
 
 
 class IRFoldBase:
@@ -57,7 +39,7 @@ class IRFoldBase:
         max_gap: int,
         seq_name: str = "seq",
         mismatches: int = 0,
-        max_n_tuple_sz_to_correct: int = 2,
+        max_n_tuple_sz_to_correct: int = 3,
         out_dir: str = ".",
         *,
         save_performance: bool = False,
@@ -65,6 +47,9 @@ class IRFoldBase:
         """Returns the MFE computed by simply adding the free energies of IRs which is incorrect but
         is illustrative of the IR free energy assumption additivity not holding consistently which is corrected
         for in class IRFold2."""
+
+        if "X" in cls.__name__:
+            cls.__name__ = f"IRFoldCorX{str(max_n_tuple_sz_to_correct)}"
 
         # Find IRs in sequence
         found_irs: List[IR] = cls.find_irs(
@@ -93,10 +78,8 @@ class IRFoldBase:
         )
 
         solver: CpSolver = CpSolver()
-        # solver.parameters.enumerate_all_solutions = True
-        # solution_printer = VarArraySolutionPrinter(variables)
 
-        status = solver.Solve(model)  # , solution_printer)
+        status = solver.Solve(model)
 
         if status == OPTIMAL or status == FEASIBLE:
             # Return dot bracket repr and objective function's final value
@@ -216,7 +199,7 @@ class IRFoldBase:
         sequence: str,
         out_dir: str,
         seq_name: str,
-        max_n_tuple_sz_to_correct: int = 2
+        max_n_tuple_sz_to_correct: int = 2,
     ) -> Tuple[CpModel, List[IntVar]]:
         model: CpModel = CpModel()
         n_irs: int = len(ir_list)
