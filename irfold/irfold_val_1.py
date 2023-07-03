@@ -11,8 +11,6 @@ from irfold.util import (
     IR,
     irs_to_dot_bracket,
     calc_free_energy,
-    ir_pair_match_same_bases,
-    ir_pair_forms_valid_loop,
 )
 
 
@@ -26,7 +24,7 @@ class IRFoldVal1(IRFoldBase):
         sequence: str,
         out_dir: str,
         seq_name: str,
-        max_n_tuple_sz_to_correct: int = 2
+        max_n_tuple_sz_to_correct: int = 3,
     ) -> Tuple[CpModel, List[IntVar]]:
         model: CpModel = CpModel()
         n_irs: int = len(ir_list)
@@ -94,9 +92,3 @@ class IRFoldVal1(IRFoldBase):
         model.Minimize(obj_fn_expr)
 
         return model, ir_indicator_variables
-
-    # @staticmethod
-    # def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
-    #     return ir_pair_match_same_bases(ir_a, ir_b) or not ir_pair_forms_valid_loop(
-    #         ir_a, ir_b
-    #     )
