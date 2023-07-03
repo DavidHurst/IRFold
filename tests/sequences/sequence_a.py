@@ -2458,11 +2458,11 @@ class SequenceA:
         "ir_6_ir_13_fe_corrector",
         "ir_7_ir_13_fe_corrector",
         "ir_8_ir_12_fe_corrector",
-        "ir_0_ir_2_ir_8_fe_corrector",
-        "ir_0_ir_2_ir_12_fe_corrector",
-        "ir_0_ir_5_ir_13_fe_corrector",
-        "ir_1_ir_6_ir_8_fe_corrector",
-        "ir_5_ir_12_ir_13_fe_corrector",
+        "ir_0_ir_2_ir_6_fe_corrector",
+        "ir_0_ir_2_ir_7_fe_corrector",
+        "ir_0_ir_5_ir_7_fe_corrector",
+        "ir_1_ir_5_ir_12_fe_corrector",
+        "ir_5_ir_7_ir_13_fe_corrector",
     ]
     ir_indicator_variables_names = [
         "ir_0",
@@ -2496,9 +2496,9 @@ class SequenceA:
         "ir_8_ir_12_fe_corrector",
     ]
     ir_triplet_corrector_indicator_variables_names = [
-        "ir_0_ir_2_ir_8_fe_corrector",
-        "ir_0_ir_2_ir_12_fe_corrector",
-        "ir_0_ir_5_ir_13_fe_corrector",
-        "ir_1_ir_6_ir_8_fe_corrector",
-        "ir_5_ir_12_ir_13_fe_corrector",
+        "ir_0_ir_2_ir_6_fe_corrector",
+        "ir_0_ir_2_ir_7_fe_corrector",
+        "ir_0_ir_5_ir_7_fe_corrector",
+        "ir_1_ir_5_ir_12_fe_corrector",
+        "ir_5_ir_7_ir_13_fe_corrector",
     ]
