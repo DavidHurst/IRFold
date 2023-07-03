@@ -5,7 +5,7 @@ import re
 
 from ortools.sat.python.cp_model import CpModel, IntVar, LinearExpr
 from typing import Tuple, List
-from irfold import IRFoldBase, IRFoldVal1
+from irfold import IRFoldVal1
 from irfold.util import (
     ir_has_valid_gap_size,
     IR,
@@ -26,7 +26,7 @@ class IRFoldVal2(IRFoldVal1):
         sequence: str,
         out_dir: str,
         seq_name: str,
-        max_n_tuple_sz_to_correct: int = 2
+        max_n_tuple_sz_to_correct: int = 3,
     ) -> Tuple[CpModel, List[IntVar]]:
         model: CpModel = CpModel()
         n_irs: int = len(ir_list)
