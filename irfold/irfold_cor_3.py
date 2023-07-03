@@ -11,14 +11,13 @@ from irfold.util import (
     IR,
     irs_to_dot_bracket,
     calc_free_energy,
-    irs_match_same_bases,
-    irs_form_valid_loop,
+    irs_incompatible,
 )
 
 
 class IRFoldCor3(IRFoldVal2):
-    """Extends IRFold2 by adding solver variables to correct for the additivity of free energy IR pairs and triplets not holding
-    consistently"""
+    """Extends IRFold2 by adding solver variables to correct for the additivity of free energy IR pairs and triplets
+    not holding consistently"""
 
     @staticmethod
     def get_solver(
@@ -27,7 +26,7 @@ class IRFoldCor3(IRFoldVal2):
         sequence: str,
         out_dir: str,
         seq_name: str,
-        max_n_tuple_sz_to_correct: int = 2
+        max_n_tuple_sz_to_correct: int = 2,
     ) -> Tuple[CpModel, List[IntVar]]:
         model: CpModel = CpModel()
         n_irs: int = len(ir_list)
@@ -141,12 +140,6 @@ class IRFoldCor3(IRFoldVal2):
             (ir_list[i], ir_list[j], ir_list[k]) for i, j, k in valid_idx_triplets
         ]
 
-        incompatible_ir_triplet_idxs: List[Tuple[int, int, int]] = [
-            idx_triplet
-            for ir_triplet, idx_triplet in zip(valid_ir_triplets, valid_idx_triplets)
-            if IRFoldCor3.irs_incompatible(list(ir_triplet))
-        ]
-
         # Add variable for each IR triplet that forms an invalid loop which corrects the pairs additive free energy
         (
             ir_triplet_fe_correction_indicator_vars,
@@ -157,7 +150,7 @@ class IRFoldCor3(IRFoldVal2):
             sequence,
             out_dir,
             seq_name,
-            incompatible_ir_triplet_idxs,
+            valid_idx_triplets,
             valid_ir_triplets,
         )
 
@@ -301,7 +294,7 @@ class IRFoldCor3(IRFoldVal2):
         for (ir_a_idx, ir_b_idx, ir_c_idx), (ir_a, ir_b, ir_c) in zip(
             valid_idx_triplets, valid_ir_triplets
         ):
-            if IRFoldCor3.irs_incompatible(
+            if irs_incompatible(
                 [ir_a, ir_b, ir_c]
             ):  # These triplets will never be in final so ignore
                 continue
@@ -350,7 +343,3 @@ class IRFoldCor3(IRFoldVal2):
             ir_triplet_fe_correction_indicator_vars,
             ir_triplet_fe_correction_indicator_vars_coeffs,
         )
-
-    @staticmethod
-    def irs_incompatible(ir_list: List[IR]) -> bool:
-        return irs_match_same_bases(ir_list) or not irs_form_valid_loop(ir_list)
