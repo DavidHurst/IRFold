@@ -54,7 +54,7 @@ def test_not_none(
                 "ir_indicator_pair_corrector_triplet_corrector_variables_names"
             ),
         ),
-        # (IRFoldCorX, pytest.lazy_fixture("all_solver_variables_names")),  # Parametrise class first
+        (IRFoldCorX, pytest.lazy_fixture("all_solver_variables_names")),
     ],
 )
 def test_number_of_variables_generated(
@@ -90,11 +90,9 @@ def test_number_of_variables_generated(
         ),
         (
             IRFoldCor3,
-            pytest.lazy_fixture(
-                "ir_indicator_pair_corrector_triplet_corrector_variables_names"
-            ),
+            pytest.lazy_fixture("all_solver_variables_names"),
         ),
-        # (IRFoldCorX, pytest.lazy_fixture("all_solver_variables_names")),  # Parametrise class first
+        (IRFoldCorX, pytest.lazy_fixture("all_solver_variables_names")),
     ],
 )
 def test_variables_for_correct_variables_generated(
@@ -106,6 +104,7 @@ def test_variables_for_correct_variables_generated(
     sequence_name,
     data_dir,
 ):
+    print("\n", "=" * 60)
     all_irs = list(all_irs)
     _, variables = ir_fold_variant.get_solver(
         all_irs,

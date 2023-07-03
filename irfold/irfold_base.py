@@ -57,7 +57,7 @@ class IRFoldBase:
         max_gap: int,
         seq_name: str = "seq",
         mismatches: int = 0,
-        solver_backend: str = "SCIP",
+        max_n_tuple_sz_to_correct: int = 2,
         out_dir: str = ".",
         *,
         save_performance: bool = False,
@@ -89,7 +89,7 @@ class IRFoldBase:
 
         # Define ILP and solve
         model, variables = cls.get_solver(
-            found_irs, seq_len, sequence, out_dir, seq_name
+            found_irs, seq_len, sequence, out_dir, seq_name, max_n_tuple_sz_to_correct
         )
 
         solver: CpSolver = CpSolver()
