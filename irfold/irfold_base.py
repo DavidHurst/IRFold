@@ -41,13 +41,7 @@ class IRFoldBase:
         seq_name: str = "seq",
         save_performance: bool = False,
     ) -> Tuple[str, float]:
-        """Returns the MFE computed by simply adding the free energies of IRs which is incorrect but
-        is illustrative of the IR free energy assumption additivity not holding consistently which is corrected
-        for in class IRFold2."""
-
-        # ToDo: Make IUPACpal params defaults and kwargs
-
-        # Renames parametrised IRFoldCorX class s.t. the class name can be used to identify the correction level
+        # Rename parametrised IRFoldCorX class s.t. the class name can be used to identify the correction level
         if "X" in cls.__name__:
             cls.__name__ = f"IRFoldCorX{str(max_n_tuple_sz_to_correct)}"
 
@@ -75,7 +69,7 @@ class IRFoldBase:
 
         solver: CpSolver = CpSolver()
 
-        with tqdm(desc=f"Running solver") as _:
+        with tqdm(desc=f"{cls.__name__} - Running solver") as _:
             status = solver.Solve(model)
 
         if status == OPTIMAL or status == FEASIBLE:
