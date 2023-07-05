@@ -10,7 +10,14 @@ from tqdm import tqdm
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 DATA_DIR = str(Path(__file__).parent.parent / "data")
 
-from irfold import IRFoldBase, IRFoldVal1, IRFoldCor2, IRFoldVal2, IRFoldCor3
+from irfold import (
+    IRFoldBase,
+    IRFoldVal1,
+    IRFoldCor2,
+    IRFoldVal2,
+    IRFoldCor3,
+    IRFoldCorX,
+)
 
 if __name__ == "__main__":
     rnalib_performance_file_path = (Path(DATA_DIR) / "RNAlib_performance.csv").resolve()
@@ -44,15 +51,17 @@ if __name__ == "__main__":
                 **fold_params
             )
 
-            irfold_cor2_secondary_structure, irfold_cor2_obj_fn_val = IRFoldCor2.fold(
+            fold_params.update({"max_n_tuple_sz_to_correct": 2})
+            irfold_corx2_secondary_structure, irfold_corx2_obj_fn_val = IRFoldCorX.fold(
                 **fold_params
             )
 
-            irfold_cor3_secondary_structure, irfold_cor3_obj_fn_val = IRFoldCor3.fold(
+            fold_params.update({"max_n_tuple_sz_to_correct": 3})
+            irfold_corx3_secondary_structure, irfold_corx3_obj_fn_val = IRFoldCorX.fold(
                 **fold_params
             )
 
-            # ToDo: Also compare with RNAstrucutre and IRFoldCorX variations
+            # ToDo: Also compare with RNAstrucutre
 
             rnalib_secondary_structure, rnalib_mfe = RNA.fold(seq, "")
 
