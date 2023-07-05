@@ -64,17 +64,9 @@ def calc_free_energy(
 
     out_file: str = str(out_dir_path / f"{seq_name}_calculated_ir_energies.txt")
 
+    # RNAlib requires a file passed as parameter even if not writing to it
     with open(out_file, "a") as file:
-        file.write(f"Evaluating IR:\n")
-        for i in range(len(dot_brk_repr)):
-            file.write(f"{i + 1:<3}")
-        file.write("\n")
-        for b in dot_brk_repr:
-            file.write(f"{b:<3}")
-        file.write("\n")
-
-        free_energy = RNA.eval_structure_simple(sequence, dot_brk_repr, 1, file)
-        file.write(f"\n\n")
+        free_energy = RNA.eval_structure_simple(sequence, dot_brk_repr, -1, file)
 
     return free_energy
 
