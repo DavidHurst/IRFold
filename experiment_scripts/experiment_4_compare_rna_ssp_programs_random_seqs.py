@@ -1,6 +1,7 @@
 import csv
 import random
 import RNA
+
 import sys
 
 from pathlib import Path
@@ -54,6 +55,8 @@ if __name__ == "__main__":
             irfold_cor3_secondary_structure, irfold_cor3_obj_fn_val = IRFoldCor3.fold(
                 **fold_params
             )
+
+            # ToDo: Also compare with RNAstrucutre and IRFoldCorX variations
 
             rnalib_secondary_structure, rnalib_mfe = RNA.fold(seq, "")
 
