@@ -3,6 +3,8 @@ __all__ = ["IRFoldCor2"]
 import itertools
 import re
 
+from tqdm import tqdm
+
 from irfold import IRFoldVal2
 from typing import Tuple, List
 from ortools.sat.python.cp_model import CpModel, IntVar, LinearExpr
@@ -154,7 +156,7 @@ class IRFoldCor2(IRFoldVal2):
     ) -> Tuple[List[IntVar], List[int]]:
         ir_pair_fe_correction_indicator_vars = []
         ir_pair_fe_correction_indicator_vars_coeffs = []
-        for (ir_a_idx, ir_b_idx), (ir_a, ir_b) in zip(valid_idx_pairs, valid_ir_pairs):
+        for (ir_a_idx, ir_b_idx), (ir_a, ir_b) in tqdm(zip(valid_idx_pairs, valid_ir_pairs), desc='Generating pair correction variables'):
             if IRFoldVal2.ir_pair_incompatible(ir_a, ir_b):
                 continue
 
