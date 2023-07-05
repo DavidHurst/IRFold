@@ -10,7 +10,7 @@ from irfold.util import (
     IR,
     irs_to_dot_bracket,
     calc_free_energy,
-    get_valid_ir_n_tuples,
+    get_valid_gap_sz_ir_n_tuples,
     irs_incompatible,
 )
 
@@ -42,6 +42,29 @@ class IRFoldCorX(IRFoldVal2):
         if len(ir_indicator_variables) <= 1:
             return model, ir_indicator_variables
 
+        # Add constraints preventing IR pairs which form invalid loops from occurring, it is sufficient to only prevent
+        # pairs - see experiment 2
+        valid_ir_pairs, valid_idx_pairs = get_valid_gap_sz_ir_n_tuples(
+            2, n_irs, ir_list, invalid_gap_sz_ir_idxs
+        )
+        incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
+            idx_pair
+            for ir_pair, idx_pair in zip(valid_ir_pairs, valid_idx_pairs)
+            if irs_incompatible([ir_pair[0], ir_pair[1]])
+        ]
+
+        for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
+            # Search required as some IRs might not have had indicator variables created for them as they were
+            # invalid so indicator variable list ordering cannot be relied upon
+            ir_a_var: IntVar = [
+                var for var in ir_indicator_variables if str(ir_a_idx) in var.Name()
+            ][0]
+            ir_b_var: IntVar = [
+                var for var in ir_indicator_variables if str(ir_b_idx) in var.Name()
+            ][0]
+
+            model.Add(ir_a_var + ir_b_var <= 1)
+
         # Obtain free energies of the IRs that are valid, these will the coefficients for IR indicator vars
         ir_indicator_var_coeffs: List[int] = []
         for var in ir_indicator_variables:
@@ -52,79 +75,50 @@ class IRFoldCorX(IRFoldVal2):
             )
             ir_indicator_var_coeffs.append(round(ir_free_energy))
 
-        #
-        if (
-            max_n_tuple_sz_to_correct > len(ir_indicator_variables)
-            or max_n_tuple_sz_to_correct < 2
-        ):
-            max_n_tuple_sz_to_correct = max(2, int(len(ir_indicator_variables) * 0.25))
+        # Max size n-tuple is the number of indicator variables
+        if max_n_tuple_sz_to_correct > len(ir_indicator_variables):
+            max_n_tuple_sz_to_correct = len(ir_indicator_variables)
 
-        # Can only correct pairs and larger if there are at least 2 valid IR indicator variables
+        # Mine size n-tuple that can be corrected is 2 i.e. pairs
+        if max_n_tuple_sz_to_correct < 2:
+            max_n_tuple_sz_to_correct = 2
+
         obj_fn_expressions: List[LinearExpr.WeightedSum] = []
         obj_fn_vars: List[IntVar] = []
-        if len(ir_indicator_variables) >= 2:
-            # Correct IR tuples of increasing size until max specified size to correct
-            for tuple_sz in range(2, max_n_tuple_sz_to_correct + 1):
-                valid_ir_n_tuples, valid_ir_idx_n_tuples = get_valid_ir_n_tuples(
-                    tuple_sz, n_irs, ir_list, invalid_gap_sz_ir_idxs
-                )
+        # Correct IR tuples of increasing size until max specified size to correct
+        for tuple_sz in range(2, max_n_tuple_sz_to_correct + 1):
+            valid_ir_n_tuples, valid_ir_idx_n_tuples = get_valid_gap_sz_ir_n_tuples(
+                tuple_sz, n_irs, ir_list, invalid_gap_sz_ir_idxs
+            )
 
-                # Add XOR between IRs that are incompatible
-                incompatible_ir_idx_n_tuples: List[Tuple[int, ...]] = [
-                    ir_idx_n_tuple
-                    for ir_n_tuple, ir_idx_n_tuple in zip(
-                        valid_ir_n_tuples, valid_ir_idx_n_tuples
-                    )
-                    if irs_incompatible(list(ir_n_tuple))
-                ]
+            # Generate correction variable and coefficient for each IR n-tuple whose free energy additivity is
+            # erroneous
+            (
+                correction_vars,
+                correction_var_coeffs,
+            ) = IRFoldCorX.generate_ir_n_tuple_correction_variables_w_coeffs(
+                model,
+                seq_len,
+                sequence,
+                out_dir,
+                seq_name,
+                valid_ir_idx_n_tuples,
+                valid_ir_n_tuples,
+            )
 
-                # Get ir indicator variables corresponding to incompatible IR indices' n_tuples found above
-                for incomp_ir_idx_n_tuple in incompatible_ir_idx_n_tuples:
-                    # Search for indicator variables by name required as some IR validation process likely removed
-                    # some IRs so cannot rely on creation order to get IRs
-                    incomp_ir_variables: List[IntVar] = [
-                        var
-                        for var in ir_indicator_variables
-                        if any(
-                            [
-                                True
-                                for ir_idx in incomp_ir_idx_n_tuple
-                                if str(ir_idx) in var.Name()
-                            ]
-                        )
-                    ]
+            # Add constraints only activating correction variables if all variable in n-tuple are active
+            IRFoldCorX.add_activation_constraints_for_correction_vars(
+                correction_vars, ir_indicator_variables, model, tuple_sz
+            )
 
-                    model.Add(
-                        LinearExpr.Sum(incomp_ir_variables) <= tuple_sz
-                    )  # Prevents IRs being active simultaneously
-
-                # Generate correction variable and coefficient for each IR n-tuple whose free energy additivity is
-                # erroneous
-                (
+            # Build up objective function expressions
+            obj_fn_vars += correction_vars
+            obj_fn_expressions.append(
+                LinearExpr.WeightedSum(
                     correction_vars,
                     correction_var_coeffs,
-                ) = IRFoldCorX.generate_ir_n_tuple_correction_variables_w_coeffs(
-                    model,
-                    seq_len,
-                    sequence,
-                    out_dir,
-                    seq_name,
-                    valid_ir_idx_n_tuples,
-                    valid_ir_n_tuples,
                 )
-                obj_fn_vars += correction_vars
-
-                # Add constraints only activating correction variables if all variable in n-tuple are active
-                IRFoldCorX.add_activation_constraints_for_correction_vars(
-                    correction_vars, ir_indicator_variables, model, tuple_sz
-                )
-
-                obj_fn_expressions.append(
-                    LinearExpr.WeightedSum(
-                        correction_vars,
-                        correction_var_coeffs,
-                    )
-                )
+            )
 
         # Define objective function
         obj_fn_expressions.append(
@@ -152,8 +146,7 @@ class IRFoldCorX(IRFoldVal2):
                 # ToDo: Pass list of compatible IRs to this function, already computed incompatible,
                 #       set difference all with that to get compatible
 
-                # This n-tuple will never be in final solution so seems efficient to not create correction var for it
-                # but might this hurt search accuracy?
+                # The IRs in this n-tuple will never all be active in the final solution so no need to correct
                 continue
 
             # Check if the addition of n-tuples' IR's free energies correctly represents the free energy of the n-tuple
@@ -217,6 +210,8 @@ class IRFoldCorX(IRFoldVal2):
                 for var in ir_indicator_variables
                 if any([True for ir_idx in ir_idxs if ir_idx in cor_var.Name()])
             ]
+
+            # ToDo: This could probably be done more cleanly with model.AddBoolAnd or something
 
             # Create variable which is 1 only when all IRs are 1
             irs_idxs_corrected_repr = "".join([f"ir_{ir_idx}_" for ir_idx in ir_idxs])
