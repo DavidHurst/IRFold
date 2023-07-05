@@ -32,7 +32,7 @@ def irs_to_dot_bracket(irs: List[IR], seq_len: int) -> str:
     return "".join(paired_bases)
 
 
-def get_valid_ir_n_tuples(
+def get_valid_gap_sz_ir_n_tuples(
     n: int, num_irs: int, ir_list: List[IR], invalid_gap_sz_irs_idxs: List[int]
 ) -> Tuple[List[Tuple[IR, ...]], List[Tuple[int, ...]]]:
     """Returns all possible and valid (valid gap size) IR n-tuples i.e. tuples of size n that can be made from the
