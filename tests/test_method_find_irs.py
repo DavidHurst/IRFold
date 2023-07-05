@@ -23,11 +23,8 @@ def test_not_none(ir_fold_variant, sequence, sequence_length, sequence_name, dat
     assert (
         ir_fold_variant.find_irs(
             sequence,
-            2,
-            sequence_length,
-            sequence_length - 1,
-            seq_name=sequence_name,
             out_dir=data_dir,
+            seq_name=sequence_name,
         )
         is not None
     )
@@ -47,9 +44,6 @@ def test_number_of_irs_found(
 ):
     found_irs = ir_fold_variant.find_irs(
         sequence,
-        2,
-        sequence_length,
-        sequence_length - 1,
         seq_name=sequence_name,
         out_dir=data_dir,
     )
@@ -66,9 +60,6 @@ def test_found_irs_output_file_created(
 ):
     _ = ir_fold_variant.find_irs(
         sequence,
-        2,
-        sequence_length,
-        sequence_length - 1,
         seq_name=sequence_name,
         out_dir=data_dir,
     )

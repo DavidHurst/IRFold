@@ -35,14 +35,10 @@ class IRFoldBase:
     def fold(
         cls,
         sequence: str,
-        min_len: int,
-        max_len: int,
-        max_gap: int,
-        seq_name: str = "seq",
-        mismatches: int = 0,
         max_n_tuple_sz_to_correct: int = 3,
         out_dir: str = ".",
         *,
+        seq_name: str = "seq",
         save_performance: bool = False,
     ) -> Tuple[str, float]:
         """Returns the MFE computed by simply adding the free energies of IRs which is incorrect but
@@ -59,10 +55,6 @@ class IRFoldBase:
         found_irs: List[IR] = cls.find_irs(
             sequence=sequence,
             seq_name=seq_name,
-            min_len=min_len,
-            max_len=max_len,
-            max_gap=max_gap,
-            mismatches=mismatches,
             out_dir=out_dir,
         )
 
@@ -128,12 +120,9 @@ class IRFoldBase:
     @staticmethod
     def find_irs(
         sequence: str,
-        min_len: int,
-        max_len: int,
-        max_gap: int,
-        seq_name: str = "seq",
-        mismatches: int = 0,  # not supported yet
         out_dir: str = ".",
+        *,
+        seq_name: str = "seq",
     ) -> List[IR]:
         out_dir_path: Path = Path(out_dir).resolve()
         if not out_dir_path.exists():
@@ -158,13 +147,13 @@ class IRFoldBase:
                 "-s",
                 seq_name,
                 "-m",
-                str(min_len),
+                str(2),
                 "-M",
-                str(max_len),
+                str(len(sequence)),
                 "-g",
-                str(max_gap),
+                str(len(sequence) - 1),
                 "-x",
-                str(mismatches),
+                str(0),
                 "-o",
                 str(out_dir_path / f"{seq_name}_found_irs.txt"),
             ]

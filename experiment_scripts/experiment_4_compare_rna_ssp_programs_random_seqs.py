@@ -27,10 +27,6 @@ if __name__ == "__main__":
 
             fold_params = {
                 "sequence": seq,
-                "min_len": 2,
-                "max_len": seq_len,
-                "max_gap": seq_len - 1,
-                "mismatches": 0,
                 "out_dir": DATA_DIR,
                 "seq_name": seq_name,
                 "save_performance": True,

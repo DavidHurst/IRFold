@@ -30,10 +30,6 @@ def test_output_not_none(
 ):
     secondary_structure_pred, obj_fn_value = ir_fold_variant.fold(
         sequence,
-        2,
-        sequence_length,
-        sequence_length - 1,
-        sequence_name,
         out_dir=data_dir,
     )
 
@@ -55,10 +51,6 @@ def test_output_type_correct(
 ):
     secondary_structure_pred, obj_fn_value = ir_fold_variant.fold(
         sequence,
-        2,
-        sequence_length,
-        sequence_length - 1,
-        sequence_name,
         out_dir=data_dir,
     )
 
@@ -75,9 +67,7 @@ def test_balanced_brackets(ir_fold_variant, data_dir):
     # ToDo: This shouldn't be randomised, find sequences that produce overlapping IRs and use as fixtures
     for _ in range(10):
         seq = "".join(random.choice("ACGU") for _ in range(seq_len))
-        secondary_structure_pred, _ = ir_fold_variant.fold(
-            seq, 2, seq_len, seq_len - 1, "test_seq", out_dir=data_dir
-        )
+        secondary_structure_pred, _ = ir_fold_variant.fold(seq, out_dir=data_dir)
 
         assert secondary_structure_pred.count("(") == secondary_structure_pred.count(
             ")"
@@ -98,10 +88,6 @@ def test_ir_fold_variant_performance_written_to_file(
 ):
     _, _ = ir_fold_variant.fold(
         sequence,
-        2,
-        sequence_length,
-        sequence_length - 1,
-        sequence_name,
         save_performance=True,
         out_dir=data_dir,
     )
@@ -119,10 +105,6 @@ def test_ir_fold_variant_performance_written_to_file(
 
     _, _ = ir_fold_variant.fold(
         sequence,
-        2,
-        sequence_length,
-        sequence_length - 1,
-        sequence_name,
         save_performance=True,
         out_dir=data_dir,
     )
