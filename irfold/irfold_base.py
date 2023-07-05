@@ -91,13 +91,12 @@ class IRFoldBase:
             db_repr: str = irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
-
             obj_fn_value: float = solver.ObjectiveValue()
-            dot_bracket_repr_mfe: float = calc_free_energy(
-                db_repr, sequence, out_dir, seq_name
-            )
 
             if save_performance:
+                dot_bracket_repr_mfe: float = calc_free_energy(
+                    db_repr, sequence, out_dir, seq_name
+                )
                 write_performance_to_file(
                     db_repr,
                     obj_fn_value,
