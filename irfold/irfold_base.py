@@ -13,6 +13,7 @@ from ortools.sat.python.cp_model import (
     OPTIMAL,
     FEASIBLE,
 )
+from tqdm import tqdm
 
 from irfold.util import (
     ir_pair_match_same_bases,
@@ -76,15 +77,14 @@ class IRFoldBase:
             return db_repr, obj_fn_value
 
         # Define constraint programming problem and solve
-        # ToDo: Wrap this to catch and supress warnings from RNA lib that bases can't pair, these arise from checks
-        #   being made to prevent said bases from pairing
         model, variables = cls.get_solver(
             found_irs, seq_len, sequence, out_dir, seq_name, max_n_tuple_sz_to_correct
         )
 
         solver: CpSolver = CpSolver()
 
-        status = solver.Solve(model)
+        with tqdm(desc=f"Running solver") as _:
+            status = solver.Solve(model)
 
         if status == OPTIMAL or status == FEASIBLE:
             # Return dot bracket repr and objective function's final value
