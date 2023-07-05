@@ -48,6 +48,9 @@ class IRFoldBase:
         is illustrative of the IR free energy assumption additivity not holding consistently which is corrected
         for in class IRFold2."""
 
+        # ToDo: Make IUPACpal params defaults and kwargs
+
+        # Renames parametrised IRFoldCorX class s.t. the class name can be used to identify the correction level
         if "X" in cls.__name__:
             cls.__name__ = f"IRFoldCorX{str(max_n_tuple_sz_to_correct)}"
 
@@ -72,7 +75,9 @@ class IRFoldBase:
                 )
             return db_repr, obj_fn_value
 
-        # Define ILP and solve
+        # Define constraint programming problem and solve
+        # ToDo: Wrap this to catch and supress warnings from RNA lib that bases can't pair, these arise from checks
+        #   being made to prevent said bases from pairing
         model, variables = cls.get_solver(
             found_irs, seq_len, sequence, out_dir, seq_name, max_n_tuple_sz_to_correct
         )
