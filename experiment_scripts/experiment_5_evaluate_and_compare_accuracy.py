@@ -182,7 +182,6 @@ if __name__ == "__main__":
         ):
             print("-" * 40)
             print(f"{model_name}:")
-            print(f'  Pred len: {len(model_pred)}')
             TPs, FPs, FNs = evaluate_prediction(
                 pairs_idxs_no_dups, unpaired_indices, model_pred
             )
