@@ -72,6 +72,7 @@ def test_output_type_correct(
 )
 def test_balanced_brackets(ir_fold_variant, data_dir):
     seq_len = 40
+    # ToDo: This shouldn't be randomised, find sequences that produce overlapping IRs and use as fixtures
     for _ in range(10):
         seq = "".join(random.choice("ACGU") for _ in range(seq_len))
         secondary_structure_pred, _ = ir_fold_variant.fold(
