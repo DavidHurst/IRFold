@@ -2,6 +2,8 @@ __all__ = ["IRFoldCorX"]
 
 import re
 
+from tqdm import tqdm
+
 from irfold import IRFoldVal2
 from typing import Tuple, List
 from ortools.sat.python.cp_model import CpModel, IntVar, LinearExpr
@@ -141,7 +143,10 @@ class IRFoldCorX(IRFoldVal2):
         correction_vars: List[IntVar] = []
         correction_var_coeffs: List[int] = []
         # Add correction variable for each n-tuple that has additive free energy different from its true free energy
-        for ir_idx_n_tuple, ir_n_tuple in zip(valid_ir_idx_n_tuples, valid_ir_n_tuples):
+        for ir_idx_n_tuple, ir_n_tuple in tqdm(
+            zip(valid_ir_idx_n_tuples, valid_ir_n_tuples),
+            desc=f"Generating {len(valid_ir_n_tuples[0])}-tuple correction variables",
+        ):
             if irs_incompatible([ir for ir in ir_n_tuple]):
                 # ToDo: Pass list of compatible IRs to this function, should be much faster
                 # The IRs in this n-tuple will never all be active in the final solution so no need to correct
@@ -198,7 +203,9 @@ class IRFoldCorX(IRFoldVal2):
     ) -> None:
         # Add constraints that only activate correction variables when the IR n-tuple the correction variable
         # represents is active
-        for cor_var in correction_vars:
+        for cor_var in tqdm(
+            correction_vars, desc="Adding correction variable constraints"
+        ):
             ir_idxs: List[str] = [
                 ir_idx for ir_idx in re.findall(r"-?\d+\.?\d*", cor_var.Name())
             ]
