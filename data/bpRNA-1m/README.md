@@ -1,0 +1,1 @@
+Download dataset from https://bprna.cgrb.oregonstate.edu/download.php. Place the fasta files and bpseq files in this directory.

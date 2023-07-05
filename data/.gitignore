@@ -2,3 +2,5 @@
 !.gitignore
 !experiment*
 !*_performance.csv
+!bpRNA-1m
+!/bpRNA-1m/README.md
