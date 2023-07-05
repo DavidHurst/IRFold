@@ -54,8 +54,8 @@ class IRFoldCorX(IRFoldVal2):
         ]
 
         for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
-            # Search required as some IRs might not have had indicator variables created for them as they were
-            # invalid so indicator variable list ordering cannot be relied upon
+            # Searches for vars required as some IRs might not have had indicator variables created for
+            # them as they were invalid so indicator variable list ordering cannot be relied upon
             ir_a_var: IntVar = [
                 var for var in ir_indicator_variables if str(ir_a_idx) in var.Name()
             ][0]
