@@ -143,9 +143,7 @@ class IRFoldCorX(IRFoldVal2):
         # Add correction variable for each n-tuple that has additive free energy different from its true free energy
         for ir_idx_n_tuple, ir_n_tuple in zip(valid_ir_idx_n_tuples, valid_ir_n_tuples):
             if irs_incompatible([ir for ir in ir_n_tuple]):
-                # ToDo: Pass list of compatible IRs to this function, already computed incompatible,
-                #       set difference all with that to get compatible
-
+                # ToDo: Pass list of compatible IRs to this function, should be much faster
                 # The IRs in this n-tuple will never all be active in the final solution so no need to correct
                 continue
 
