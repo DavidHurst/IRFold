@@ -1,17 +1,40 @@
 import csv
 import re
 import sys
+import subprocess
+import time
+
 from pathlib import Path
+
 
 import RNA
 
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+sys.path.append(str(Path(__file__).resolve().parents[1]))  # Add root
+RNA_STRUCTURE_DATA_TABLES_DIR_PATH = str(
+    (Path(__file__).parent / "RNAstructure" / "data_tables").resolve()
+)
+RNA_STRUCTURE_FOLD_PATH = str(
+    (Path(__file__).parent / "RNAstructure" / "Fold").resolve()
+)
+RNA_STRUCTURE_CT2DOT_PATH = str(
+    (Path(__file__).parent / "RNAstructure" / "ct2dot").resolve()
+)
+TEMP_DOT_BRACKET_FILE_PATH = str(
+    (Path(__file__).parent / "RNAstructure" / "temp_dot_bracket.txt").resolve()
+)
+TEMP_CT_FILE_PATH = str(
+    (Path(__file__).parent / "RNAstructure" / "temp_ct.ct").resolve()
+)
+
 
 from irfold import IRFoldVal2, IRFoldCorX
 
+
 DATA_DIR = Path(__file__).parent.parent / "data"
+EXPERIMENT_5_DIR_PATH = DATA_DIR / "experiment_5"
 BP_RNA_1_M_BP_SEQ_FILES_DIR = DATA_DIR / "bpRNA-1m" / "bpseqFiles"
 BP_RNA_1_M_FASTA_FILES_DIR = DATA_DIR / "bpRNA-1m" / "fastaFiles"
+
 
 UNPAIRED_FLAG = (
     -1
@@ -24,6 +47,7 @@ def evaluate_prediction(true_idx_pairs, true_unpaired_idxs, pred):
     false_positives = 0
 
     for idx in true_idx_pairs:
+        # ToDo: Add square brackets as TPs as RNAstructure uses them for pseudoknot identification
         # True positive: pair is in the in prediction and in the true secondary structure
         if (pred[idx[0]] == "(" and pred[idx[1]] == ")") or (
             pred[idx[0]] == ")" and pred[idx[1]] == "("
@@ -60,6 +84,103 @@ def calc_metrics(true_positives, false_positives, false_negatives):
     return sensitivity, ppv, f1
 
 
+def append_performance_to_file(
+    pred,
+    pred_wall_time,
+    true_pair_idxs,
+    true_unpaired_idxs,
+    seq_db_name,
+    seq_db_num,
+    seq_info,
+    seq_len,
+    performance_file_path,
+):
+    TPs, FPs, FNs = evaluate_prediction(true_pair_idxs, true_unpaired_idxs, pred)
+    sensitivity, ppv, f1 = calc_metrics(TPs, FPs, FNs)
+    for metric, metric_name in zip(
+        [sensitivity, ppv, f1], ["Sensitivity", "PPV", "F1"]
+    ):
+        print(f"  {metric_name.ljust(15)}: {metric:.2f}")
+
+    column_entries = [
+        seq_db_name,
+        seq_db_num,
+        seq_info,
+        seq_len,
+        sensitivity,
+        ppv,
+        f1,
+        pred_wall_time,
+    ]
+
+    with open(str(performance_file_path), "a") as perf_file:
+        writer = csv.writer(perf_file)
+        writer.writerow(column_entries)
+
+
+def run_rnastructure(seq_fasta_file_path):
+    # Clear temp files
+    with open(TEMP_DOT_BRACKET_FILE_PATH) as _:
+        pass
+    with open(TEMP_CT_FILE_PATH) as _:
+        pass
+
+    start_time = time.monotonic()
+    subprocess.run([RNA_STRUCTURE_FOLD_PATH, seq_fasta_file_path, TEMP_CT_FILE_PATH])
+    wall_time = time.monotonic() - start_time
+
+    subprocess.run(
+        [
+            RNA_STRUCTURE_CT2DOT_PATH,
+            TEMP_CT_FILE_PATH,
+            str(1),
+            TEMP_DOT_BRACKET_FILE_PATH,
+        ]
+    )
+
+    with open(TEMP_DOT_BRACKET_FILE_PATH, "r") as db_file:
+        lines = db_file.readlines()
+        pred = lines[2]
+
+    return pred, wall_time
+
+
+def run_rnafold(seq):
+    start_time = time.monotonic()
+    pred, _ = RNA.fold(seq, "")
+    wall_time = time.monotonic() - start_time
+
+    return pred, wall_time
+
+
+def run_irfold_val2(seq):
+    start_time = time.monotonic()
+    pred, _ = IRFoldVal2.fold(seq, out_dir=str(EXPERIMENT_5_DIR_PATH))
+    wall_time = time.monotonic() - start_time
+
+    return pred, wall_time
+
+
+def run_irfold_corx2(seq):
+    start_time = time.monotonic()
+    pred, _ = IRFoldCorX.fold(
+        seq, max_n_tuple_sz_to_correct=2, out_dir=str(EXPERIMENT_5_DIR_PATH)
+    )
+    wall_time = time.monotonic() - start_time
+
+    return pred, wall_time
+
+
+def run_irfold_corx3(seq):
+    start_time = time.monotonic()
+    pred, _ = IRFoldCorX.fold(
+        seq, max_n_tuple_sz_to_correct=3, out_dir=str(EXPERIMENT_5_DIR_PATH)
+    )
+    wall_time = time.monotonic() - start_time
+
+    return pred, wall_time
+
+
 if __name__ == "__main__":
     results_file_column_names = [
         "database",
@@ -69,9 +190,13 @@ if __name__ == "__main__":
         "sensitivity",
         "ppv",
         "f1",
+        "execution_wall_time_secs",
     ]
-    rnalib_performance_file_path = (
-        Path(DATA_DIR) / "experiment_5" / "RNAlib_performance_metrics.csv"
+    rnafold_performance_file_path = (
+        Path(DATA_DIR) / "experiment_5" / "RNAfold_performance_metrics.csv"
+    ).resolve()
+    rnastructure_performance_file_path = (
+        Path(DATA_DIR) / "experiment_5" / "RNAstructure_performance_metrics.csv"
     ).resolve()
     irfold_val2_performance_file_path = (
         Path(DATA_DIR) / "experiment_5" / "IRFoldVal2_performance_metrics.csv"
@@ -79,21 +204,37 @@ if __name__ == "__main__":
     irfold_corx2_performance_file_path = (
         Path(DATA_DIR) / "experiment_5" / "IRFoldCorX2_performance_metrics.csv"
     ).resolve()
+    irfold_corx3_performance_file_path = (
+        Path(DATA_DIR) / "experiment_5" / "IRFoldCorX3_performance_metrics.csv"
+    ).resolve()
 
-    for file_path in [rnalib_performance_file_path, irfold_val2_performance_file_path, irfold_corx2_performance_file_path]:
+    for file_path in [
+        rnafold_performance_file_path,
+        rnastructure_performance_file_path,
+        irfold_val2_performance_file_path,
+        irfold_corx2_performance_file_path,
+        irfold_corx3_performance_file_path,
+    ]:
         with open(str(file_path), "w") as perf_file:
             writer = csv.writer(perf_file)
             writer.writerow(results_file_column_names)
 
-
     for test_seq_idx, fasta_file_path in enumerate(
         BP_RNA_1_M_FASTA_FILES_DIR.glob("*.fasta")
     ):
-        print(f"Test Sequence #{test_seq_idx}".center(70, "="))
-
         fasta_file_name = str(fasta_file_path).split("/")[-1]
         database_name = fasta_file_name.split("_")[1]
         sequence_number = fasta_file_name.split("_")[2].split(".")[0]
+
+        print(
+            f"Test Sequence #{test_seq_idx}: {database_name}-{sequence_number}".center(
+                70, "="
+            )
+        )
+
+        if database_name not in ["SPR", "SRP"]:
+            print("Not SPR or SRP databases.")
+            continue
 
         with open(fasta_file_path, "r") as fasta_file:
             lines = fasta_file.readlines()
@@ -102,11 +243,15 @@ if __name__ == "__main__":
                 print("No sequence found in fasta.")
                 continue
 
-            seq_info = lines[0].strip().split("|")[0]
+            seq_info = lines[0].strip().split("|")[0][1:]
             seq = lines[1].strip()
             seq_len = len(seq)
 
-        if seq_len > 150:
+        if "." in seq or "_" in seq:
+            print("Unsupported notation for RNAstructure")
+            continue
+
+        if seq_len > 80:
             print("Sequence too long")
             continue
 
@@ -144,63 +289,53 @@ if __name__ == "__main__":
             if UNPAIRED_FLAG in true_pair:
                 unpaired_indices.append(int(true_pair[1]))
 
-        max_index_in_bp_seq_file = max([max(tup) for tup in pairs_idxs_no_dups] + unpaired_indices)
+        max_index_in_bp_seq_file = max(
+            [max(tup) for tup in pairs_idxs_no_dups] + unpaired_indices
+        )
 
         if max_index_in_bp_seq_file != seq_len - 1:
-            print('bpSeq file and fasta file do not align.')
+            print("bpSeq file and fasta file do not align.")
             continue
 
-        print(f'Fasta file   : {fasta_file_name}')
-        print(f'BPSeq file   : {bp_seq_file_name}')
-        print(f'DB name      : {database_name}')
-        print(f'Seq\'s DB num.: {sequence_number}')
+        print(f"Fasta file   : {fasta_file_name}")
+        print(f"BPSeq file   : {bp_seq_file_name}")
+        print(f"DB name      : {database_name}")
+        print(f"Seq's DB num.: {sequence_number}")
         print(f"Seq. info    : {seq_info}")
         print(f"Seq. len.    : {seq_len}")
-        print(f'BPSeq max idx: {max_index_in_bp_seq_file}')
-
-        fold_params = {
-            "sequence": seq,
-            "out_dir": DATA_DIR,
-            "save_performance": False,
-        }
+        print(f"BPSeq max idx: {max_index_in_bp_seq_file}")
 
         # Get predicted secondary structures from models
-        irfold_val2_pred, _ = IRFoldVal2.fold(**fold_params)
-
-        fold_params.update({"max_n_tuple_sz_to_correct": 2})
-        irfold_corx2_pred, _ = IRFoldCorX.fold(**fold_params)
-
-        # fold_params.update({"max_n_tuple_sz_to_correct": 3})
-        # irfold_cor3_pred, _ = IRFoldCorX.fold(**fold_params)
-
-        rnalib_pred, _ = RNA.fold(seq, "")
-
-        for model_pred, model_name, perf_file_path in zip(
-            [rnalib_pred, irfold_val2_pred, irfold_corx2_pred],
-            ["RNAlib", "IRFoldVal2", "IRFoldCorX2"],
-            [rnalib_performance_file_path, irfold_val2_performance_file_path, irfold_corx2_performance_file_path],
+        for run_fold_fn, perf_file in zip(
+            [
+                run_rnastructure,
+                run_rnafold,
+                run_irfold_val2,
+                run_irfold_corx2,
+                run_irfold_corx3,
+            ],
+            [
+                rnastructure_performance_file_path,
+                rnafold_performance_file_path,
+                irfold_val2_performance_file_path,
+                irfold_corx2_performance_file_path,
+                irfold_corx3_performance_file_path,
+            ],
         ):
-            print("-" * 40)
-            print(f"{model_name}:")
-            TPs, FPs, FNs = evaluate_prediction(
-                pairs_idxs_no_dups, unpaired_indices, model_pred
-            )
-            sensitivity, ppv, f1 = calc_metrics(TPs, FPs, FNs)
-            for metric, metric_name in zip(
-                [sensitivity, ppv, f1], ["Sensitivity", "PPV", "F1"]
-            ):
-                print(f"  {metric_name.ljust(15)}: {metric:.2f}")
+            print("-" * 70)
+            fn_input = seq
+            if "rnastructure" in run_fold_fn.__name__:
+                fn_input = fasta_file_path
 
-            column_entries = [
+            pred, pred_wall_time = run_fold_fn(fn_input)
+            append_performance_to_file(
+                pred,
+                pred_wall_time,
+                pairs_idxs_no_dups,
+                unpaired_indices,
                 database_name,
                 sequence_number,
                 seq_info,
                 seq_len,
-                sensitivity,
-                ppv,
-                f1,
-            ]
-
-            with open(str(perf_file_path), "a") as perf_file:
-                writer = csv.writer(perf_file)
-                writer.writerow(column_entries)
+                perf_file,
+            )
