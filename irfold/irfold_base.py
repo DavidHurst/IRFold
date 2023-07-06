@@ -69,7 +69,7 @@ class IRFoldBase:
 
         solver: CpSolver = CpSolver()
 
-        with tqdm(desc=f"{cls.__name__} - Running solver") as _:
+        with tqdm(desc=f"{cls.__name__} - Running solver ({len(variables)} variables)") as _:
             status = solver.Solve(model)
 
         if status == OPTIMAL or status == FEASIBLE:
