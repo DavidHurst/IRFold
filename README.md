@@ -1,5 +1,11 @@
-# RNA Secondary Structure Prediction
+# IRFold
 
-Finding optimal foldings of given primary sequences of RNA by optimising the configurations of inverted repeats found in the primary sequence.
+RNA Secondary Structure Prediction by optimising configurations of found inverted repeats via Constraint Programming
+
+Set location of thermodynamic parameters for RNAstructure:
+
+```
+$ export DATAPATH=experiment_scripts/RNAstructure/data_tables/
+```
 
 
