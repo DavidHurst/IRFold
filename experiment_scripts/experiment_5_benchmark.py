@@ -193,19 +193,19 @@ if __name__ == "__main__":
         "execution_wall_time_secs",
     ]
     rnafold_performance_file_path = (
-        Path(DATA_DIR) / "experiment_5" / "RNAfold_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "RNAfold_performance_metrics.csv"
     ).resolve()
     rnastructure_performance_file_path = (
-        Path(DATA_DIR) / "experiment_5" / "RNAstructure_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "RNAstructure_performance_metrics.csv"
     ).resolve()
     irfold_val2_performance_file_path = (
-        Path(DATA_DIR) / "experiment_5" / "IRFoldVal2_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "IRFoldVal2_performance_metrics.csv"
     ).resolve()
     irfold_corx2_performance_file_path = (
-        Path(DATA_DIR) / "experiment_5" / "IRFoldCorX2_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "IRFoldCorX2_performance_metrics.csv"
     ).resolve()
     irfold_corx3_performance_file_path = (
-        Path(DATA_DIR) / "experiment_5" / "IRFoldCorX3_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "IRFoldCorX3_performance_metrics.csv"
     ).resolve()
 
     for file_path in [
