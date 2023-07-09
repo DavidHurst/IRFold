@@ -1,15 +1,14 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 
 from pathlib import Path
 
-DATA_DIR = str(Path(__file__).parent.parent / "data")
+DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
+EXPERIMENT_2_DATA_DIR = (DATA_DIR / "experiment_2").resolve()
 
-plt.rcParams["figure.figsize"] = (6, 4)
 
 if __name__ == "__main__":
-    trips_res_df = pd.read_csv(f"{DATA_DIR}/experiment_2/results_triplets.csv")
-    quads_res_df = pd.read_csv(f"{DATA_DIR}/experiment_2/results_quadruplets.csv")
+    trips_res_df = pd.read_csv(f"{EXPERIMENT_2_DATA_DIR}/results_triplets.csv")
+    quads_res_df = pd.read_csv(f"{EXPERIMENT_2_DATA_DIR}/results_quadruplets.csv")
 
     # Show that only IR triplets containing invalid loop forming IR pairs are themselves invalid
     print("IR Triplets".center(70, "="))

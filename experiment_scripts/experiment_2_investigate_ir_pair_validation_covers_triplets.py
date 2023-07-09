@@ -1,4 +1,3 @@
-import random
 import sys
 import itertools
 import pandas as pd
@@ -15,13 +14,13 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from irfold import IRFoldBase
 
-DATA_DIR = str(Path(__file__).parent.parent / "data")
+DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
+EXPERIMENT_2_DATA_DIR = (DATA_DIR / "experiment_2").resolve()
 
 
 if __name__ == "__main__":
     """Evaluate the IR pairs found in a single sequence"""
 
-    random.seed(223332)
     experiment_results = {
         "seq": [],
         "seq_len": [],
@@ -40,20 +39,12 @@ if __name__ == "__main__":
     }
 
     sequence_len = 30
-    seq = "UGAUGACAAAUGCUUAACCCAAGCACGGCA"  # "".join(random.choice("ACGU") for _ in range(sequence_len))
+    seq = "UGAUGACAAAUGCUUAACCCAAGCACGGCA"
 
     print(f"Seq. length: {sequence_len}")
     print(f"Seq.       : {seq}")
 
-    find_irs_kwargs = {
-        "sequence": seq,
-        "min_len": 2,
-        "max_len": sequence_len,
-        "max_gap": sequence_len - 1,
-        "mismatches": 0,
-        "out_dir": DATA_DIR,
-    }
-    found_irs = IRFoldBase.find_irs(**find_irs_kwargs)
+    found_irs = IRFoldBase.find_irs(seq, out_dir=str(EXPERIMENT_2_DATA_DIR))
     n_irs = len(found_irs)
 
     # Find all compatible IR triplets
@@ -95,10 +86,6 @@ if __name__ == "__main__":
         )
 
     print("=" * 60)
-    print(f"IUPACpal Parameters:")
-    for kw, kwarg in find_irs_kwargs.items():
-        if kw.startswith("m"):
-            print(f"  - {kw} = {kwarg}")
     print(f"Num. IRs found                       : {n_irs}")
     print(f"Num. unique IR triplets              : {comb(n_irs, 3)}")
     print(
@@ -110,4 +97,4 @@ if __name__ == "__main__":
 
     # Save results
     df = pd.DataFrame(experiment_results)
-    df.to_csv(f"{DATA_DIR}/experiment_2/results_triplets.csv")
+    df.to_csv(f"{EXPERIMENT_2_DATA_DIR}/results_triplets.csv")
