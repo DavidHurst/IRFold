@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 
 from pathlib import Path
 
-DATA_DIR = str(Path(__file__).parent.parent / "data")
+DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
+EXPERIMENT_3_DATA_DIR = (DATA_DIR / "experiment_3").resolve()
 
 plt.rcParams["figure.figsize"] = (14, 12)
 
@@ -24,7 +25,6 @@ def plot_analysis(df, name):
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
 
     # Plot triplets additive free energy with first IR pair corrected
-    # ax1.scatter(valid_loop_triplets_df.index, valid_loop_triplets_df.triplet_union_fe)
     ax1.bar(df.index, df.corrected_additive_fe_first_ir_pair)
     ax1.set_title("First IR Pair's Free Energy Corrected")
     ax1.set_xlabel("IR Triplet")
@@ -49,15 +49,14 @@ def plot_analysis(df, name):
     ax4.set_ylabel("Free Energy - Difference from True")
 
     plt.tight_layout()
-    # plt.suptitle(name)
     plt.savefig(
-        f"{DATA_DIR}/experiment_3/ir_triplets_fe_corrections_{name.lower()}.png"
+        f"{EXPERIMENT_3_DATA_DIR}/ir_triplets_fe_corrections_{name.lower()}.png"
     )
     plt.show()
 
 
 if __name__ == "__main__":
-    results_df = pd.read_csv(f"{DATA_DIR}/experiment_3/results.csv")
+    results_df = pd.read_csv(f"{EXPERIMENT_3_DATA_DIR}/results.csv")
 
     valid_loop_triplets_df = results_df[results_df["triplet_union_fe"] < 90_000]
     invalid_loop_triplets_df = results_df[results_df["triplet_union_fe"] > 90_000]

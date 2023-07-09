@@ -1,5 +1,4 @@
 import itertools
-import random
 import sys
 from pathlib import Path
 
@@ -17,28 +16,19 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 from irfold import IRFoldBase
 
 
-DATA_DIR = str(Path(__file__).parent.parent / "data")
+DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
+EXPERIMENT_3_DATA_DIR = (DATA_DIR / "experiment_3").resolve()
 
 
 if __name__ == "__main__":
-    # Get all valid gap IR pairs which don't match same bases
-    # random.seed(223332)
 
     sequence_len = 30
-    seq = "UGAUGACAAAUGCUUAACCCAAGCACGGCA"  # "".join(random.choice("ACGU") for _ in range(sequence_len))
+    seq = "UGAUGACAAAUGCUUAACCCAAGCACGGCA"
 
     print(f"Seq. length: {sequence_len}")
     print(f"Seq.       : {seq}")
 
-    find_irs_kwargs = {
-        "sequence": seq,
-        "min_len": 2,
-        "max_len": sequence_len,
-        "max_gap": sequence_len - 1,
-        "mismatches": 0,
-        "out_dir": DATA_DIR,
-    }
-    found_irs = IRFoldBase.find_irs(**find_irs_kwargs)
+    found_irs = IRFoldBase.find_irs(seq, out_dir=str(EXPERIMENT_3_DATA_DIR))
     n_irs = len(found_irs)
 
     print("Compatible IR Pairs FEs and Correction Variables".center(60, "="))
@@ -72,16 +62,14 @@ if __name__ == "__main__":
             correction_var = 0
         ir_pair_correction_variables[str(ir_a) + str(ir_b)] = correction_var
 
-        ir_a_fmt = f"[{str(ir_a[0][0]).zfill(2)}->{str(ir_a[0][1]).zfill(2)} {str(ir_a[1][0]).zfill(2)}->{str(ir_a[1][1]).zfill(2)}]"
-        ir_b_fmt = f"[{str(ir_b[0][0]).zfill(2)}->{str(ir_b[0][1]).zfill(2)} {str(ir_b[1][0]).zfill(2)}->{str(ir_b[1][1]).zfill(2)}]"
-
-        # print_space = " " * 4
-        # print(f"Pair #{i}: A = {ir_a_fmt}, B = {ir_b_fmt}")
-        # print(print_space, f"FE(A)        : {ir_a_fe:.4f}")
-        # print(print_space, f"FE(B)        : {ir_b_fe:.4f}")
-        # print(print_space, f"FE(A) + FE(B): {pairs_fe_sum:.4f}")
-        # print(print_space, f"FE(A U B)    : {pairs_fe_union:.4f}")
-        # print(print_space, f"Correction   : {correction_var:.4f}")
+        ir_a_fmt = (
+            f"[{str(ir_a[0][0]).zfill(2)}->{str(ir_a[0][1]).zfill(2)}"
+            f"{str(ir_a[1][0]).zfill(2)}->{str(ir_a[1][1]).zfill(2)}]"
+        )
+        ir_b_fmt = (
+            f"[{str(ir_b[0][0]).zfill(2)}->{str(ir_b[0][1]).zfill(2)} "
+            f"{str(ir_b[1][0]).zfill(2)}->{str(ir_b[1][1]).zfill(2)}]"
+        )
 
     print("IR Triplets Corrected FEs".center(60, "="))
 
@@ -157,4 +145,4 @@ if __name__ == "__main__":
         )
 
     df = pd.DataFrame(experiment_results)
-    df.to_csv(f"{DATA_DIR}/experiment_3/results.csv")
+    df.to_csv(f"{EXPERIMENT_3_DATA_DIR}/results.csv")
