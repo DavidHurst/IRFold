@@ -16,7 +16,7 @@ def test_objective_function_more_correct_with_increasing_model_version(
     all_irs,
 ):
     model_outputs = [
-        ir_fold_variant.fold(sequence, seq_name=sequence_name, out_dir=data_dir)
+        ir_fold_variant.fold(sequence, out_dir=data_dir, seq_name=sequence_name)
         for ir_fold_variant in [
             IRFoldBase,
             IRFoldVal1,

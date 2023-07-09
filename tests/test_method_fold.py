@@ -29,8 +29,7 @@ def test_output_not_none(
     all_irs,
 ):
     secondary_structure_pred, obj_fn_value = ir_fold_variant.fold(
-        sequence,
-        out_dir=data_dir,
+        sequence, out_dir=data_dir
     )
 
     assert secondary_structure_pred is not None
@@ -50,8 +49,7 @@ def test_output_type_correct(
     all_irs,
 ):
     secondary_structure_pred, obj_fn_value = ir_fold_variant.fold(
-        sequence,
-        out_dir=data_dir,
+        sequence, out_dir=data_dir
     )
 
     assert isinstance(secondary_structure_pred, str)
@@ -86,11 +84,7 @@ def test_ir_fold_variant_performance_written_to_file(
     data_dir,
     all_irs,
 ):
-    _, _ = ir_fold_variant.fold(
-        sequence,
-        save_performance=True,
-        out_dir=data_dir,
-    )
+    _, _ = ir_fold_variant.fold(sequence, out_dir=data_dir, save_performance=True)
 
     # Performance file for IRFold variant created
     performance_file_path = (
@@ -103,11 +97,7 @@ def test_ir_fold_variant_performance_written_to_file(
         lines = file.readlines()
     assert len(lines) == 2
 
-    _, _ = ir_fold_variant.fold(
-        sequence,
-        save_performance=True,
-        out_dir=data_dir,
-    )
+    _, _ = ir_fold_variant.fold(sequence, out_dir=data_dir, save_performance=True)
 
     # Should now have two entries written to the file (3 lines including column titles)
     with open(performance_file_path, "r") as file:
