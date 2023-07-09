@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 
 from pathlib import Path
 
-DATA_DIR = str(Path(__file__).parent.parent / "data")
+DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
+EXPERIMENT_1_DATA_DIR = (DATA_DIR / 'experiment_1').resolve()
 
 plt.rcParams["figure.figsize"] = (6, 4)
 
@@ -34,13 +35,13 @@ def plot_pair_analysis(pairs_df, pair_type):
         )
     plt.tight_layout()
     plt.savefig(
-        f"{DATA_DIR}/experiment_1/ir_pairs_fe_sorted_abs_diff_{pair_type.lower()}.png"
+        f"{EXPERIMENT_1_DATA_DIR}/ir_pairs_fe_sorted_abs_diff_{pair_type.lower()}.png"
     )
     plt.show()
 
 
 if __name__ == "__main__":
-    results_df = pd.read_csv(f"{DATA_DIR}/experiment_1/results.csv")
+    results_df = pd.read_csv(f"{EXPERIMENT_1_DATA_DIR}/results.csv")
 
     # Show free energy value of pairs, highlight pairs that form valid loops and those that don't
     form_valid_loop_highlighted_df = results_df.assign(
@@ -65,7 +66,7 @@ if __name__ == "__main__":
     )
     plt.tight_layout()
     plt.savefig(
-        f"{DATA_DIR}/experiment_1/ir_pairs_forming_valid_loops_vs_free_energy.png"
+        f"{EXPERIMENT_1_DATA_DIR}/ir_pairs_forming_valid_loops_vs_free_energy.png"
     )
     plt.show()
 
