@@ -6,7 +6,7 @@ from pathlib import Path
 DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
 EXPERIMENT_3_DATA_DIR = (DATA_DIR / "experiment_3").resolve()
 
-plt.rcParams["figure.figsize"] = (14, 12)
+plt.rcParams["figure.figsize"] = (8, 8)
 
 
 def plot_analysis(df, name):
