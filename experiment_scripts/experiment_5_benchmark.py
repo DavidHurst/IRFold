@@ -48,7 +48,6 @@ def evaluate_prediction(true_idx_pairs, true_unpaired_idxs, pred):
     false_positives = 0
 
     for idx in true_idx_pairs:
-        # ToDo: Add square brackets as TPs as RNAstructure uses them for pseudoknot identification
         # True positive: pair is in the in prediction and in the true secondary structure
         if (pred[idx[0]] == "(" and pred[idx[1]] == ")") or (
             pred[idx[0]] == ")" and pred[idx[1]] == "("
