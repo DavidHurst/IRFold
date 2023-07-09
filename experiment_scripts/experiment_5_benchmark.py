@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 import RNA
+import pandas as pd
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))  # Add root
 RNA_STRUCTURE_DATA_TABLES_DIR_PATH = str(
@@ -155,7 +156,9 @@ def run_rnafold(seq):
 
 def run_irfold_val2(seq):
     start_time = time.monotonic()
-    pred, _ = IRFoldVal2.fold(seq, out_dir=str(EXPERIMENT_5_DIR_PATH))
+    pred, _ = IRFoldVal2.fold(
+        seq, out_dir=str(EXPERIMENT_5_DIR_PATH), save_performance=True
+    )
     wall_time = time.monotonic() - start_time
 
     return pred, wall_time
@@ -164,7 +167,10 @@ def run_irfold_val2(seq):
 def run_irfold_corx2(seq):
     start_time = time.monotonic()
     pred, _ = IRFoldCorX.fold(
-        seq, max_n_tuple_sz_to_correct=2, out_dir=str(EXPERIMENT_5_DIR_PATH)
+        seq,
+        max_n_tuple_sz_to_correct=2,
+        out_dir=str(EXPERIMENT_5_DIR_PATH),
+        save_performance=True,
     )
     wall_time = time.monotonic() - start_time
 
@@ -174,7 +180,10 @@ def run_irfold_corx2(seq):
 def run_irfold_corx3(seq):
     start_time = time.monotonic()
     pred, _ = IRFoldCorX.fold(
-        seq, max_n_tuple_sz_to_correct=3, out_dir=str(EXPERIMENT_5_DIR_PATH)
+        seq,
+        max_n_tuple_sz_to_correct=3,
+        out_dir=str(EXPERIMENT_5_DIR_PATH),
+        save_performance=True,
     )
     wall_time = time.monotonic() - start_time
 
@@ -193,19 +202,19 @@ if __name__ == "__main__":
         "execution_wall_time_secs",
     ]
     rnafold_performance_file_path = (
-        EXPERIMENT_5_DIR_PATH / "RNAfold_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "RNAfold_benchmarking_results.csv"
     ).resolve()
     rnastructure_performance_file_path = (
-        EXPERIMENT_5_DIR_PATH / "RNAstructure_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "RNAstructure_benchmarking_results.csv"
     ).resolve()
     irfold_val2_performance_file_path = (
-        EXPERIMENT_5_DIR_PATH / "IRFoldVal2_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "IRFoldVal2_benchmarking_results.csv"
     ).resolve()
     irfold_corx2_performance_file_path = (
-        EXPERIMENT_5_DIR_PATH / "IRFoldCorX2_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "IRFoldCorX2_benchmarking_results.csv"
     ).resolve()
     irfold_corx3_performance_file_path = (
-        EXPERIMENT_5_DIR_PATH / "IRFoldCorX3_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "IRFoldCorX3_benchmarking_results.csv"
     ).resolve()
 
     for file_path in [
@@ -215,9 +224,12 @@ if __name__ == "__main__":
         irfold_corx2_performance_file_path,
         irfold_corx3_performance_file_path,
     ]:
-        with open(str(file_path), "w") as perf_file:
-            writer = csv.writer(perf_file)
-            writer.writerow(results_file_column_names)
+        if not file_path.exists():
+            with open(str(file_path), "w") as perf_file:
+                writer = csv.writer(perf_file)
+                writer.writerow(results_file_column_names)
+        else:
+            print("Benchmark file already exists")
 
     for test_seq_idx, fasta_file_path in enumerate(
         BP_RNA_1_M_FASTA_FILES_DIR.glob("*.fasta")
@@ -227,12 +239,15 @@ if __name__ == "__main__":
         sequence_number = fasta_file_name.split("_")[2].split(".")[0]
 
         print(
-            f"Test Sequence #{test_seq_idx}: {database_name}-{sequence_number}".center(
+            f"Sequence #{test_seq_idx}: {database_name}-{sequence_number}".center(
                 70, "="
             )
         )
 
-        if database_name not in ["SPR", "SRP"]:
+        if database_name not in [
+            "SPR",
+            "SRP",
+        ]:  # These two datasets don't have pseudoknots I believe
             print("Not SPR or SRP databases.")
             continue
 
@@ -322,20 +337,35 @@ if __name__ == "__main__":
                 irfold_corx3_performance_file_path,
             ],
         ):
-            print("-" * 70)
-            fn_input = seq
-            if "rnastructure" in run_fold_fn.__name__:
-                fn_input = fasta_file_path
+            print(run_fold_fn.__name__.center(70, "-"))
 
-            pred, pred_wall_time = run_fold_fn(fn_input)
-            append_performance_to_file(
-                pred,
-                pred_wall_time,
-                pairs_idxs_no_dups,
-                unpaired_indices,
-                database_name,
-                sequence_number,
-                seq_info,
-                seq_len,
-                perf_file,
-            )
+            # Check if sequence has already been analysed
+            seq_already_evaluated = False
+            for _, seq_entry in pd.read_csv(perf_file).iterrows():
+                if (
+                    str(seq_entry.database) == database_name
+                    and str(seq_entry.sequence_database_number) == sequence_number
+                ):
+                    print(f"{database_name}-{sequence_number} already analysed.")
+                    seq_already_evaluated = True
+                    break
+
+            if not seq_already_evaluated:
+                fn_input = seq
+                if "rnastructure" in run_fold_fn.__name__:
+                    fn_input = fasta_file_path
+
+                pred, pred_wall_time = run_fold_fn(fn_input)
+                pred = pred.strip()
+
+                append_performance_to_file(
+                    pred,
+                    pred_wall_time,
+                    pairs_idxs_no_dups,
+                    unpaired_indices,
+                    database_name,
+                    sequence_number,
+                    seq_info,
+                    seq_len,
+                    perf_file,
+                )
