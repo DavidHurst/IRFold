@@ -1,6 +1,10 @@
 from pathlib import Path
 
-from irfold.util import irs_to_dot_bracket, calc_free_energy, write_solver_performance_to_file
+from irfold.util import (
+    irs_to_dot_bracket,
+    calc_free_energy,
+    write_solver_performance_to_file,
+)
 
 
 def test_dot_bracket_conversion_lengths_match(all_irs, sequence_length):

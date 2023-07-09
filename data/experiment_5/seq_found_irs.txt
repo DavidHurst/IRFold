@@ -1,0 +1,640 @@
+Palindromes of: /home/david/dev/rna_ssp/data/experiment_5/seq.fasta
+Sequence name: seq
+Sequence length is: 71
+Start at position: 1
+End at position: 71
+Minimum length of Palindromes is: 2
+Maximum length of Palindromes is: 71
+Maximum gap between elements is: 70
+Number of mismatches allowed in Palindrome: 0
+
+
+
+Palindromes:
+1        aaa        3
+         |||
+68       uuu       66
+
+1        aaaggua        7
+         |||||||
+67       uuuccau       61
+
+1        aa        2
+         ||
+66       uu       65
+
+1        aa        2
+         ||
+59       uu       58
+
+1        aaa        3
+         |||
+41       uuu       39
+
+1        aaa        3
+         |||
+40       uuu       38
+
+1        aa        2
+         ||
+39       uu       38
+
+1        aaag        4
+         ||||
+36       uuuc       33
+
+1        aa        2
+         ||
+35       uu       34
+
+1        aa        2
+         ||
+10       uu        9
+
+2        aa        3
+         ||
+68       uu       67
+
+2        aa        3
+         ||
+59       uu       58
+
+2        aa        3
+         ||
+41       uu       40
+
+2        aa        3
+         ||
+36       uu       35
+
+2        aa        3
+         ||
+10       uu        9
+
+3        ag        4
+         ||
+61       uc       60
+
+3        ag        4
+         ||
+56       uc       55
+
+3        ag        4
+         ||
+49       uc       48
+
+3        ag        4
+         ||
+30       uc       29
+
+3        ag        4
+         ||
+27       uc       26
+
+4        gg        5
+         ||
+70       cc       69
+
+5        gu        6
+         ||
+55       ca       54
+
+5        gu        6
+         ||
+48       ca       47
+
+5        gu        6
+         ||
+33       ca       32
+
+6        uaa        8
+         |||
+37       auu       35
+
+6        ua        7
+         ||
+31       au       30
+
+6        ua        7
+         ||
+22       au       21
+
+6        ua        7
+         ||
+17       au       16
+
+6        uaa        8
+         |||
+11       auu        9
+
+7        aa        8
+         ||
+68       uu       67
+
+7        aa        8
+         ||
+67       uu       66
+
+7        aa        8
+         ||
+66       uu       65
+
+7        aa        8
+         ||
+59       uu       58
+
+7        aa        8
+         ||
+41       uu       40
+
+7        aa        8
+         ||
+40       uu       39
+
+7        aau        9
+         |||
+39       uua       37
+
+7        aa        8
+         ||
+35       uu       34
+
+8        auu       10
+         |||
+21       uaa       19
+
+8        auu       10
+         |||
+16       uaa       14
+
+9        uu       10
+         ||
+54       aa       53
+
+9        uu       10
+         ||
+53       aa       52
+
+9        uu       10
+         ||
+52       aa       51
+
+9        uu       10
+         ||
+47       aa       46
+
+9        uuag       12
+         ||||
+32       aauc       29
+
+9        uu       10
+         ||
+24       aa       23
+
+9        uua       11
+         |||
+23       aau       21
+
+9        uu       10
+         ||
+19       aa       18
+
+9        uua       11
+         |||
+18       aau       16
+
+10       uag       12
+         |||
+62       auc       60
+
+10       ua       11
+         ||
+37       au       36
+
+11       agg       13
+         |||
+65       ucc       63
+
+11       ag       12
+         ||
+56       uc       55
+
+11       ag       12
+         ||
+49       uc       48
+
+11       ag       12
+         ||
+34       uc       33
+
+11       ag       12
+         ||
+27       uc       26
+
+12       ggaa       15
+         ||||
+70       ccuu       67
+
+13       gaa       15
+         |||
+60       cuu       58
+
+13       ga       14
+         ||
+50       cu       49
+
+14       aa       15
+         ||
+67       uu       66
+
+14       aa       15
+         ||
+66       uu       65
+
+14       aa       15
+         ||
+41       uu       40
+
+14       aa       15
+         ||
+40       uu       39
+
+14       aauaaa       19
+         ||||||
+39       uuauuu       34
+
+14       aa       15
+         ||
+36       uu       35
+
+14       aa       15
+         ||
+35       uu       34
+
+15       au       16
+         ||
+21       ua       20
+
+16       ua       17
+         ||
+62       au       61
+
+16       ua       17
+         ||
+31       au       30
+
+16       ua       17
+         ||
+22       au       21
+
+17       aaaa       20
+         ||||
+68       uuuu       65
+
+17       aaa       19
+         |||
+67       uuu       65
+
+17       aa       18
+         ||
+66       uu       65
+
+17       aa       18
+         ||
+59       uu       58
+
+17       aaaauaaag       25
+         |||||||||
+41       uuuuauuuc       33
+
+17       aaa       19
+         |||
+40       uuu       38
+
+17       aa       18
+         ||
+39       uu       38
+
+17       aa       18
+         ||
+35       uu       34
+
+18       aaa       20
+         |||
+68       uuu       66
+
+18       aa       19
+         ||
+59       uu       58
+
+18       aaa       20
+         |||
+41       uuu       39
+
+18       aaa       20
+         |||
+36       uuu       34
+
+19       aa       20
+         ||
+68       uu       67
+
+19       aa       20
+         ||
+59       uu       58
+
+19       aa       20
+         ||
+41       uu       40
+
+19       aa       20
+         ||
+36       uu       35
+
+21       ua       22
+         ||
+62       au       61
+
+21       ua       22
+         ||
+31       au       30
+
+22       aaa       24
+         |||
+68       uuu       66
+
+22       aaag       25
+         ||||
+67       uuuc       64
+
+22       aa       23
+         ||
+66       uu       65
+
+22       aa       23
+         ||
+59       uu       58
+
+22       aaa       24
+         |||
+41       uuu       39
+
+22       aaa       24
+         |||
+40       uuu       38
+
+22       aa       23
+         ||
+39       uu       38
+
+22       aa       23
+         ||
+35       uu       34
+
+23       aa       24
+         ||
+68       uu       67
+
+23       aa       24
+         ||
+59       uu       58
+
+23       aa       24
+         ||
+41       uu       40
+
+23       aa       24
+         ||
+36       uu       35
+
+24       ag       25
+         ||
+61       uc       60
+
+24       ag       25
+         ||
+56       uc       55
+
+24       ag       25
+         ||
+49       uc       48
+
+24       agc       26
+         |||
+30       ucg       28
+
+24       ag       25
+         ||
+27       uc       26
+
+25       gcu       27
+         |||
+45       cga       43
+
+27       ug       28
+         ||
+71       ac       70
+
+27       ug       28
+         ||
+51       ac       50
+
+27       ugcu       30
+         ||||
+46       acga       43
+
+30       ua       31
+         ||
+62       au       61
+
+30       uaa       32
+         |||
+37       auu       35
+
+31       aa       32
+         ||
+68       uu       67
+
+31       aa       32
+         ||
+67       uu       66
+
+31       aa       32
+         ||
+66       uu       65
+
+31       aac       33
+         |||
+59       uug       57
+
+31       aa       32
+         ||
+41       uu       40
+
+31       aa       32
+         ||
+40       uu       39
+
+31       aa       32
+         ||
+39       uu       38
+
+31       aa       32
+         ||
+35       uu       34
+
+33       cu       34
+         ||
+44       ga       43
+
+34       uuu       36
+         |||
+54       aaa       52
+
+34       uuu       36
+         |||
+53       aaa       51
+
+34       uu       35
+         ||
+52       aa       51
+
+34       uu       35
+         ||
+47       aa       46
+
+35       uu       36
+         ||
+54       aa       53
+
+35       uu       36
+         ||
+47       aa       46
+
+36       ua       37
+         ||
+62       au       61
+
+38       uuuugag       44
+         |||||||
+54       aaaacuc       48
+
+38       uuu       40
+         |||
+53       aaa       51
+
+38       uu       39
+         ||
+52       aa       51
+
+38       uu       39
+         ||
+47       aa       46
+
+39       uuu       41
+         |||
+54       aaa       52
+
+39       uu       40
+         ||
+47       aa       46
+
+40       uu       41
+         ||
+54       aa       53
+
+40       uug       42
+         |||
+47       aac       45
+
+41       ug       42
+         ||
+71       ac       70
+
+42       ga       43
+         ||
+69       cu       68
+
+42       ga       43
+         ||
+60       cu       59
+
+43       ag       44
+         ||
+65       uc       64
+
+43       ag       44
+         ||
+61       uc       60
+
+43       ag       44
+         ||
+56       uc       55
+
+45       ca       46
+         ||
+57       gu       56
+
+46       aa       47
+         ||
+68       uu       67
+
+46       aa       47
+         ||
+67       uu       66
+
+46       aa       47
+         ||
+66       uu       65
+
+46       aac       48
+         |||
+59       uug       57
+
+50       ca       51
+         ||
+57       gu       56
+
+51       aaaa       54
+         ||||
+68       uuuu       65
+
+51       aaa       53
+         |||
+67       uuu       65
+
+51       aa       52
+         ||
+66       uu       65
+
+51       aa       52
+         ||
+59       uu       58
+
+52       aaa       54
+         |||
+68       uuu       66
+
+52       aa       53
+         ||
+59       uu       58
+
+53       aa       54
+         ||
+68       uu       67
+
+53       aac       55
+         |||
+59       uug       57
+
+56       ug       57
+         ||
+71       ac       70
+
+57       gu       58
+         ||
+63       ca       62
+
+
+
+

@@ -1,0 +1,44 @@
+Palindromes of: /home/david/dev/rna_ssp/data/experiment_4/seq.fasta
+Sequence name: seq
+Sequence length is: 18
+Start at position: 1
+End at position: 18
+Minimum length of Palindromes is: 2
+Maximum length of Palindromes is: 18
+Maximum gap between elements is: 17
+Number of mismatches allowed in Palindrome: 0
+
+
+
+Palindromes:
+2        aua        4
+         |||
+17       uau       15
+
+3        ua        4
+         ||
+13       au       12
+
+3        ua        4
+         ||
+7        au        6
+
+6        ua        7
+         ||
+16       au       15
+
+6        ua        7
+         ||
+13       au       12
+
+8        ca        9
+         ||
+18       gu       17
+
+12       ua       13
+         ||
+16       au       15
+
+
+
+
