@@ -30,7 +30,6 @@ class IRFoldBase:
     """Base IRFold Model: RNA secondary structure prediction based on extracting optimal
     inverted repeat configurations from the primary sequence"""
 
-    # ToDo: Decorate with timer which writes time to performance file
     @classmethod
     def fold(
         cls,
@@ -69,7 +68,9 @@ class IRFoldBase:
 
         solver: CpSolver = CpSolver()
 
-        with tqdm(desc=f"{cls.__name__} - Running solver ({len(variables)} variables)") as _:
+        with tqdm(
+            desc=f"{cls.__name__} - Running solver ({len(variables)} variables)"
+        ) as _:
             status = solver.Solve(model)
 
         if status == OPTIMAL or status == FEASIBLE:
