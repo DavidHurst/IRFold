@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
-EXPERIMENT_1_DATA_DIR = (DATA_DIR / 'experiment_1').resolve()
+EXPERIMENT_1_DATA_DIR = (DATA_DIR / "experiment_1").resolve()
 
 plt.rcParams["figure.figsize"] = (6, 4)
 
