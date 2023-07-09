@@ -246,7 +246,7 @@ if __name__ == "__main__":
         if database_name not in [
             "SPR",
             "SRP",
-        ]:  # These two datasets don't have pseudoknots I believe
+        ]:
             print("Not SPR or SRP databases.")
             continue
 
@@ -308,7 +308,7 @@ if __name__ == "__main__":
         )
 
         if max_index_in_bp_seq_file != seq_len - 1:
-            print("bpSeq file and fasta file do not align.")
+            print("bpSeq file and fasta file contents do not match.")
             continue
 
         print(f"Fasta file   : {fasta_file_name}")
@@ -319,7 +319,7 @@ if __name__ == "__main__":
         print(f"Seq. len.    : {seq_len}")
         print(f"BPSeq max idx: {max_index_in_bp_seq_file}")
 
-        # Get predicted secondary structures from models
+        # Get predicted secondary structures from models, evaluate and store evaluation metrics
         for run_fold_fn, perf_file in zip(
             [
                 run_rnastructure,
