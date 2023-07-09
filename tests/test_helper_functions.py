@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from irfold.util import irs_to_dot_bracket, calc_free_energy, write_performance_to_file
+from irfold.util import irs_to_dot_bracket, calc_free_energy, write_solver_performance_to_file
 
 
 def test_dot_bracket_conversion_lengths_match(all_irs, sequence_length):
@@ -31,12 +31,12 @@ def test_calc_free_energy(data_dir, sequence, sequence_name, sequence_length):
 
 def test_write_performance_to_file(data_dir):
     perf_file_name = "test_write_perf_to_file"
-    perf_file = Path(data_dir) / f"{perf_file_name}_performance.csv"
+    perf_file = Path(data_dir) / f"{perf_file_name}_solver_performance.csv"
 
     if perf_file.exists():
         perf_file.unlink()
 
-    write_performance_to_file(
+    write_solver_performance_to_file(
         dot_bracket_repr="first_sample",
         obj_fn_final_value=0.0,
         dot_bracket_repr_mfe=0.0,
@@ -58,7 +58,7 @@ def test_write_performance_to_file(data_dir):
     assert lines[1].split(",")[0] == "first_sample"
 
     # Check the next write is added to the same file
-    write_performance_to_file(
+    write_solver_performance_to_file(
         dot_bracket_repr="second_sample",
         obj_fn_final_value=0.0,
         dot_bracket_repr_mfe=0.0,

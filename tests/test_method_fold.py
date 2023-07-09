@@ -88,7 +88,7 @@ def test_ir_fold_variant_performance_written_to_file(
 
     # Performance file for IRFold variant created
     performance_file_path = (
-        Path(data_dir) / f"{ir_fold_variant.__name__}_performance.csv"
+        Path(data_dir) / f"{ir_fold_variant.__name__}_solver_performance.csv"
     )
     assert performance_file_path.exists()
 

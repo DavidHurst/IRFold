@@ -21,7 +21,7 @@ from irfold.util import (
     calc_free_energy,
     IR,
     create_seq_file,
-    write_performance_to_file,
+    write_solver_performance_to_file,
     run_cmd,
 )
 
@@ -56,7 +56,7 @@ class IRFoldBase:
         if n_irs_found == 0:  # Return sequence if no IRs found
             db_repr, obj_fn_value = "".join(["." for _ in range(seq_len)]), 0
             if save_performance:
-                write_performance_to_file(
+                write_solver_performance_to_file(
                     db_repr, obj_fn_value, 0.0, seq_len, out_dir, cls.__name__
                 )
             return db_repr, obj_fn_value
@@ -89,7 +89,7 @@ class IRFoldBase:
                 dot_bracket_repr_mfe: float = calc_free_energy(
                     db_repr, sequence, out_dir, seq_name
                 )
-                write_performance_to_file(
+                write_solver_performance_to_file(
                     db_repr,
                     obj_fn_value,
                     dot_bracket_repr_mfe,
@@ -107,7 +107,7 @@ class IRFoldBase:
             # The optimisation problem does not have an optimal solution
             db_repr, obj_fn_value = "".join(["." for _ in range(seq_len)]), 0
             if save_performance:
-                write_performance_to_file(
+                write_solver_performance_to_file(
                     db_repr, obj_fn_value, 0.0, seq_len, out_dir, cls.__name__
                 )
             return db_repr, obj_fn_value

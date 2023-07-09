@@ -83,7 +83,7 @@ def run_cmd(cmd):
     return proc.returncode, stdout, stderr
 
 
-def write_performance_to_file(
+def write_solver_performance_to_file(
     dot_bracket_repr: str,
     obj_fn_final_value: float,
     dot_bracket_repr_mfe: float,
@@ -100,7 +100,7 @@ def write_performance_to_file(
     if not out_dir_path.exists():
         out_dir_path = Path.cwd().resolve()
 
-    performance_file_name: str = f"{ssp_model_name}_performance.csv"
+    performance_file_name: str = f"{ssp_model_name}_solver_performance.csv"
     performance_file_path: Path = (Path(out_dir_path) / performance_file_name).resolve()
 
     if (

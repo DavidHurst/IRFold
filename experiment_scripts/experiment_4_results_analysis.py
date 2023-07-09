@@ -13,25 +13,25 @@ if __name__ == "__main__":
     show = True
 
     irfold_base_res_df = pd.read_csv(
-        EXPERIMENT_4_DATA_DIR / "IRFoldBase_performance.csv"
+        EXPERIMENT_4_DATA_DIR / "IRFoldBase_solver_performance.csv"
     )
     irfold_val1_res_df = pd.read_csv(
-        EXPERIMENT_4_DATA_DIR / "IRFoldVal1_performance.csv"
+        EXPERIMENT_4_DATA_DIR / "IRFoldVal1_solver_performance.csv"
     )
     irfold_val2_res_df = pd.read_csv(
-        EXPERIMENT_4_DATA_DIR / "IRFoldVal2_performance.csv"
+        EXPERIMENT_4_DATA_DIR / "IRFoldVal2_solver_performance.csv"
     )
     irfold_corx2_res_df = pd.read_csv(
-        EXPERIMENT_4_DATA_DIR / "IRFoldCorX2_performance.csv"
+        EXPERIMENT_4_DATA_DIR / "IRFoldCorX2_solver_performance.csv"
     )
     irfold_corx3_res_df = pd.read_csv(
-        EXPERIMENT_4_DATA_DIR / "IRFoldCorX3_performance.csv"
+        EXPERIMENT_4_DATA_DIR / "IRFoldCorX3_solver_performance.csv"
     )
     irfold_corx4_res_df = pd.read_csv(
-        EXPERIMENT_4_DATA_DIR / "IRFoldCorX4_performance.csv"
+        EXPERIMENT_4_DATA_DIR / "IRFoldCorX4_solver_performance.csv"
     )
     irfold_corx5_res_df = pd.read_csv(
-        EXPERIMENT_4_DATA_DIR / "IRFoldCorX5_performance.csv"
+        EXPERIMENT_4_DATA_DIR / "IRFoldCorX5_solver_performance.csv"
     )
 
     irfold_base_avg_df = irfold_base_res_df.groupby("seq_len").mean(numeric_only=True)
