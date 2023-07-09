@@ -7,19 +7,19 @@ EXPERIMENT_5_DIR_PATH = DATA_DIR / "experiment_5"
 
 if __name__ == "__main__":
     rnafold_res_df = pd.read_csv(
-        EXPERIMENT_5_DIR_PATH / "RNAfold_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "RNAfold_benchmarking_results.csv"
     )
     rnastructure_res_df = pd.read_csv(
-        EXPERIMENT_5_DIR_PATH / "RNAstructure_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "RNAstructure_benchmarking_results.csv"
     )
     irfold_val2_res_df = pd.read_csv(
-        EXPERIMENT_5_DIR_PATH / "IRFoldVal2_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "IRFoldVal2_benchmarking_results.csv"
     )
     irfold_corx2_res_df = pd.read_csv(
-        EXPERIMENT_5_DIR_PATH / "IRFoldCorX2_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "IRFoldCorX2_benchmarking_results.csv"
     )
     irfold_corx3_res_df = pd.read_csv(
-        EXPERIMENT_5_DIR_PATH / "IRFoldCorX3_performance_metrics.csv"
+        EXPERIMENT_5_DIR_PATH / "IRFoldCorX3_benchmarking_results.csv"
     )
 
     for res_df, df_name in zip(

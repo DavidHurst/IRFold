@@ -243,13 +243,6 @@ if __name__ == "__main__":
             )
         )
 
-        if database_name not in [
-            "SPR",
-            "SRP",
-        ]:
-            print("Not SPR or SRP databases.")
-            continue
-
         with open(fasta_file_path, "r") as fasta_file:
             lines = fasta_file.readlines()
 
