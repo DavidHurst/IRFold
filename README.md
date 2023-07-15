@@ -8,4 +8,5 @@ Set location of thermodynamic parameters for RNAstructure:
 $ export DATAPATH=experiment_scripts/RNAstructure/data_tables/
 ```
 
+Compile IPknot which depends on ViennaRNA so ViennaRNA also.
 
