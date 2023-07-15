@@ -1,43 +1,223 @@
 Palindromes of: /home/david/dev/rna_ssp/data/experiment_4/seq.fasta
 Sequence name: seq
-Sequence length is: 18
+Sequence length is: 50
 Start at position: 1
-End at position: 18
+End at position: 50
 Minimum length of Palindromes is: 2
-Maximum length of Palindromes is: 18
-Maximum gap between elements is: 17
+Maximum length of Palindromes is: 50
+Maximum gap between elements is: 49
 Number of mismatches allowed in Palindrome: 0
 
 
 
 Palindromes:
-2        aua        4
+1        cgc        3
          |||
-17       uau       15
+22       gcg       20
 
-3        ua        4
+2        gc        3
          ||
-13       au       12
+47       cg       46
 
-3        ua        4
+2        gc        3
          ||
-7        au        6
+41       cg       40
 
-6        ua        7
-         ||
-16       au       15
+2        gcc        4
+         |||
+37       cgg       35
 
-6        ua        7
+2        gc        3
          ||
-13       au       12
+25       cg       24
 
-8        ca        9
-         ||
-18       gu       17
+3        cca        5
+         |||
+11       ggu        9
 
-12       ua       13
+4        ca        5
          ||
-16       au       15
+40       gu       39
+
+4        ca        5
+         ||
+20       gu       19
+
+5        au        6
+         ||
+44       ua       43
+
+5        au        6
+         ||
+18       ua       17
+
+9        ugg       11
+         |||
+50       acc       48
+
+9        ugg       11
+         |||
+17       acc       15
+
+10       gg       11
+         ||
+48       cc       47
+
+10       gg       11
+         ||
+38       cc       37
+
+11       gag       13
+         |||
+31       cuc       29
+
+12       ag       13
+         ||
+42       uc       41
+
+12       ag       13
+         ||
+39       uc       38
+
+12       aga       14
+         |||
+32       ucu       30
+
+12       ag       13
+         ||
+26       uc       25
+
+15       cc       16
+         ||
+36       gg       35
+
+16       ca       17
+         ||
+40       gu       39
+
+16       ca       17
+         ||
+20       gu       19
+
+17       au       18
+         ||
+44       ua       43
+
+19       ug       20
+         ||
+50       ac       49
+
+20       gc       21
+         ||
+47       cg       46
+
+20       gc       21
+         ||
+41       cg       40
+
+20       gc       21
+         ||
+37       cg       36
+
+20       gc       21
+         ||
+25       cg       24
+
+22       gag       24
+         |||
+31       cuc       29
+
+23       agc       25
+         |||
+42       ucg       40
+
+23       ag       24
+         ||
+39       uc       38
+
+23       ag       24
+         ||
+32       uc       31
+
+23       ag       24
+         ||
+26       uc       25
+
+24       gcu       26
+         |||
+47       cga       45
+
+24       gc       25
+         ||
+37       cg       36
+
+25       cu       26
+         ||
+35       ga       34
+
+27       ua       28
+         ||
+45       au       44
+
+27       ua       28
+         ||
+43       au       42
+
+27       ua       28
+         ||
+34       au       33
+
+29       cu       30
+         ||
+46       ga       45
+
+29       cu       30
+         ||
+35       ga       34
+
+31       cu       32
+         ||
+46       ga       45
+
+31       cu       32
+         ||
+35       ga       34
+
+33       ua       34
+         ||
+45       au       44
+
+33       uag       35
+         |||
+43       auc       41
+
+34       agg       36
+         |||
+39       ucc       37
+
+35       gg       36
+         ||
+49       cc       48
+
+35       ggc       37
+         |||
+48       ccg       46
+
+36       gc       37
+         ||
+41       cg       40
+
+38       cu       39
+         ||
+46       ga       45
+
+39       ug       40
+         ||
+50       ac       49
+
+40       gcua       43
+         ||||
+47       cgau       44
 
 
 
