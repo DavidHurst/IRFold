@@ -109,7 +109,7 @@ def append_performance_to_file(
     ):
         print(f"  {metric_name.ljust(15)}: {metric:.2f}")
 
-    print(f"  {'Exe. Time'.ljust(15)}: {pred_wall_time:.4f}")
+    print(f"  {'Running Time'.ljust(15)}: {pred_wall_time:.4f}")
 
     column_entries = [
         seq_db_name,

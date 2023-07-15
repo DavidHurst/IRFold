@@ -12,34 +12,39 @@ if __name__ == "__main__":
     rnastructure_res_df = pd.read_csv(
         EXPERIMENT_5_DIR_PATH / "RNAstructure_benchmarking_results.csv"
     )
+    ipknot_res_df = pd.read_csv(
+        EXPERIMENT_5_DIR_PATH / "IPknot_benchmarking_results.csv"
+    )
     irfold_val2_res_df = pd.read_csv(
         EXPERIMENT_5_DIR_PATH / "IRFoldVal2_benchmarking_results.csv"
     )
     irfold_corx2_res_df = pd.read_csv(
         EXPERIMENT_5_DIR_PATH / "IRFoldCorX2_benchmarking_results.csv"
     )
-    irfold_corx3_res_df = pd.read_csv(
-        EXPERIMENT_5_DIR_PATH / "IRFoldCorX3_benchmarking_results.csv"
-    )
+    # irfold_corx3_res_df = pd.read_csv(
+    #     EXPERIMENT_5_DIR_PATH / "IRFoldCorX3_benchmarking_results.csv"
+    # )
 
     for res_df, df_name in zip(
         [
             rnafold_res_df,
             rnastructure_res_df,
+            ipknot_res_df,
             irfold_val2_res_df,
             irfold_corx2_res_df,
-            irfold_corx3_res_df,
+            # irfold_corx3_res_df,
         ],
-        ["RNAfold", "RNAstructure", "IRFoldVal2", "IRFoldCorX2", "IRFoldCorX3"],
+        ["RNAfold", "RNAstructure", "IPknot", "IRFoldVal2", "IRFoldCorX2"],
     ):
         print(f"Model: {df_name}")
+        print(f'   Num. Samples Evaluated: {len(res_df)}')
         for col_name in [
             "sensitivity",
             "ppv",
             "f1",
             "execution_wall_time_secs",
         ]:
-            print(f"   Mean {col_name}: {res_df[col_name].mean():.2f}")
+            print(f"   Mean {col_name.ljust(30)}: {res_df[col_name].mean():.4f}")
 
     # Compare RNA SSP programs' performances at sequence length intervals
     #     rnalib_avg_df = rnalib_res_df.groupby("seq_len").mean(numeric_only=True)
