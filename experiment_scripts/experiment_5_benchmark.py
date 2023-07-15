@@ -11,13 +11,16 @@ import RNA
 import pandas as pd
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))  # Add root
+
+IPKNOT_EXE_PATH = str((Path(__file__).parent / "ipknot" / "build" / "ipknot").resolve())
+
 RNA_STRUCTURE_DATA_TABLES_DIR_PATH = str(
     (Path(__file__).parent / "RNAstructure" / "data_tables").resolve()
 )
-RNA_STRUCTURE_FOLD_PATH = str(
+RNA_STRUCTURE_FOLD_EXE_PATH = str(
     (Path(__file__).parent / "RNAstructure" / "Fold").resolve()
 )
-RNA_STRUCTURE_CT2DOT_PATH = str(
+RNA_STRUCTURE_CT2DOT_EXE_PATH = str(
     (Path(__file__).parent / "RNAstructure" / "ct2dot").resolve()
 )
 TEMP_DOT_BRACKET_FILE_PATH = str(
@@ -49,8 +52,11 @@ def evaluate_prediction(true_idx_pairs, true_unpaired_idxs, pred):
 
     for idx in true_idx_pairs:
         # True positive: pair is in the in prediction and in the true secondary structure
-        if (pred[idx[0]] == "(" and pred[idx[1]] == ")") or (
-            pred[idx[0]] == ")" and pred[idx[1]] == "("
+        if (
+            (pred[idx[0]] == "(" and pred[idx[1]] == ")")
+            or (pred[idx[0]] == ")" and pred[idx[1]] == "(")
+            or (pred[idx[0]] == "]" and pred[idx[1]] == "[")  # IPknot knot notation
+            or (pred[idx[0]] == "]" and pred[idx[1]] == "[")  # IPknot knot notation
         ):
             true_positives += 1
         else:
@@ -59,7 +65,8 @@ def evaluate_prediction(true_idx_pairs, true_unpaired_idxs, pred):
 
     # False positive: pair is in the prediction but is not in the true secondary structure
     for idx in true_unpaired_idxs:
-        if pred[idx] == "(" or pred[idx] == ")":
+        # Square brackets are IPknot notation for knots
+        if pred[idx] == "(" or pred[idx] == ")" or pred[idx] == "]" or pred[idx] == "[":
             false_positives += 1
 
     return true_positives, false_positives, false_negatives
@@ -102,6 +109,8 @@ def append_performance_to_file(
     ):
         print(f"  {metric_name.ljust(15)}: {metric:.2f}")
 
+    print(f"  {'Exe. Time'.ljust(15)}: {pred_wall_time:.4f}")
+
     column_entries = [
         seq_db_name,
         seq_db_num,
@@ -126,12 +135,14 @@ def run_rnastructure(seq_fasta_file_path):
         pass
 
     start_time = time.monotonic()
-    subprocess.run([RNA_STRUCTURE_FOLD_PATH, seq_fasta_file_path, TEMP_CT_FILE_PATH])
+    _ = subprocess.check_output(
+        [RNA_STRUCTURE_FOLD_EXE_PATH, seq_fasta_file_path, TEMP_CT_FILE_PATH]
+    )
     wall_time = time.monotonic() - start_time
 
-    subprocess.run(
+    _ = subprocess.check_output(
         [
-            RNA_STRUCTURE_CT2DOT_PATH,
+            RNA_STRUCTURE_CT2DOT_EXE_PATH,
             TEMP_CT_FILE_PATH,
             str(1),
             TEMP_DOT_BRACKET_FILE_PATH,
@@ -141,6 +152,18 @@ def run_rnastructure(seq_fasta_file_path):
     with open(TEMP_DOT_BRACKET_FILE_PATH, "r") as db_file:
         lines = db_file.readlines()
         pred = lines[2]
+
+    return pred, wall_time
+
+
+def run_ipknot(seq_fasta_file_path):
+
+    start_time = time.monotonic()
+    out = subprocess.check_output([IPKNOT_EXE_PATH, seq_fasta_file_path])
+    wall_time = time.monotonic() - start_time
+
+    # Parse pred from std_out
+    pred = str(out).split(r"\n")[2]
 
     return pred, wall_time
 
@@ -206,6 +229,9 @@ if __name__ == "__main__":
     rnastructure_performance_file_path = (
         EXPERIMENT_5_DIR_PATH / "RNAstructure_benchmarking_results.csv"
     ).resolve()
+    ipknot_performance_file_path = (
+        EXPERIMENT_5_DIR_PATH / "IPknot_benchmarking_results.csv"
+    ).resolve()
     irfold_val2_performance_file_path = (
         EXPERIMENT_5_DIR_PATH / "IRFoldVal2_benchmarking_results.csv"
     ).resolve()
@@ -219,6 +245,7 @@ if __name__ == "__main__":
     for file_path in [
         rnafold_performance_file_path,
         rnastructure_performance_file_path,
+        ipknot_performance_file_path,
         irfold_val2_performance_file_path,
         irfold_corx2_performance_file_path,
         irfold_corx3_performance_file_path,
@@ -317,16 +344,18 @@ if __name__ == "__main__":
             [
                 run_rnastructure,
                 run_rnafold,
+                run_ipknot,
                 run_irfold_val2,
                 run_irfold_corx2,
-                run_irfold_corx3,
+                # run_irfold_corx3,
             ],
             [
                 rnastructure_performance_file_path,
                 rnafold_performance_file_path,
+                ipknot_performance_file_path,
                 irfold_val2_performance_file_path,
                 irfold_corx2_performance_file_path,
-                irfold_corx3_performance_file_path,
+                # irfold_corx3_performance_file_path,
             ],
         ):
             print(run_fold_fn.__name__.center(70, "-"))
@@ -344,7 +373,10 @@ if __name__ == "__main__":
 
             if not seq_already_evaluated:
                 fn_input = seq
-                if "rnastructure" in run_fold_fn.__name__:
+                if (
+                    "rnastructure" in run_fold_fn.__name__
+                    or "ipknot" in run_fold_fn.__name__
+                ):
                     fn_input = fasta_file_path
 
                 pred, pred_wall_time = run_fold_fn(fn_input)
