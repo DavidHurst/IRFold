@@ -238,9 +238,6 @@ if __name__ == "__main__":
     irfold_corx2_performance_file_path = (
         EXPERIMENT_5_DIR_PATH / "IRFoldCorX2_benchmarking_results.csv"
     ).resolve()
-    irfold_corx3_performance_file_path = (
-        EXPERIMENT_5_DIR_PATH / "IRFoldCorX3_benchmarking_results.csv"
-    ).resolve()
 
     for file_path in [
         rnafold_performance_file_path,
@@ -248,7 +245,6 @@ if __name__ == "__main__":
         ipknot_performance_file_path,
         irfold_val2_performance_file_path,
         irfold_corx2_performance_file_path,
-        irfold_corx3_performance_file_path,
     ]:
         if not file_path.exists():
             with open(str(file_path), "w") as perf_file:
@@ -281,12 +277,8 @@ if __name__ == "__main__":
             seq = lines[1].strip()
             seq_len = len(seq)
 
-        if "." in seq or "_" in seq:
-            print("Unsupported notation for RNAstructure")
-            continue
-
-        if seq_len > 80:
-            print("Sequence too long")
+        if set(seq) != {"A", "U", "C", "G"}:
+            print("Unsupported nucleobase encoding.")
             continue
 
         # Get corresponding bpSeq file
@@ -305,6 +297,7 @@ if __name__ == "__main__":
         with open(seq_bp_seq_file_path, "r") as bp_seq_file:
             pair_lines = [line.strip() for line in bp_seq_file.readlines()][2:]
 
+        # Extract true base pairs and true unpaired bases from database sequence
         pairs_idxs = [
             (
                 int(re.findall(r"-?\d+\.?\d*", pair_line)[0]) - 1,
@@ -347,7 +340,6 @@ if __name__ == "__main__":
                 run_ipknot,
                 run_irfold_val2,
                 run_irfold_corx2,
-                # run_irfold_corx3,
             ],
             [
                 rnastructure_performance_file_path,
@@ -355,7 +347,6 @@ if __name__ == "__main__":
                 ipknot_performance_file_path,
                 irfold_val2_performance_file_path,
                 irfold_corx2_performance_file_path,
-                # irfold_corx3_performance_file_path,
             ],
         ):
             print(run_fold_fn.__name__.center(70, "-"))
