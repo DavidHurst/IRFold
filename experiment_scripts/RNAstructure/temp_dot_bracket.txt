@@ -1,3 +1,3 @@
->ENERGY = -34.9  tdbR00000110
-GCGGCGUUAGUCCAUCUGGUUAAGACACUGGCCUGCCACGCCAGCGUCCCGGGUUCAAAUCCCGGACGCCGCACCA
-(((((((.((.((....))))..(((.(((((.......))))).)))(((((.......))))))))))))....
+>ENERGY = -35.2  tdbR00000505
+CGCGGGGUAGAGCAGUUGGUAGCUCGCCGGGCUCAUAACCCGGAGGCCGCAGGUUCGAGUCCUGCCCCCGCAACCA
+.((((((..((((........)))).(((((.......))))).....(((((.......))))))))))).....

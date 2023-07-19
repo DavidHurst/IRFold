@@ -85,23 +85,23 @@ if __name__ == "__main__":
 
     seq_intervals[-1][-1] += 1
     col_width = 15
-    small_col_width = 7
+    n_intervals = len(seq_intervals)
 
     print(
         "".join(
             ["              ".ljust(col_width)]
-            + [f"F1 Mean".center(small_col_width * 7)]
+            + [f"F1 Mean".center(col_width * n_intervals)]
         )
     )
-    print("-" * (col_width + (small_col_width * 7)))
+    print("-" * (col_width + (col_width * n_intervals)))
 
     print(
         "".join(
             ["Model\Interval".ljust(col_width)]
-            + [f"{i[0]}-{i[1]}".center(small_col_width) for i in seq_intervals]
+            + [f"{i[0]}-{i[1]}".center(col_width) for i in seq_intervals]
         )
     )
-    print("-" * (col_width + (small_col_width * 7)))
+    print("-" * (col_width * (n_intervals + 1)))
 
     model_seq_len_interval_f1_means = {
         "RNAfold": [],
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         print(
             "".join(
                 [df_name.ljust(col_width)]
-                + [f" {f1:.2f} ".center(small_col_width) for f1 in seq_interval_means]
+                + [f" {f1:.2f} ".center(col_width) for f1 in seq_interval_means]
             )
         )
 
@@ -146,14 +146,15 @@ if __name__ == "__main__":
         )
 
     plt.bar(
-        [i for i in range(7)],
+        [i for i in range(n_intervals)],
         normalised_interval_counts,
         label="Sample Dist.",
         alpha=0.3,
     )
 
     plt.xticks(
-        [i for i in range(7)], [f"{i[0]}-{i[1]}".center(9) for i in seq_intervals]
+        [i for i in range(n_intervals)],
+        [f"{i[0]}-{i[1]}".center(9) for i in seq_intervals],
     )
     plt.xlabel("Sequence Length")
     plt.ylabel("Mean F1")

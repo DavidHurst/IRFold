@@ -116,6 +116,7 @@ def append_performance_to_file(
         seq_db_num,
         seq_info,
         seq_len,
+        pred,
         sensitivity,
         ppv,
         f1,
@@ -214,10 +215,11 @@ def run_irfold_corx3(seq):
 
 if __name__ == "__main__":
     results_file_column_names = [
-        "database",
+        "database_name",
         "sequence_database_number",
         "sequence_info",
         "sequence_length",
+        "pred",
         "sensitivity",
         "ppv",
         "f1",
@@ -355,10 +357,10 @@ if __name__ == "__main__":
             seq_already_evaluated = False
             for _, seq_entry in pd.read_csv(perf_file).iterrows():
                 if (
-                    str(seq_entry.database) == database_name
+                    str(seq_entry.database_name) == database_name
                     and str(seq_entry.sequence_database_number) == sequence_number
                 ):
-                    print(f"{database_name}-{sequence_number} already analysed.")
+                    print(f"{database_name}-{sequence_number} already predicted.")
                     seq_already_evaluated = True
                     break
 
