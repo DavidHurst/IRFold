@@ -1,711 +1,571 @@
 Palindromes of: /home/david/dev/rna_ssp/data/experiment_5/seq.fasta
 Sequence name: seq
-Sequence length is: 87
+Sequence length is: 76
 Start at position: 1
-End at position: 87
+End at position: 76
 Minimum length of Palindromes is: 2
-Maximum length of Palindromes is: 87
-Maximum gap between elements is: 86
+Maximum length of Palindromes is: 76
+Maximum gap between elements is: 75
 Number of mismatches allowed in Palindrome: 0
 
 
 
 Palindromes:
-1        gu        2
-         ||
-85       ca       84
+1        gcggcgu        7
+         |||||||
+72       cgccgca       66
 
-1        gucag        5
+1        gcg        3
+         |||
+69       cgc       67
+
+1        gc        2
+         ||
+45       cg       44
+
+1        gcg        3
+         |||
+41       cgc       39
+
+1        gc        2
+         ||
+36       cg       35
+
+1        gc        2
+         ||
+32       cg       31
+
+1        gc        2
+         ||
+5        cg        4
+
+2        cgg        4
+         |||
+64       gcc       62
+
+2        cgg        4
+         |||
+51       gcc       49
+
+2        cg        3
+         ||
+46       gc       45
+
+2        cg        3
+         ||
+6        gc        5
+
+3        gg        4
+         ||
+75       cc       74
+
+3        gg        4
+         ||
+62       cc       61
+
+3        gg        4
+         ||
+49       cc       48
+
+3        ggcgu        7
          |||||
-83       caguc       79
+42       ccgca       38
 
-1        gu        2
-         ||
-76       ca       75
-
-1        guc        3
+3        ggc        5
          |||
-33       cag       31
+37       ccg       35
 
-2        uc        3
-         ||
-55       ag       54
-
-2        uc        3
-         ||
-14       ag       13
-
-2        uc        3
-         ||
-7        ag        6
-
-3        ca        4
-         ||
-62       gu       61
-
-3        cag        5
+3        ggc        5
          |||
-43       guc       41
+33       ccg       31
 
-3        ca        4
+3        gg        4
          ||
-17       gu       16
+13       cc       12
 
-3        ca        4
+4        gcg        6
+         |||
+72       cgc       70
+
+4        gc        5
          ||
-9        gu        8
+45       cg       44
 
-4        ag        5
+5        cg        6
          ||
-77       uc       76
+64       gc       63
 
-4        ag        5
+5        cg        6
          ||
-50       uc       49
+51       gc       50
 
-4        agga        7
-         ||||
-48       uccu       45
+5        cg        6
+         ||
+46       gc       45
 
-4        ag        5
+6        gu        7
+         ||
+74       ca       73
+
+6        gu        7
+         ||
+28       ca       27
+
+6        gu        7
+         ||
+26       ca       25
+
+7        uu        8
+         ||
+59       aa       58
+
+7        uu        8
+         ||
+58       aa       57
+
+7        uua        9
+         |||
+23       aau       21
+
+9        ag       10
          ||
 34       uc       33
 
-4        ag        5
-         ||
-21       uc       20
+9        agu       11
+         |||
+29       uca       27
 
-5        gg        6
+9        ag       10
          ||
-86       cc       85
+17       uc       16
 
-5        gg        6
+10       gu       11
          ||
-74       cc       73
+74       ca       73
 
-5        ggau        8
+10       gucc       13
          ||||
-73       ccua       70
+67       cagg       64
 
-5        gg        6
+10       gu       11
          ||
-29       cc       28
+39       ca       38
 
-5        gg        6
-         ||
-12       cc       11
-
-6        ga        7
-         ||
-79       cu       78
-
-6        ga        7
-         ||
-67       cu       66
-
-6        ga        7
-         ||
-49       cu       48
-
-6        ga        7
-         ||
-41       cu       40
-
-6        ga        7
-         ||
-20       cu       19
-
-8        ugg       10
+10       guc       12
          |||
-87       acc       85
+26       cag       24
 
-8        ug        9
+12       cc       13
          ||
-84       ac       83
+53       gg       52
 
-8        ugg       10
+12       cc       13
+         ||
+52       gg       51
+
+12       cca       14
          |||
-75       acc       73
+31       ggu       29
 
-8        ug        9
+12       cca       14
+         |||
+19       ggu       17
+
+13       ca       14
          ||
-68       ac       67
+35       gu       34
 
-8        uggc       11
+14       au       15
+         ||
+60       ua       59
+
+15       uc       16
+         ||
+66       ag       65
+
+15       ucu       17
+         |||
+25       aga       23
+
+16       cugg       19
          ||||
-30       accg       27
+44       gacc       41
 
-9        gg       10
-         ||
-73       cc       72
-
-9        gg       10
-         ||
-47       cc       46
-
-9        gg       10
-         ||
-12       cc       11
-
-10       gcc       12
-         |||
-59       cgg       57
-
-10       gcc       12
-         |||
-26       cgg       24
-
-11       cc       12
-         ||
-64       gg       63
-
-11       cc       12
-         ||
-63       gg       62
-
-11       cc       12
-         ||
-57       gg       56
-
-11       cc       12
-         ||
-54       gg       53
-
-11       cc       12
-         ||
-44       gg       43
-
-11       cc       12
-         ||
-18       gg       17
-
-12       cg       13
-         ||
-60       gc       59
-
-12       cg       13
-         ||
-27       gc       26
-
-13       ga       14
-         ||
-79       cu       78
-
-13       ga       14
-         ||
-72       cu       71
-
-13       ga       14
-         ||
-67       cu       66
-
-13       gag       15
-         |||
-49       cuc       47
-
-13       ga       14
-         ||
-46       cu       45
-
-13       ga       14
-         ||
-41       cu       40
-
-13       ga       14
-         ||
-20       cu       19
-
-14       ag       15
-         ||
-80       uc       79
-
-14       agugg       18
-         |||||
-77       ucacc       73
-
-14       ag       15
-         ||
-50       uc       49
-
-14       ag       15
-         ||
-42       uc       41
-
-14       agu       16
-         |||
-34       uca       32
-
-14       ag       15
-         ||
-21       uc       20
-
-15       gug       17
-         |||
-85       cac       83
-
-15       gu       16
-         ||
-83       ca       82
-
-16       uggu       19
+17       uggu       20
          ||||
-87       acca       84
+76       acca       73
 
-16       ug       17
+17       ug       18
          ||
-68       ac       67
+73       ac       72
 
-16       ugg       18
+17       ug       18
+         ||
+57       ac       56
+
+17       ugg       19
          |||
-30       acc       28
+38       acc       36
 
-17       gg       18
+17       ug       18
          ||
-73       cc       72
+27       ac       26
 
-17       gg       18
+18       gg       19
          ||
-47       cc       46
+70       cc       69
 
-18       guc       20
-         |||
-83       cag       81
-
-18       gu       19
+18       gg       19
          ||
-76       ca       75
+63       cc       62
 
-18       gucu       21
-         ||||
-33       caga       30
-
-19       uc       20
+18       gg       19
          ||
-55       ag       54
+62       cc       61
 
-20       cu       21
+18       gg       19
          ||
-56       ga       55
+50       cc       49
 
-20       cu       21
+18       gg       19
          ||
-53       ga       52
+49       cc       48
 
-20       cu       21
+18       gg       19
          ||
-38       ga       37
+33       cc       32
 
-20       cu       21
+19       gu       20
          ||
-24       ga       23
+67       ca       66
 
-21       ua       22
+19       gu       20
          ||
-51       au       50
+39       ca       38
 
-21       uaag       24
-         ||||
-36       auuc       33
+19       gu       20
+         ||
+28       ca       27
 
-22       aag       24
-         |||
-78       uuc       76
+19       gu       20
+         ||
+26       ca       25
+
+20       uu       21
+         ||
+59       aa       58
+
+20       uu       21
+         ||
+58       aa       57
+
+20       uu       21
+         ||
+23       aa       22
 
 22       aa       23
          ||
-66       uu       65
-
-22       aa       23
-         ||
-40       uu       39
+55       uu       54
 
 23       ag       24
-         ||
-80       uc       79
-
-23       ag       24
-         ||
-50       uc       49
-
-23       agg       25
-         |||
-48       ucc       46
-
-23       ag       24
-         ||
-42       uc       41
-
-24       gg       25
-         ||
-86       cc       85
-
-24       gg       25
-         ||
-74       cc       73
-
-24       gg       25
-         ||
-73       cc       72
-
-24       ggc       26
-         |||
-29       ccg       27
-
-25       gc       26
-         ||
-59       cg       58
-
-26       cgcc       29
-         ||||
-60       gcgg       57
-
-28       cc       29
-         ||
-64       gg       63
-
-28       cca       30
-         |||
-63       ggu       61
-
-28       cc       29
-         ||
-57       gg       56
-
-28       cc       29
-         ||
-54       gg       53
-
-28       ccaga       32
-         |||||
-44       ggucu       40
-
-29       caga       32
-         ||||
-81       gucu       78
-
-30       ag       31
-         ||
-77       uc       76
-
-30       aga       32
-         |||
-50       ucu       48
-
-30       ag       31
-         ||
-48       uc       47
-
-30       ag       31
          ||
 34       uc       33
 
-31       ga       32
+23       ag       24
          ||
-72       cu       71
+29       uc       28
 
-31       ga       32
+24       ga       25
          ||
-67       cu       66
+61       cu       60
 
-31       gac       33
+24       ga       25
+         ||
+56       cu       55
+
+24       gac       26
          |||
-46       cug       44
+48       cug       46
 
-32       ac       33
+25       ac       26
          ||
-65       ug       64
+54       ug       53
 
-32       ac       33
+26       ca       27
          ||
-61       ug       60
+35       gu       34
 
-32       acuu       35
-         ||||
-39       ugaa       36
-
-33       cu       34
+26       ca       27
          ||
-56       ga       55
+30       gu       29
 
-33       cuua       36
-         ||||
-53       gaau       50
-
-34       uu       35
+27       ac       28
          ||
-70       aa       69
+54       ug       53
 
-34       uu       35
+27       ac       28
          ||
-69       aa       68
+47       ug       46
 
-36       aagu       39
-         ||||
-78       uuca       75
-
-36       aa       37
-         ||
-66       uu       65
-
-36       aa       37
-         ||
-40       uu       39
-
-37       ag       38
-         ||
-80       uc       79
-
-37       ag       38
-         ||
-50       uc       49
-
-37       ag       38
-         ||
-48       uc       47
-
-37       ag       38
-         ||
-42       uc       41
-
-38       gu       39
-         ||
-85       ca       84
-
-38       gu       39
-         ||
-83       ca       82
-
-39       uu       40
-         ||
-70       aa       69
-
-39       uu       40
-         ||
-69       aa       68
-
-39       uu       40
-         ||
-52       aa       51
-
-40       uc       41
-         ||
-82       ag       81
-
-40       uc       41
-         ||
-55       ag       54
-
-41       cu       42
-         ||
-56       ga       55
-
-41       cu       42
-         ||
-53       ga       52
-
-42       uggu       45
-         ||||
-87       acca       84
-
-42       ug       43
-         ||
-84       ac       83
-
-42       ugg       44
-         |||
-75       acc       73
-
-42       ug       43
-         ||
-68       ac       67
-
-43       gg       44
-         ||
-73       cc       72
-
-43       gg       44
-         ||
-47       cc       46
-
-44       guc       46
-         |||
-83       cag       81
-
-44       gu       45
-         ||
-76       ca       75
-
-45       uccu       48
-         ||||
-55       agga       52
-
-46       cc       47
-         ||
-64       gg       63
-
-46       cc       47
-         ||
-63       gg       62
-
-46       cc       47
-         ||
-58       gg       57
-
-46       ccuc       49
-         ||||
-57       ggag       54
-
-48       uc       49
-         ||
-82       ag       81
-
-49       cu       50
-         ||
-56       ga       55
-
-49       cu       50
-         ||
-53       ga       52
-
-51       aag       53
-         |||
-78       uuc       76
-
-51       aa       52
-         ||
-66       uu       65
-
-52       ag       53
-         ||
-80       uc       79
-
-53       gg       54
-         ||
-86       cc       85
-
-53       gg       54
-         ||
-74       cc       73
-
-53       gga       55
-         |||
-73       ccu       71
-
-54       ga       55
-         ||
-79       cu       78
-
-54       ga       55
-         ||
-67       cu       66
-
-55       ag       56
-         ||
-80       uc       79
-
-55       ag       56
-         ||
-77       uc       76
-
-56       gg       57
-         ||
-86       cc       85
-
-56       ggg       58
-         |||
-74       ccc       72
-
-56       gg       57
-         ||
-73       cc       72
-
-57       gg       58
-         ||
-86       cc       85
-
-57       gg       58
-         ||
-74       cc       73
-
-60       gug       62
-         |||
-85       cac       83
-
-60       gu       61
-         ||
-83       ca       82
-
-60       guggg       64
+28       cuggc       32
          |||||
-76       caccc       72
+44       gaccg       40
 
-61       ugg       63
+29       ugg       31
          |||
-87       acc       85
+76       acc       74
 
-61       ug       62
+29       ug       30
          ||
-68       ac       67
+73       ac       72
 
-62       gg       63
+29       ug       30
          ||
-73       cc       72
+57       ac       56
 
-63       ggu       65
+29       uggc       32
+         ||||
+38       accg       35
+
+30       ggc       32
          |||
-86       cca       84
+70       ccg       68
 
-63       gg       64
+30       gg       31
          ||
-74       cc       73
+63       cc       62
 
-64       gu       65
+30       gg       31
          ||
-83       ca       82
+62       cc       61
 
-64       gu       65
+30       gg       31
          ||
-76       ca       75
+50       cc       49
 
-65       uu       66
+30       gg       31
          ||
-70       aa       69
+49       cc       48
 
-65       uu       66
+30       gg       31
          ||
-69       aa       68
+33       cc       32
 
-66       uca       68
+31       gc       32
+         ||
+72       cg       71
+
+31       gc       32
+         ||
+45       cg       44
+
+32       cc       33
+         ||
+65       gg       64
+
+32       cc       33
+         ||
+53       gg       52
+
+32       cc       33
+         ||
+52       gg       51
+
+33       cug       35
          |||
-82       agu       80
+44       gac       42
 
-68       aa       69
+34       ug       35
          ||
-78       uu       77
+76       ac       75
 
-69       aa       70
-         ||
-78       uu       77
+34       ugc       36
+         |||
+73       acg       71
 
-71       uc       72
+34       ug       35
          ||
-82       ag       81
+57       ac       56
 
-74       ca       75
+34       ug       35
          ||
-81       gu       80
+38       ac       37
 
-78       uc       79
+35       gc       36
          ||
-82       ag       81
+69       cg       68
 
-80       ug       81
+35       gc       36
          ||
-87       ac       86
+45       cg       44
 
-80       ug       81
+35       gc       36
          ||
-84       ac       83
+41       cg       40
+
+36       cc       37
+         ||
+65       gg       64
+
+36       cc       37
+         ||
+53       gg       52
+
+36       cc       37
+         ||
+52       gg       51
+
+38       ac       39
+         ||
+54       ug       53
+
+38       acgc       41
+         ||||
+47       ugcg       44
+
+39       cg       40
+         ||
+71       gc       70
+
+39       cg       40
+         ||
+68       gc       67
+
+39       cg       40
+         ||
+64       gc       63
+
+39       cg       40
+         ||
+51       gc       50
+
+40       gc       41
+         ||
+72       cg       71
+
+40       gc       41
+         ||
+69       cg       68
+
+41       cc       42
+         ||
+65       gg       64
+
+41       cc       42
+         ||
+53       gg       52
+
+41       cc       42
+         ||
+52       gg       51
+
+44       gcg       46
+         |||
+72       cgc       70
+
+44       gcgucc       49
+         ||||||
+69       cgcagg       64
+
+45       cg       46
+         ||
+64       gc       63
+
+45       cg       46
+         ||
+51       gc       50
+
+46       gu       47
+         ||
+74       ca       73
+
+48       ccc       50
+         |||
+53       ggg       51
+
+48       cc       49
+         ||
+52       gg       51
+
+49       ccggg       53
+         |||||
+65       ggccc       61
+
+49       cc       50
+         ||
+53       gg       52
+
+50       cgg       52
+         |||
+71       gcc       69
+
+50       cg       51
+         ||
+68       gc       67
+
+51       gg       52
+         ||
+75       cc       74
+
+51       gg       52
+         ||
+62       cc       61
+
+52       ggu       54
+         |||
+75       cca       73
+
+52       gg       53
+         ||
+70       cc       69
+
+52       gg       53
+         ||
+63       cc       62
+
+53       gu       54
+         ||
+67       ca       66
+
+54       uu       55
+         ||
+59       aa       58
+
+54       uu       55
+         ||
+58       aa       57
+
+55       uc       56
+         ||
+66       ag       65
+
+60       ucc       62
+         |||
+66       agg       64
+
+62       cc       63
+         ||
+65       gg       64
+
+63       cgg       65
+         |||
+71       gcc       69
+
+63       cg       64
+         ||
+68       gc       67
+
+64       gg       65
+         ||
+75       cc       74
+
+67       cg       68
+         ||
+71       gc       70
+
+68       gc       69
+         ||
+72       cg       71
 
 
 
