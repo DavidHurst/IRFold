@@ -16,9 +16,9 @@ from irfold import (
 )
 
 if __name__ == "__main__":
-    n_runs_per_seq_length = 30
+    n_trials = 20
     for seq_len in range(7, 400):
-        for _ in range(n_runs_per_seq_length):
+        for _ in range(n_trials):
             seq = "".join(random.choice("ACGU") for _ in range(seq_len))
 
             fold_params = {
@@ -42,5 +42,3 @@ if __name__ == "__main__":
             fold_params.update({"max_n_tuple_sz_to_correct": 4})
             _, _ = IRFoldCorX.fold(**fold_params)
 
-            fold_params.update({"max_n_tuple_sz_to_correct": 5})
-            _, _ = IRFoldCorX.fold(**fold_params)

@@ -326,6 +326,10 @@ if __name__ == "__main__":
             print("bpSeq file and fasta file contents do not match.")
             continue
 
+        if len(seq) >= 150:
+            print("Sequence too long for IRFoldCorX2.")
+            continue
+
         print(f"Fasta file   : {fasta_file_name}")
         print(f"BPSeq file   : {bp_seq_file_name}")
         print(f"DB name      : {database_name}")

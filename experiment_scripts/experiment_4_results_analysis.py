@@ -30,9 +30,7 @@ if __name__ == "__main__":
     irfold_corx4_res_df = pd.read_csv(
         EXPERIMENT_4_DATA_DIR / "IRFoldCorX4_solver_performance.csv"
     )
-    irfold_corx5_res_df = pd.read_csv(
-        EXPERIMENT_4_DATA_DIR / "IRFoldCorX5_solver_performance.csv"
-    )
+
 
     irfold_base_avg_df = irfold_base_res_df.groupby("seq_len").mean(numeric_only=True)
     irfold_val1_avg_df = irfold_val1_res_df.groupby("seq_len").mean(numeric_only=True)
@@ -40,7 +38,6 @@ if __name__ == "__main__":
     irfold_corx2_avg_df = irfold_corx2_res_df.groupby("seq_len").mean(numeric_only=True)
     irfold_corx3_avg_df = irfold_corx3_res_df.groupby("seq_len").mean(numeric_only=True)
     irfold_corx4_avg_df = irfold_corx4_res_df.groupby("seq_len").mean(numeric_only=True)
-    irfold_corx5_avg_df = irfold_corx5_res_df.groupby("seq_len").mean(numeric_only=True)
 
     res_dfs = [
         irfold_base_res_df,
@@ -49,7 +46,6 @@ if __name__ == "__main__":
         irfold_corx2_res_df,
         irfold_corx3_res_df,
         irfold_corx4_res_df,
-        irfold_corx5_res_df,
     ]
     avg_res_dfs = [
         irfold_base_avg_df,
@@ -58,7 +54,6 @@ if __name__ == "__main__":
         irfold_corx2_avg_df,
         irfold_corx3_avg_df,
         irfold_corx4_avg_df,
-        irfold_corx5_avg_df,
     ]
     df_model_names = [
         "IRFoldBase",
@@ -67,7 +62,6 @@ if __name__ == "__main__":
         "IRFoldCorX2",
         "IRFoldCorX3",
         "IRFoldCorX4",
-        "IRFoldCorX5",
     ]
 
     plt.rcParams["figure.figsize"] = (6, 4)
@@ -152,7 +146,7 @@ if __name__ == "__main__":
     )
     plt.grid()
     plt.xlabel("Sequence Length")
-    plt.ylabel("Objective Function Error (kcal/mol)")
+    plt.ylabel("Mean Abs. Objective Function Error (kcal/mol)")
     plt.tight_layout()
     plt.savefig(f"{EXPERIMENT_4_DATA_DIR}/IRFoldBase_obj_fn_err.png")
     if show:
@@ -168,7 +162,7 @@ if __name__ == "__main__":
     )
     plt.grid()
     plt.xlabel("Sequence Length")
-    plt.ylabel("Objective Function Error (kcal/mol)")
+    plt.ylabel("Mean Abs. Objective Function Error (kcal/mol)")
     plt.tight_layout()
     plt.savefig(f"{EXPERIMENT_4_DATA_DIR}/IRFoldVal1_obj_fn_err.png")
     if show:
@@ -183,7 +177,7 @@ if __name__ == "__main__":
     )
     plt.grid()
     plt.xlabel("Sequence Length")
-    plt.ylabel("Objective Function Error (kcal/mol)")
+    plt.ylabel("Mean Abs. Objective Function Error (kcal/mol)")
     plt.tight_layout()
     plt.savefig(f"{EXPERIMENT_4_DATA_DIR}/IRFoldVal2_obj_fn_err.png")
     if show:
@@ -195,20 +189,17 @@ if __name__ == "__main__":
             irfold_corx2_res_df,
             irfold_corx3_res_df,
             irfold_corx4_res_df,
-            irfold_corx5_res_df,
         ],
         [
             irfold_val2_avg_df,
             irfold_corx2_avg_df,
             irfold_corx3_avg_df,
             irfold_corx4_avg_df,
-            irfold_corx5_avg_df,
         ],
         [
             "IRFoldCorX2",
             "IRFoldCorX3",
             "IRFoldCorX4",
-            "IRFoldCorX5",
         ],
     ):
         plt.plot(
@@ -219,7 +210,7 @@ if __name__ == "__main__":
     plt.legend()
     plt.grid()
     plt.xlabel("Sequence Length")
-    plt.ylabel("Objective Function Error (kcal/mol)")
+    plt.ylabel("Mean Abs. Objective Function Error (kcal/mol)")
     plt.tight_layout()
     plt.savefig(f"{EXPERIMENT_4_DATA_DIR}/IRFoldCorX_obj_fn_err.png")
     if show:
