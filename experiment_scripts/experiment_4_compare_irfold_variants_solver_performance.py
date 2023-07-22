@@ -16,8 +16,9 @@ from irfold import (
 )
 
 if __name__ == "__main__":
-    n_trials = 20
-    for seq_len in range(7, 400):
+    n_trials = 10
+    for seq_len in (7, 200):
+        print(f'Seq. len. :{seq_len}'.center(70, '='))
         for _ in range(n_trials):
             seq = "".join(random.choice("ACGU") for _ in range(seq_len))
 
