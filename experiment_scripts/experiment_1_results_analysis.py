@@ -19,7 +19,6 @@ def plot_pair_analysis(pairs_df, pair_type):
         x="ir_pair_index",
         y="assumption_error",
         kind="bar",
-        title=f"MFE {pair_type.replace('_', ' ')} Pairs \n Difference From Added MFE to Pair's Union MFE",
         xticks=[],
         xlabel="IR Pair",
         ylabel="Sorted, Absolute FE Difference",
