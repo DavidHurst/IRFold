@@ -90,11 +90,11 @@ def write_solver_performance_to_file(
     seq_len: int,
     out_dir: str,
     ssp_model_name: str,
-    n_irs_found: int = None,
-    solver_num_booleans: int = None,
+    n_irs_found: int = 0,
+    solver_num_booleans: int = 0,
     solver_solve_time: float = None,
-    solver_num_branches_explored: int = None,
-    solver_num_conflicts: int = None,
+    solver_num_branches_explored: int = 0,
+    solver_num_conflicts: int = 0,
 ):
     out_dir_path: Path = Path(out_dir).resolve()
     if not out_dir_path.exists():
