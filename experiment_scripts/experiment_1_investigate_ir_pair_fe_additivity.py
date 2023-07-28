@@ -94,15 +94,15 @@ if __name__ == "__main__":
         if ir_pair_wholly_nested(ir_i, ir_j):
             pair_type_indicator_binary_repr[0] = 1
             wholly_nested_ir_pairs.append((ir_i, ir_j))
-            print('     Wholly Nested')
+            print("     Wholly Nested")
         if not ir_pair_wholly_nested(ir_i, ir_j) and not ir_pair_disjoint(ir_i, ir_j):
             pair_type_indicator_binary_repr[1] = 1
             partially_nested_ir_pairs.append((ir_i, ir_j))
-            print('     Partially Nested')
+            print("     Partially Nested")
         if ir_pair_disjoint(ir_i, ir_j):
             pair_type_indicator_binary_repr[2] = 1
             disjoint_ir_pairs.append((ir_i, ir_j))
-            print('     Disjoint')
+            print("     Disjoint")
 
         experiment_results["ir_pair_wholly_nested"].append(
             pair_type_indicator_binary_repr[0]

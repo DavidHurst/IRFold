@@ -187,32 +187,6 @@ def run_irfold_val2(seq):
     return pred, wall_time
 
 
-def run_irfold_corx2(seq):
-    start_time = time.monotonic()
-    pred, _ = IRFoldCorX.fold(
-        seq,
-        max_n_tuple_sz_to_correct=2,
-        out_dir=str(EXPERIMENT_5_DIR_PATH),
-        save_performance=True,
-    )
-    wall_time = time.monotonic() - start_time
-
-    return pred, wall_time
-
-
-def run_irfold_corx3(seq):
-    start_time = time.monotonic()
-    pred, _ = IRFoldCorX.fold(
-        seq,
-        max_n_tuple_sz_to_correct=3,
-        out_dir=str(EXPERIMENT_5_DIR_PATH),
-        save_performance=True,
-    )
-    wall_time = time.monotonic() - start_time
-
-    return pred, wall_time
-
-
 if __name__ == "__main__":
     results_file_column_names = [
         "database_name",
@@ -237,23 +211,19 @@ if __name__ == "__main__":
     irfold_val2_performance_file_path = (
         EXPERIMENT_5_DIR_PATH / "IRFoldVal2_benchmarking_results.csv"
     ).resolve()
-    irfold_corx2_performance_file_path = (
-        EXPERIMENT_5_DIR_PATH / "IRFoldCorX2_benchmarking_results.csv"
-    ).resolve()
 
     for file_path in [
         rnafold_performance_file_path,
         rnastructure_performance_file_path,
         ipknot_performance_file_path,
         irfold_val2_performance_file_path,
-        irfold_corx2_performance_file_path,
     ]:
         if not file_path.exists():
             with open(str(file_path), "w") as perf_file:
                 writer = csv.writer(perf_file)
                 writer.writerow(results_file_column_names)
         else:
-            print("Benchmark file already exists")
+            print("Benchmark file for model already exists.")
 
     for test_seq_idx, fasta_file_path in enumerate(
         BP_RNA_1_M_FASTA_FILES_DIR.glob("*.fasta")
@@ -326,10 +296,6 @@ if __name__ == "__main__":
             print("bpSeq file and fasta file contents do not match.")
             continue
 
-        if len(seq) >= 150:
-            print("Sequence too long for IRFoldCorX2.")
-            continue
-
         print(f"Fasta file   : {fasta_file_name}")
         print(f"BPSeq file   : {bp_seq_file_name}")
         print(f"DB name      : {database_name}")
@@ -345,14 +311,12 @@ if __name__ == "__main__":
                 run_rnafold,
                 run_ipknot,
                 run_irfold_val2,
-                run_irfold_corx2,
             ],
             [
                 rnastructure_performance_file_path,
                 rnafold_performance_file_path,
                 ipknot_performance_file_path,
                 irfold_val2_performance_file_path,
-                irfold_corx2_performance_file_path,
             ],
         ):
             print(run_fold_fn.__name__.center(70, "-"))
