@@ -47,6 +47,18 @@ if __name__ == "__main__":
 
     plt.rcParams["figure.figsize"] = (5, 3.5)
 
+    plt.plot(
+        irfold_base_res_df.seq_len.unique(),
+        irfold_base_avg_df.n_irs_found,
+    )
+    plt.grid()
+    plt.ylabel("Mean # IRs Found")
+    plt.xlabel("Sequence Length")
+    plt.tight_layout()
+    plt.savefig(f"{EXPERIMENT_4_DATA_DIR}/num_irs_found.png")
+    if show:
+        plt.show()
+
     # Compare IRFold versions' prediction's free energy values
     # IRFoldBase
     plt.plot(
