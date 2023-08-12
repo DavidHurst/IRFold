@@ -4,19 +4,23 @@ RNA Secondary Structure Prediction by optimising configurations of found inverte
 
 ## Minimal Install
 Assumes Conda installed 
-1. Clone repository
+1. Clone repository 
     ```
-    $ git clone https://github.com/DavidHurst
+    $ git clone https://github.com/DavidHurst/IRFold 
     ```
-2. Create new environment from requirements file 
+2. Move to repository directory
+    ```
+    $ cd IRFold/
+    ```
+3. Create new environment from requirements file 
     ```
     $ conda env create -f requirements.yml
     ```
-3. Activate environment 
+4. Activate environment 
     ```
     $ conda activate irfold
     ```
-2. Run demo script 
+5. Run demo script 
     ```
     $ python demo.py
     ```

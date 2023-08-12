@@ -1,0 +1,22 @@
+name: irfold
+channels:
+  - bioconda
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - biopython
+  - black
+  - pandas
+  - matplotlib
+  - viennarna=2.4.18
+  - typing
+  - pathlib
+  - pytest
+  - pytest-cov
+  - tqdm
+  - pip=23.2.1
+  - pip:
+      - ortools==9.6.2534
+prefix: /home/david/miniconda3/envs/irfold
