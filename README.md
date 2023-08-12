@@ -34,7 +34,6 @@ Assumes Conda installed
 1. Compile and install ViennaRNA version 2.5.1 to /experiment_scripts/ViennaRNA-2.5.1
 2. Compile and install GLPK version 5.0 to /experiment_scripts/
 3. Compile and install IPknot to /experiment_scripts/ipknot
-4. Compile and install RNAstrucutre to /experiment_scripts/RNAstructure
 5. Set location of thermodynamic parameters for RNAstructure:
     ```
     export DATAPATH=experiment_scripts/RNAstructure/data_tables/
