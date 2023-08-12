@@ -1,17 +1,9 @@
-import random
-import sys
+from irfold import IRFoldVal2
 
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-
-from irfold import (
-    IRFoldVal2,
-)
 
 if __name__ == "__main__":
     seq_len = 50
-    seq = "".join(random.choice("ACGU") for _ in range(seq_len))
+    seq = 'GGGUGGCGCCAAUGUGAGACCCCGUACAGUCGCUUGAACAUGAGGUCGAA'
 
     folded_sequence, obj_fn_value = IRFoldVal2.fold(seq)
 
