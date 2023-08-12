@@ -11,6 +11,7 @@ from irfold.util import (
     IR,
     irs_to_dot_bracket,
     calc_free_energy,
+    irs_incompatible,
 )
 
 
@@ -18,7 +19,7 @@ class IRFoldVal1(IRFoldBase):
     """Extends base IRFold model by validating found IRs in pairs before passing them to the solver."""
 
     @staticmethod
-    def __get_solver(
+    def _get_solver(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
@@ -57,7 +58,7 @@ class IRFoldVal1(IRFoldBase):
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(valid_ir_pairs, valid_idx_pairs)
-            if IRFoldBase.__ir_pair_incompatible(ir_pair[0], ir_pair[1])
+            if irs_incompatible([ir_pair[0], ir_pair[1]])
         ]
 
         # Add XOR between IRs that are incompatible

@@ -19,7 +19,7 @@ from irfold.util import (
 
 class IRFoldCorX(IRFoldVal2):
     @staticmethod
-    def __get_solver(
+    def _get_solver(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
@@ -98,7 +98,7 @@ class IRFoldCorX(IRFoldVal2):
             (
                 correction_vars,
                 correction_var_coeffs,
-            ) = IRFoldCorX.__generate_ir_n_tuple_correction_variables_w_coeffs(
+            ) = IRFoldCorX._generate_ir_n_tuple_correction_variables_w_coeffs(
                 model,
                 seq_len,
                 sequence,
@@ -109,7 +109,7 @@ class IRFoldCorX(IRFoldVal2):
             )
 
             # Add constraints only activating correction variables if all variable in n-tuple are active
-            IRFoldCorX.__add_activation_constraints_for_correction_vars(
+            IRFoldCorX._add_activation_constraints_for_correction_vars(
                 correction_vars, ir_indicator_variables, model, tuple_sz
             )
 
@@ -131,7 +131,7 @@ class IRFoldCorX(IRFoldVal2):
         return model, ir_indicator_variables + obj_fn_vars
 
     @staticmethod
-    def __generate_ir_n_tuple_correction_variables_w_coeffs(
+    def _generate_ir_n_tuple_correction_variables_w_coeffs(
         model: CpModel,
         seq_len: int,
         sequence: str,
@@ -195,7 +195,7 @@ class IRFoldCorX(IRFoldVal2):
         return correction_vars, correction_var_coeffs
 
     @staticmethod
-    def __add_activation_constraints_for_correction_vars(
+    def _add_activation_constraints_for_correction_vars(
         correction_vars: List[IntVar],
         ir_indicator_variables: List[IntVar],
         model: CpModel,

@@ -13,6 +13,7 @@ from irfold.util import (
     IR,
     irs_to_dot_bracket,
     calc_free_energy,
+    irs_incompatible,
 )
 
 
@@ -21,7 +22,7 @@ class IRFoldCor2(IRFoldVal2):
     consistently"""
 
     @staticmethod
-    def __get_solver(
+    def _get_solver(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
@@ -61,7 +62,7 @@ class IRFoldCor2(IRFoldVal2):
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(valid_ir_pairs, valid_idx_pairs)
-            if IRFoldVal2.__ir_pair_incompatible(ir_pair[0], ir_pair[1])
+            if irs_incompatible([ir_pair[0], ir_pair[1]])
         ]
 
         # Add XOR between IRs that are incompatible
@@ -160,7 +161,7 @@ class IRFoldCor2(IRFoldVal2):
             zip(valid_idx_pairs, valid_ir_pairs),
             desc="Generating pair correction variables",
         ):
-            if IRFoldVal2.__ir_pair_incompatible(ir_a, ir_b):
+            if irs_incompatible([ir_a, ir_b]):
                 continue
 
             ir_a_db_repr: str = irs_to_dot_bracket([ir_list[ir_a_idx]], seq_len)

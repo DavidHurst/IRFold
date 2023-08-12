@@ -22,7 +22,7 @@ class IRFoldCor3(IRFoldVal2):
     not holding consistently"""
 
     @staticmethod
-    def __get_solver(
+    def _get_solver(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
@@ -62,7 +62,7 @@ class IRFoldCor3(IRFoldVal2):
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(valid_ir_pairs, valid_idx_pairs)
-            if IRFoldVal2.__ir_pair_incompatible(ir_pair[0], ir_pair[1])
+            if irs_incompatible([ir_pair[0], ir_pair[1]])
         ]
 
         # Add XOR between IRs that are incompatible
@@ -92,7 +92,7 @@ class IRFoldCor3(IRFoldVal2):
         (
             ir_pair_fe_correction_indicator_vars,
             ir_pair_fe_correction_indicator_vars_coeffs,
-        ) = IRFoldCor3.__generate_ir_pair_correction_variables_w_coeffs(
+        ) = IRFoldCor3._generate_ir_pair_correction_variables_w_coeffs(
             model,
             ir_list,
             seq_len,
@@ -146,7 +146,7 @@ class IRFoldCor3(IRFoldVal2):
         (
             ir_triplet_fe_correction_indicator_vars,
             ir_triplet_fe_correction_indicator_vars_coeffs,
-        ) = IRFoldCor3.__generate_ir_triplet_correction_variables_w_coeffs(
+        ) = IRFoldCor3._generate_ir_triplet_correction_variables_w_coeffs(
             model,
             seq_len,
             sequence,
@@ -219,7 +219,7 @@ class IRFoldCor3(IRFoldVal2):
         )
 
     @staticmethod
-    def __generate_ir_pair_correction_variables_w_coeffs(
+    def _generate_ir_pair_correction_variables_w_coeffs(
         model: CpModel,
         ir_list: List[IR],
         seq_len: int,
@@ -235,7 +235,7 @@ class IRFoldCor3(IRFoldVal2):
             zip(valid_idx_pairs, valid_ir_pairs),
             desc="Generating pair correction variables",
         ):
-            if IRFoldVal2.__ir_pair_incompatible(ir_a, ir_b):
+            if irs_incompatible([ir_a, ir_b]):
                 continue
 
             ir_a_db_repr: str = irs_to_dot_bracket([ir_list[ir_a_idx]], seq_len)
@@ -285,7 +285,7 @@ class IRFoldCor3(IRFoldVal2):
         )
 
     @staticmethod
-    def __generate_ir_triplet_correction_variables_w_coeffs(
+    def _generate_ir_triplet_correction_variables_w_coeffs(
         model: CpModel,
         seq_len: int,
         sequence: str,

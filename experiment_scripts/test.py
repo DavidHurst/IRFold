@@ -22,8 +22,8 @@ from irfold.util import (
 DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
 EXPERIMENT_1_DATA_DIR = (DATA_DIR / "experiment_1").resolve()
 
-if __name__ == '__main__':
-    seq = 'UGAUGACA'
+if __name__ == "__main__":
+    seq = "UGAUGACA"
     irs = IRFoldBase.__find_irs(seq, out_dir=str(EXPERIMENT_1_DATA_DIR))
     for ir in irs:
         print(ir)
