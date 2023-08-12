@@ -45,7 +45,7 @@ class IRFoldBase:
             cls.__name__ = f"IRFoldCorX{str(max_n_tuple_sz_to_correct)}"
 
         # Find IRs in sequence
-        found_irs: List[IR] = cls.find_irs(
+        found_irs: List[IR] = cls.__find_irs(
             sequence=sequence,
             seq_name=seq_name,
             out_dir=out_dir,
@@ -62,7 +62,7 @@ class IRFoldBase:
             return db_repr, obj_fn_value
 
         # Define constraint programming problem and solve
-        model, variables = cls.get_solver(
+        model, variables = cls.__get_solver(
             found_irs, seq_len, sequence, out_dir, seq_name, max_n_tuple_sz_to_correct
         )
 
@@ -113,7 +113,7 @@ class IRFoldBase:
             return db_repr, obj_fn_value
 
     @staticmethod
-    def find_irs(
+    def __find_irs(
         sequence: str,
         out_dir: str = ".",
         *,
@@ -181,7 +181,7 @@ class IRFoldBase:
             return []
 
     @staticmethod
-    def get_solver(
+    def __get_solver(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
@@ -201,7 +201,7 @@ class IRFoldBase:
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if IRFoldBase.ir_pair_incompatible(ir_pair[0], ir_pair[1])
+            if IRFoldBase.__ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
         # Create binary indicator variables for IRs
@@ -234,5 +234,5 @@ class IRFoldBase:
         return model, ir_indicator_variables
 
     @staticmethod
-    def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
+    def __ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
         return ir_pair_match_same_bases(ir_a, ir_b)

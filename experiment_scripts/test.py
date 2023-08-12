@@ -24,6 +24,6 @@ EXPERIMENT_1_DATA_DIR = (DATA_DIR / "experiment_1").resolve()
 
 if __name__ == '__main__':
     seq = 'UGAUGACA'
-    irs = IRFoldBase.find_irs(seq, out_dir=str(EXPERIMENT_1_DATA_DIR))
+    irs = IRFoldBase.__find_irs(seq, out_dir=str(EXPERIMENT_1_DATA_DIR))
     for ir in irs:
         print(ir)

@@ -21,7 +21,7 @@ class IRFoldCor2(IRFoldVal2):
     consistently"""
 
     @staticmethod
-    def get_solver(
+    def __get_solver(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
@@ -61,7 +61,7 @@ class IRFoldCor2(IRFoldVal2):
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(valid_ir_pairs, valid_idx_pairs)
-            if IRFoldVal2.ir_pair_incompatible(ir_pair[0], ir_pair[1])
+            if IRFoldVal2.__ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
         # Add XOR between IRs that are incompatible
@@ -91,7 +91,7 @@ class IRFoldCor2(IRFoldVal2):
         (
             ir_pair_fe_correction_indicator_vars,
             ir_pair_fe_correction_indicator_vars_coeffs,
-        ) = IRFoldCor2.generate_ir_pair_correction_variables_w_coeffs(
+        ) = IRFoldCor2.__generate_ir_pair_correction_variables_w_coeffs(
             model,
             ir_list,
             seq_len,
@@ -144,7 +144,7 @@ class IRFoldCor2(IRFoldVal2):
         return model, ir_indicator_variables + ir_pair_fe_correction_indicator_vars
 
     @staticmethod
-    def generate_ir_pair_correction_variables_w_coeffs(
+    def __generate_ir_pair_correction_variables_w_coeffs(
         model: CpModel,
         ir_list: List[IR],
         seq_len: int,
@@ -160,7 +160,7 @@ class IRFoldCor2(IRFoldVal2):
             zip(valid_idx_pairs, valid_ir_pairs),
             desc="Generating pair correction variables",
         ):
-            if IRFoldVal2.ir_pair_incompatible(ir_a, ir_b):
+            if IRFoldVal2.__ir_pair_incompatible(ir_a, ir_b):
                 continue
 
             ir_a_db_repr: str = irs_to_dot_bracket([ir_list[ir_a_idx]], seq_len)

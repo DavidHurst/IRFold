@@ -44,7 +44,7 @@ if __name__ == "__main__":
     print(f"Seq. length: {sequence_len}")
     print(f"Seq.       : {seq}")
 
-    found_irs = IRFoldBase.find_irs(seq, out_dir=str(EXPERIMENT_2_DATA_DIR))
+    found_irs = IRFoldBase.__find_irs(seq, out_dir=str(EXPERIMENT_2_DATA_DIR))
     n_irs = len(found_irs)
 
     # Find all compatible IR triplets

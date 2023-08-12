@@ -20,7 +20,7 @@ def test_not_none(
     ir_fold_variant, all_irs, sequence, sequence_length, sequence_name, data_dir
 ):
     all_irs = list(all_irs)
-    solver, variables = ir_fold_variant.get_solver(
+    solver, variables = ir_fold_variant.__get_solver(
         all_irs,
         sequence_length,
         sequence,
@@ -67,7 +67,7 @@ def test_number_of_variables_generated(
     data_dir,
 ):
     all_irs = list(all_irs)
-    _, variables = ir_fold_variant.get_solver(
+    _, variables = ir_fold_variant.__get_solver(
         all_irs,
         sequence_length,
         sequence,
@@ -106,7 +106,7 @@ def test_variables_for_correct_variables_generated(
 ):
     print("\n", "=" * 60)
     all_irs = list(all_irs)
-    _, variables = ir_fold_variant.get_solver(
+    _, variables = ir_fold_variant.__get_solver(
         all_irs,
         sequence_length,
         sequence,

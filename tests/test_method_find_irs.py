@@ -21,7 +21,7 @@ from irfold import (
 )
 def test_not_none(ir_fold_variant, sequence, sequence_length, sequence_name, data_dir):
     assert (
-        ir_fold_variant.find_irs(
+        ir_fold_variant.__find_irs(
             sequence,
             out_dir=data_dir,
             seq_name=sequence_name,
@@ -42,7 +42,7 @@ def test_number_of_irs_found(
     data_dir,
     all_irs,
 ):
-    found_irs = ir_fold_variant.find_irs(
+    found_irs = ir_fold_variant.__find_irs(
         sequence,
         seq_name=sequence_name,
         out_dir=data_dir,
@@ -58,7 +58,7 @@ def test_number_of_irs_found(
 def test_found_irs_output_file_created(
     ir_fold_variant, sequence, sequence_length, sequence_name, data_dir
 ):
-    _ = ir_fold_variant.find_irs(
+    _ = ir_fold_variant.__find_irs(
         sequence,
         seq_name=sequence_name,
         out_dir=data_dir,

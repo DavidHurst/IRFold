@@ -20,7 +20,7 @@ class IRFoldVal2(IRFoldVal1):
     """Extends IRFold model by validating found IRs and IRs in pairs before passing them to the solver."""
 
     @staticmethod
-    def get_solver(
+    def __get_solver(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
@@ -59,7 +59,7 @@ class IRFoldVal2(IRFoldVal1):
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(valid_ir_pairs, valid_idx_pairs)
-            if IRFoldVal2.ir_pair_incompatible(ir_pair[0], ir_pair[1])
+            if IRFoldVal2.__ir_pair_incompatible(ir_pair[0], ir_pair[1])
         ]
 
         # Add XOR between IRs that are incompatible
@@ -96,7 +96,7 @@ class IRFoldVal2(IRFoldVal1):
         return model, ir_indicator_variables
 
     @staticmethod
-    def ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
+    def __ir_pair_incompatible(ir_a: IR, ir_b: IR) -> bool:
         return ir_pair_match_same_bases(ir_a, ir_b) or not ir_pair_forms_valid_loop(
             ir_a, ir_b
         )
