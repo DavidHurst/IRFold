@@ -1,0 +1,1 @@
+This folder contains code from https://rna.urmc.rochester.edu/RNAstructure.html used for benchmarking
