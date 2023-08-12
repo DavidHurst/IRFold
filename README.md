@@ -1,3 +1,6 @@
+I verify that I am the sole author of the programmes contained in this archive, except where explicitly stated to the contrary.
+David Hurst, 12/08/2023
+
 # IRFold
 
 RNA Secondary Structure Prediction by optimising configurations of found inverted repeats via Constraint Programming
