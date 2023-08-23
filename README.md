@@ -3,7 +3,8 @@ David Hurst, 12/08/2023
 
 # IRFold
 
-RNA Secondary Structure Prediction by optimising configurations of found inverted repeats via Constraint Programming
+RNA Secondary Structure Prediction by optimising configurations of found inverted repeats via Constraint Programming.
+IRFold will only run on Linux due to RNAlib's Python package.
 
 ## Minimal Install
 Assumes Conda installed 
