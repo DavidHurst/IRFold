@@ -10,12 +10,11 @@ import RNA
 IR = Tuple[Tuple[int, int], Tuple[int, int]]
 
 
-def irs_to_dot_bracket(irs: List[IR], seq_len: int) -> str:
-    """Does not support mismatches."""
+def irs_to_dot_bracket(ir_list: List[IR], seq_len: int) -> str:
     paired_bases: List[str] = ["." for _ in range(seq_len)]  # Initially none paired
 
-    for ir in irs:
-        n_base_pairs: int = ir[0][1] - ir[0][0] + 1  # Assumes no mismatches
+    for ir in ir_list:
+        n_base_pairs: int = ir[0][1] - ir[0][0] + 1
 
         left_strand: Tuple[int, int]
         right_strand: Tuple[int, int]
