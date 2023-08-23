@@ -22,7 +22,7 @@ from irfold.util import (
     create_seq_file,
     write_solver_performance_to_file,
     run_cmd,
-    irs_incompatible,
+    ir_pair_match_same_bases,
 )
 
 
@@ -46,9 +46,9 @@ class IRFoldBase:
 
         # Find IRs in sequence
         found_irs: List[IR] = cls._find_irs(
-            sequence=sequence,
+            sequence,
+            out_dir,
             seq_name=seq_name,
-            out_dir=out_dir,
         )
 
         n_irs_found: int = len(found_irs)
@@ -62,7 +62,7 @@ class IRFoldBase:
             return db_repr, obj_fn_value
 
         # Define constraint programming problem and solve
-        model, variables = cls._get_solver(
+        model, variables = cls._get_cp_model(
             found_irs, seq_len, sequence, out_dir, seq_name, max_n_tuple_sz_to_correct
         )
 
@@ -181,7 +181,7 @@ class IRFoldBase:
             return []
 
     @staticmethod
-    def _get_solver(
+    def _get_cp_model(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
@@ -192,30 +192,10 @@ class IRFoldBase:
         model: CpModel = CpModel()
         n_irs: int = len(ir_list)
 
-        unique_idx_pairs: List[Tuple[int, int]] = list(
-            itertools.combinations([i for i in range(n_irs)], 2)
-        )
-        unique_ir_pairs: List[Tuple[IR, IR]] = [
-            (ir_list[i], ir_list[j]) for i, j in unique_idx_pairs
-        ]
-        incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
-            idx_pair
-            for ir_pair, idx_pair in zip(unique_ir_pairs, unique_idx_pairs)
-            if irs_incompatible([ir_pair[0], ir_pair[1]])
-        ]
-
         # Create binary indicator variables for IRs
         ir_indicator_variables = [
             model.NewIntVar(0, 1, f"ir_{i}") for i in range(n_irs)
         ]
-
-        # All constraints and the objective must have integer coefficients for CP-SAT solver
-
-        # Add XOR between IRs that match the same bases
-        for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
-            model.Add(
-                ir_indicator_variables[ir_a_idx] + ir_indicator_variables[ir_b_idx] <= 1
-            )
 
         # Define objective function
         db_reprs: List[str] = [
