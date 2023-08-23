@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -21,7 +22,7 @@ if __name__ == "__main__":
         EXPERIMENT_5_DIR_PATH / "IRFoldVal2_benchmarking_results.csv"
     )
 
-    plt.rcParams["figure.figsize"] = (5, 3.5)
+    plt.rcParams["figure.figsize"] = (4, 3)
 
     print(f"Num. Samples: {len(irfold_val2_res_df)}")
 
@@ -106,7 +107,7 @@ if __name__ == "__main__":
         irfold_val2_res_df, pk_samples, on=["database_name", "sequence_database_number"]
     )
 
-    print(rnastructure_res_df_pk.sample(3))
+    # print(rnastructure_res_df_pk.sample(3))
 
     # Inner join results DFs with pk_status=False DF to get results of pseudoknotted sequences
     no_pk_samples = samples_pk_status_df[samples_pk_status_df.contains_pk == False]
@@ -127,7 +128,7 @@ if __name__ == "__main__":
         on=["database_name", "sequence_database_number"],
     )
 
-    print(rnastructure_res_df_no_pk.sample(3))
+    # print(rnastructure_res_df_no_pk.sample(3))
 
     markers = {"RNAfold": "o", "RNAstructure": "+", "IPknot": "s", "IRFoldVal2": "^"}
 
@@ -222,37 +223,22 @@ if __name__ == "__main__":
     plt.savefig(f"{EXPERIMENT_5_DIR_PATH}/ppv_vs_sens_bulge.png")
     plt.show()
 
-    # Plot mean F1 as sequence length increases
-    seq_interval_sz = 10
-    avg_df = rnafold_res_df.groupby("sequence_length").mean(numeric_only=True)
-    seq_intervals = [
-        [start, start + seq_interval_sz - 1]
-        for start in range(
-            rnafold_res_df.sequence_length.unique().min(),
-            rnafold_res_df.sequence_length.unique().max(),
-            seq_interval_sz,
-        )
-    ]
+    plt.rcParams["figure.figsize"] = (8, 5)
 
-    interval_counts = [
-        len(
-            ipknot_res_df[
-                (ipknot_res_df.sequence_length >= start)
-                & (ipknot_res_df.sequence_length <= end)
-            ]
-        )
-        for start, end in seq_intervals
-    ]
-    normalised_interval_counts = [
-        (cnt - min(interval_counts)) / (max(interval_counts) - min(interval_counts))
-        for cnt in interval_counts
-    ]
-
-    seq_intervals[-1][-1] += 1
-    col_width = 15
-    n_intervals = len(seq_intervals)
+    # Plot mean F1 as sequence length increases for sequence length intervals
+    min = 5  # rnafold_res_df.sequence_length.min()
+    max = 425  # rnafold_res_df.sequence_length.max()
+    interval_sz = 10
+    vals = np.arange(min, max + interval_sz, interval_sz)
+    intervals = [[vals[i], vals[i + 1]] for i in range(len(vals) - 1)]
 
     model_seq_len_interval_f1_means = {
+        "RNAfold": [],
+        "RNAstructure": [],
+        "IPknot": [],
+        "IRFoldVal2": [],
+    }
+    model_seq_len_interval_seq_counts = {
         "RNAfold": [],
         "RNAstructure": [],
         "IPknot": [],
@@ -269,41 +255,114 @@ if __name__ == "__main__":
     ):
         avg_df = res_df.groupby("sequence_length").mean(numeric_only=True)
 
-        seq_interval_means = []
-        for start, end in seq_intervals:
+        seq_interval_f1_means = []
+        seq_interval_seq_counts = []
+
+        for start, end in intervals:
             f1_mean = avg_df[(avg_df.index >= start) & (avg_df.index <= end)].f1.mean()
-            seq_interval_means.append(f1_mean)
+            seq_count = len(
+                res_df[
+                    (res_df.sequence_length >= start) & (res_df.sequence_length <= end)
+                ]
+            )
 
-        model_seq_len_interval_f1_means[df_name] = seq_interval_means
+            seq_interval_f1_means.append(f1_mean)
+            seq_interval_seq_counts.append(seq_count)
 
-        # print(
-        #     "".join(
-        #         [df_name.ljust(col_width)]
-        #         + [f" {f1:.2f} ".center(col_width) for f1 in seq_interval_means]
-        #     )
-        # )
+        model_seq_len_interval_f1_means[df_name] = seq_interval_f1_means
+        model_seq_len_interval_seq_counts[df_name] = seq_interval_seq_counts
 
-    for model_name, f1_inverval_means in model_seq_len_interval_f1_means.items():
-        plt.plot(
-            [i for i in range(len(f1_inverval_means))],
-            f1_inverval_means,
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(
+        2,
+        2,
+        sharey="row",
+        sharex="col",
+        gridspec_kw={"height_ratios": [4, 1], "width_ratios": [3.25, 1]},
+    )
+    fig.subplots_adjust(wspace=0.1, bottom=0.25)
+    fig.text(0.5, 0.04, "Sequence Length (bases)", ha="center")
+
+    for model_name, means in model_seq_len_interval_f1_means.items():
+        ax1.plot(
+            np.arange(0, len(intervals)),
+            means,
             label=model_name,
+            marker=markers[model_name],
+        )
+        ax2.plot(
+            np.arange(0, len(intervals)),
+            means,
+            label=model_name,
+            marker=markers[model_name],
         )
 
-    # plt.bar(
-    #     [i for i in range(n_intervals)],
-    #     normalised_interval_counts,
-    #     label="Sample Dist.",
-    #     alpha=0.3,
-    # )
+    for model_name, counts in model_seq_len_interval_seq_counts.items():
+        ax3bar = ax3.bar(np.arange(0, len(intervals)), counts, color="grey")
+        ax4bar = ax4.bar(np.arange(0, len(intervals)), counts, color="grey")
 
-    plt.xticks(
-        [i for i in range(n_intervals)],
-        [f"{i[0]}-{i[1]}".center(9) for i in seq_intervals],
+        ax3.bar_label(
+            ax3bar,
+            labels=[int(val) if val <= 5 else "" for val in counts],
+        )
+        ax4.bar_label(ax4bar)
+
+    ticks = [f"{i[0]}-{i[1]}" for i in intervals]
+    ax1.set_xticks(
+        [i for i in range(len(intervals))],
+        ticks,
     )
-    plt.xlabel("Sequence Length")
-    plt.ylabel("Mean F1")
-    plt.legend(loc="upper center")
-    plt.tight_layout()
-    plt.savefig(str(EXPERIMENT_5_DIR_PATH / "models_performance_over_seq_len.png"))
+    ax2.set_xticks(
+        [i for i in range(len(intervals))],
+        ticks,
+    )
+
+    ax1.set_xlim(-1, 18.5)
+    ax1.legend()
+    ax1.spines["right"].set_visible(False)
+    ax1.tick_params(axis="x", rotation=90)
+    ax1.set_ylabel("Mean F1")
+
+    ax2.set_xlim(37.9, 41.1)
+    ax2.spines["left"].set_visible(False)
+    ax2.tick_params(
+        axis="y",
+        which="both",
+        left=False,
+        right=False,
+        labelleft=False,
+        labelright=False,
+    )
+    ax2.tick_params(axis="x", rotation=90)
+
+    ax3.set_xlim(-1, 18.5)
+    ax3.spines["right"].set_visible(False)
+    ax3.tick_params(axis="x", rotation=90)
+    ax3.set_ylabel("# Sequences")
+
+    ax4.set_xlim(37.9, 41.1)
+    ax4.spines["left"].set_visible(False)
+    ax4.tick_params(
+        axis="y",
+        which="both",
+        left=False,
+        right=False,
+        labelleft=False,
+        labelright=False,
+    )
+    ax4.tick_params(axis="x", rotation=90)
+
+    # Plot slanted lines to show axis break
+    d = 0.9
+    kwargs = dict(marker=[(-1, -d), (1, d)], markersize=6,
+                  linestyle="none", color='k', mec='k', mew=1, clip_on=False)
+    ax1.plot([1, 1], [1, 0], transform=ax1.transAxes, **kwargs)
+    ax3.plot([1, 1], [1, 0], transform=ax3.transAxes, **kwargs)
+
+    ax2.plot([0, 0], [1, 0], transform=ax2.transAxes, **kwargs)
+    ax4.plot([0, 0], [1, 0], transform=ax4.transAxes, **kwargs)
+
+
+    plt.savefig(str(EXPERIMENT_5_DIR_PATH / "mean_f1_vs_seq_len.png"))
     plt.show()
+
+    # Compare running time of solver only
