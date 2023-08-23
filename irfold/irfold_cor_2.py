@@ -1,3 +1,4 @@
+"""Deprecated class, used for testing."""
 __all__ = ["IRFoldCor2"]
 
 import itertools
@@ -22,7 +23,7 @@ class IRFoldCor2(IRFoldVal2):
     consistently"""
 
     @staticmethod
-    def _get_solver(
+    def _get_cp_model(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
