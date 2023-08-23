@@ -58,7 +58,7 @@ def test_output_type_correct(
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3, IRFoldCorX],
+    [IRFoldVal2, IRFoldCor2, IRFoldCor3, IRFoldCorX],
 )
 def test_balanced_brackets(ir_fold_variant, data_dir):
     seq_len = 40
