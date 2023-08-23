@@ -9,8 +9,6 @@ DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
 EXPERIMENT_4_DATA_DIR = (DATA_DIR / "experiment_4").resolve()
 
 from irfold import (
-    IRFoldBase,
-    IRFoldVal1,
     IRFoldVal2,
     IRFoldCorX,
 )
@@ -27,10 +25,6 @@ if __name__ == "__main__":
                 "out_dir": EXPERIMENT_4_DATA_DIR,
                 "save_performance": True,
             }
-
-            _, _ = IRFoldBase.fold(**fold_params)
-
-            _, _ = IRFoldVal1.fold(**fold_params)
 
             _, _ = IRFoldVal2.fold(**fold_params)
 

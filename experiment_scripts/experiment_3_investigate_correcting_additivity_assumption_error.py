@@ -28,7 +28,7 @@ if __name__ == "__main__":
     print(f"Seq. length: {sequence_len}")
     print(f"Seq.       : {seq}")
 
-    found_irs = IRFoldBase.__find_irs(seq, out_dir=str(EXPERIMENT_3_DATA_DIR))
+    found_irs = IRFoldBase._find_irs(seq, out_dir=str(EXPERIMENT_3_DATA_DIR))
     n_irs = len(found_irs)
 
     print("Compatible IR Pairs FEs and Correction Variables".center(60, "="))
