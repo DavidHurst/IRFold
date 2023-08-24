@@ -22,7 +22,7 @@ if __name__ == "__main__":
         EXPERIMENT_5_DIR_PATH / "IRFoldVal2_benchmarking_results.csv"
     )
 
-    plt.rcParams["figure.figsize"] = (4, 3)
+    plt.rcParams["figure.figsize"] = (3.5, 3)
 
     print(f"Num. Samples: {len(irfold_val2_res_df)}")
 
@@ -36,7 +36,7 @@ if __name__ == "__main__":
             ipknot_res_df,
             irfold_val2_res_df,
         ],
-        ["RNAfold", "RNAstructure", "IPknot", "IRFoldVal2"],
+        ["RNAfold", "RNAstructure", "IPknot", "IRFold"],
     ):
         f1_scores.append(res_df["f1"].mean())
         running_times.append(res_df["execution_wall_time_secs"].mean())
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     )
     print("-" * (15 + 9 + 31))
     for model, f1, running_time in zip(
-        ["RNAfold", "RNAstructure", "IPknot", "IRFoldVal2"],
+        ["RNAfold", "RNAstructure", "IPknot", "IRFold"],
         f1_scores,
         running_times,
     ):
@@ -128,9 +128,43 @@ if __name__ == "__main__":
         on=["database_name", "sequence_database_number"],
     )
 
+    print(f'Num no PK seqs: {len(rnastructure_res_df_no_pk)}')
+    print(f'Num PK seqs: {len(rnastructure_res_df_pk)}')
+
     # print(rnastructure_res_df_no_pk.sample(3))
 
-    markers = {"RNAfold": "o", "RNAstructure": "+", "IPknot": "s", "IRFoldVal2": "^"}
+    markers = {"RNAfold": "o", "RNAstructure": "x", "IPknot": "s", "IRFold": "^", 'IRFold Solver':'^'}
+
+    # Plot PPV against Sens for all seqs
+    ppv_scores = []
+    sens_scores = []
+    for res_df, df_name in zip(
+        [
+            rnafold_res_df,
+            rnastructure_res_df,
+            ipknot_res_df,
+            irfold_val2_res_df,
+        ],
+        ["RNAfold", "RNAstructure", "IPknot", "IRFold"],
+    ):
+        ppv_scores.append(res_df["sensitivity"].mean())
+        sens_scores.append(res_df["ppv"].mean())
+
+    for model_name, mean_ppv, mean_sens in zip(
+        ["RNAfold", "RNAstructure", "IPknot", "IRFold"], ppv_scores, sens_scores
+    ):
+        plt.scatter(
+            mean_ppv, mean_sens, label=model_name, marker=markers[model_name], s=50
+        )
+
+    plt.legend()
+    plt.xlabel("Positive Predictive Value")
+    plt.ylabel("Sensitivity")
+    plt.ylim(0.7, 0.9)
+    plt.xlim(0.4, 0.8)
+    plt.tight_layout()
+    plt.savefig(f"{EXPERIMENT_5_DIR_PATH}/ppv_vs_sens_all.png")
+    plt.show()
 
     # Plot PPV against Sens for non-pseudoknotted structures
     ppv_scores = []
@@ -142,13 +176,13 @@ if __name__ == "__main__":
             ipknot_res_df_no_pk,
             irfold_val2_res_df_no_pk,
         ],
-        ["RNAfold", "RNAstructure", "IPknot", "IRFoldVal2"],
+        ["RNAfold", "RNAstructure", "IPknot", "IRFold"],
     ):
         ppv_scores.append(res_df["sensitivity"].mean())
         sens_scores.append(res_df["ppv"].mean())
 
     for model_name, mean_ppv, mean_sens in zip(
-        ["RNAfold", "RNAstructure", "IPknot", "IRFoldVal2"], ppv_scores, sens_scores
+        ["RNAfold", "RNAstructure", "IPknot", "IRFold"], ppv_scores, sens_scores
     ):
         plt.scatter(
             mean_ppv, mean_sens, label=model_name, marker=markers[model_name], s=50
@@ -157,6 +191,8 @@ if __name__ == "__main__":
     plt.legend()
     plt.xlabel("Positive Predictive Value")
     plt.ylabel("Sensitivity")
+    plt.ylim(0.7, 0.9)
+    plt.xlim(0.4, 0.8)
     plt.tight_layout()
     plt.savefig(f"{EXPERIMENT_5_DIR_PATH}/ppv_vs_sens_no_pk.png")
     plt.show()
@@ -171,26 +207,28 @@ if __name__ == "__main__":
             ipknot_res_df_pk,
             irfold_val2_res_df_pk,
         ],
-        ["RNAfold", "RNAstructure", "IPknot", "IRFoldVal2"],
+        ["RNAfold", "RNAstructure", "IPknot", "IRFold"],
     ):
         ppv_scores.append(res_df["sensitivity"].mean())
         sens_scores.append(res_df["ppv"].mean())
 
     for model_name, mean_ppv, mean_sens in zip(
-        ["RNAfold", "RNAstructure", "IPknot", "IRFoldVal2"], ppv_scores, sens_scores
+        ["RNAfold", "RNAstructure", "IPknot", "IRFold"], ppv_scores, sens_scores
     ):
         plt.scatter(
             mean_ppv, mean_sens, label=model_name, marker=markers[model_name], s=50
         )
 
-    plt.legend()
+    plt.legend(loc='lower right')
     plt.xlabel("Positive Predictive Value")
     plt.ylabel("Sensitivity")
+    plt.ylim(0.7, 0.9)
+    plt.xlim(0.4, 0.8)
     plt.tight_layout()
     plt.savefig(f"{EXPERIMENT_5_DIR_PATH}/ppv_vs_sens_pk.png")
     plt.show()
 
-    # Plot PPV vs sens for IRFold on samples with and without bulge loops
+    # Plot PPV vs sens for IRFold on samples with and without bulge loops and without pseudoknots
     no_bulge_samples = samples_pk_status_df[
         samples_pk_status_df.contains_bulge == False
     ]
@@ -206,19 +244,24 @@ if __name__ == "__main__":
         on=["database_name", "sequence_database_number"],
     )
 
+    print(f'Num no bulge: {len(irfold_val2_res_df_bulge)}')
+    print(f'Num bulge: {len(irfold_val2_res_df_no_bulge)}')
+
     bulge_sens = irfold_val2_res_df_bulge["sensitivity"].mean()
     bulge_ppv = irfold_val2_res_df_bulge["ppv"].mean()
     no_bulge_sens = irfold_val2_res_df_no_bulge["sensitivity"].mean()
     no_bulge_ppv = irfold_val2_res_df_no_bulge["ppv"].mean()
 
-    print(f'No bulge mean F1: {irfold_val2_res_df_no_bulge["f1"].mean():.4f}')
-    print(f'Bulge mean F1: {irfold_val2_res_df_bulge["f1"].mean():.4f}')
+    print(f'No bulge mean F1: {irfold_val2_res_df_no_bulge["f1"].mean():.2f}')
+    print(f'Bulge mean F1: {irfold_val2_res_df_bulge["f1"].mean():.2f}')
 
     plt.scatter(bulge_ppv, bulge_sens, label="Bulge Loops", marker="s", s=50)
     plt.scatter(no_bulge_ppv, no_bulge_sens, label="No Bulge Loops", marker="^", s=50)
     plt.legend()
     plt.xlabel("Positive Predictive Value")
     plt.ylabel("Sensitivity")
+    # plt.ylim(0.7, 0.9)
+    # plt.xlim(0.4, 0.8)
     plt.tight_layout()
     plt.savefig(f"{EXPERIMENT_5_DIR_PATH}/ppv_vs_sens_bulge.png")
     plt.show()
@@ -231,18 +274,28 @@ if __name__ == "__main__":
     interval_sz = 10
     vals = np.arange(min, max + interval_sz, interval_sz)
     intervals = [[vals[i], vals[i + 1]] for i in range(len(vals) - 1)]
+    n_intervals = len(intervals)
+    for range in intervals[:-1]:
+        range[1] = range[1] - 1
+
 
     model_seq_len_interval_f1_means = {
         "RNAfold": [],
         "RNAstructure": [],
         "IPknot": [],
-        "IRFoldVal2": [],
+        "IRFold": [],
     }
     model_seq_len_interval_seq_counts = {
         "RNAfold": [],
         "RNAstructure": [],
         "IPknot": [],
-        "IRFoldVal2": [],
+        "IRFold": [],
+    }
+    model_seq_len_interval_mean_running_times = {
+        "RNAfold": [],
+        "RNAstructure": [],
+        "IPknot": [],
+        "IRFold": [],
     }
     for res_df, df_name in zip(
         [
@@ -251,12 +304,13 @@ if __name__ == "__main__":
             ipknot_res_df,
             irfold_val2_res_df,
         ],
-        ["RNAfold", "RNAstructure", "IPknot", "IRFoldVal2"],
+        ["RNAfold", "RNAstructure", "IPknot", "IRFold"],
     ):
         avg_df = res_df.groupby("sequence_length").mean(numeric_only=True)
 
         seq_interval_f1_means = []
         seq_interval_seq_counts = []
+        seq_interval_running_times = []
 
         for start, end in intervals:
             f1_mean = avg_df[(avg_df.index >= start) & (avg_df.index <= end)].f1.mean()
@@ -265,12 +319,15 @@ if __name__ == "__main__":
                     (res_df.sequence_length >= start) & (res_df.sequence_length <= end)
                 ]
             )
+            running_time_mean = avg_df[(avg_df.index >= start) & (avg_df.index <= end)].execution_wall_time_secs.mean()
 
             seq_interval_f1_means.append(f1_mean)
             seq_interval_seq_counts.append(seq_count)
+            seq_interval_running_times.append(running_time_mean)
 
         model_seq_len_interval_f1_means[df_name] = seq_interval_f1_means
         model_seq_len_interval_seq_counts[df_name] = seq_interval_seq_counts
+        model_seq_len_interval_mean_running_times[df_name] = seq_interval_running_times
 
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(
         2,
@@ -279,8 +336,8 @@ if __name__ == "__main__":
         sharex="col",
         gridspec_kw={"height_ratios": [4, 1], "width_ratios": [3.25, 1]},
     )
-    fig.subplots_adjust(wspace=0.1, bottom=0.25)
-    fig.text(0.5, 0.04, "Sequence Length (bases)", ha="center")
+    fig.subplots_adjust(wspace=0.025, bottom=0.2)
+    fig.text(0.5, 0.03, "Sequence Length (bases)", ha="center")
 
     for model_name, means in model_seq_len_interval_f1_means.items():
         ax1.plot(
@@ -308,21 +365,22 @@ if __name__ == "__main__":
 
     ticks = [f"{i[0]}-{i[1]}" for i in intervals]
     ax1.set_xticks(
-        [i for i in range(len(intervals))],
+        np.arange(0, n_intervals),
         ticks,
     )
     ax2.set_xticks(
-        [i for i in range(len(intervals))],
+        np.arange(0, n_intervals),
         ticks,
     )
 
-    ax1.set_xlim(-1, 18.5)
+    ax1.set_xlim(-0.5, 18.5)
     ax1.legend()
     ax1.spines["right"].set_visible(False)
     ax1.tick_params(axis="x", rotation=90)
     ax1.set_ylabel("Mean F1")
+    ax1.grid(axis='y')
 
-    ax2.set_xlim(37.9, 41.1)
+    ax2.set_xlim(37.5, 41.5)
     ax2.spines["left"].set_visible(False)
     ax2.tick_params(
         axis="y",
@@ -333,13 +391,14 @@ if __name__ == "__main__":
         labelright=False,
     )
     ax2.tick_params(axis="x", rotation=90)
+    ax2.grid(axis='y')
 
-    ax3.set_xlim(-1, 18.5)
+    ax3.set_xlim(-0.5, 18.5)
     ax3.spines["right"].set_visible(False)
     ax3.tick_params(axis="x", rotation=90)
     ax3.set_ylabel("# Sequences")
 
-    ax4.set_xlim(37.9, 41.1)
+    ax4.set_xlim(37.5, 41.5)
     ax4.spines["left"].set_visible(False)
     ax4.tick_params(
         axis="y",
@@ -353,16 +412,180 @@ if __name__ == "__main__":
 
     # Plot slanted lines to show axis break
     d = 0.9
-    kwargs = dict(marker=[(-1, -d), (1, d)], markersize=6,
-                  linestyle="none", color='k', mec='k', mew=1, clip_on=False)
+    kwargs = dict(
+        marker=[(-1, -d), (1, d)],
+        markersize=6,
+        linestyle="none",
+        color="k",
+        mec="k",
+        mew=1,
+        clip_on=False,
+    )
     ax1.plot([1, 1], [1, 0], transform=ax1.transAxes, **kwargs)
     ax3.plot([1, 1], [1, 0], transform=ax3.transAxes, **kwargs)
 
     ax2.plot([0, 0], [1, 0], transform=ax2.transAxes, **kwargs)
     ax4.plot([0, 0], [1, 0], transform=ax4.transAxes, **kwargs)
 
-
     plt.savefig(str(EXPERIMENT_5_DIR_PATH / "mean_f1_vs_seq_len.png"))
     plt.show()
 
-    # Compare running time of solver only
+    plt.rcParams["figure.figsize"] = (8, 3)
+
+    # Plot running time as sequence length increases
+    fig, (ax1, ax2) = plt.subplots(
+        1,
+        2,
+        sharey="row",
+        sharex="col",
+        gridspec_kw={"width_ratios": [3.25, 1]},
+    )
+    fig.subplots_adjust(wspace=0.025, bottom=0.4)
+    fig.text(0.5, 0.05, "Sequence Length (bases)", ha="center")
+
+    for model_name, means in model_seq_len_interval_mean_running_times.items():
+        ax1.plot(
+            np.arange(0, len(intervals)),
+            means,
+            label=model_name,
+            marker=markers[model_name],
+        )
+        ax2.plot(
+            np.arange(0, len(intervals)),
+            means,
+            label=model_name,
+            marker=markers[model_name],
+        )
+
+    ticks = [f"{i[0]}-{i[1]}" for i in intervals]
+    ax1.set_xticks(
+        np.arange(0, n_intervals),
+        ticks,
+    )
+    ax2.set_xticks(
+        np.arange(0, n_intervals),
+        ticks,
+    )
+
+    ax1.set_xlim(-0.5, 18.5)
+    ax1.legend(loc='upper left')
+    ax1.spines["right"].set_visible(False)
+    ax1.tick_params(axis="x", rotation=90)
+    ax1.set_ylabel("Mean Running \nTime (secs)")
+    ax1.grid(axis='y')
+
+    ax2.set_xlim(37.5, 41.5)
+    ax2.spines["left"].set_visible(False)
+    ax2.tick_params(
+        axis="y",
+        which="both",
+        left=False,
+        right=False,
+        labelleft=False,
+        labelright=False,
+    )
+    ax2.tick_params(axis="x", rotation=90)
+    ax2.grid(axis='y')
+
+    # Plot slanted lines to show axis break
+    d = 0.9
+    kwargs = dict(
+        marker=[(-1, -d), (1, d)],
+        markersize=6,
+        linestyle="none",
+        color="k",
+        mec="k",
+        mew=1,
+        clip_on=False,
+    )
+    ax1.plot([1, 1], [1, 0], transform=ax1.transAxes, **kwargs)
+    ax2.plot([0, 0], [1, 0], transform=ax2.transAxes, **kwargs)
+
+    plt.savefig(str(EXPERIMENT_5_DIR_PATH / "mean_running_time_vs_seq_len.png"))
+    plt.show()
+
+    # Plot running time as sequence length increases with IRFold solver
+    irfold_solver_perf_df = pd.read_csv(
+        EXPERIMENT_5_DIR_PATH / "IRFoldVal2_solver_performance.csv"
+    )
+    avg_df = irfold_solver_perf_df.groupby("seq_len").mean(numeric_only=True)
+
+    seq_interval_running_times = []
+
+    for start, end in intervals:
+        running_time_mean = avg_df[(avg_df.index >= start) & (avg_df.index <= end)].solver_solve_time.mean()
+        seq_interval_running_times.append(running_time_mean)
+
+    model_seq_len_interval_mean_running_times['IRFold Solver'] = seq_interval_running_times
+    del model_seq_len_interval_mean_running_times['IRFold']
+
+    fig, (ax1, ax2) = plt.subplots(
+        1,
+        2,
+        sharey="row",
+        sharex="col",
+        gridspec_kw={"width_ratios": [3.25, 1]},
+    )
+    fig.subplots_adjust(wspace=0.025, bottom=0.4)
+    fig.text(0.5, 0.05, "Sequence Length (bases)", ha="center")
+
+    for model_name, means in model_seq_len_interval_mean_running_times.items():
+        ax1.plot(
+            np.arange(0, len(intervals)),
+            means,
+            label=model_name,
+            marker=markers[model_name],
+        )
+        ax2.plot(
+            np.arange(0, len(intervals)),
+            means,
+            label=model_name,
+            marker=markers[model_name],
+        )
+
+    ticks = [f"{i[0]}-{i[1]}" for i in intervals]
+    ax1.set_xticks(
+        np.arange(0, n_intervals),
+        ticks,
+    )
+    ax2.set_xticks(
+        np.arange(0, n_intervals),
+        ticks,
+    )
+
+    ax1.set_xlim(-0.5, 18.5)
+    ax1.legend(loc='upper left')
+    ax1.spines["right"].set_visible(False)
+    ax1.tick_params(axis="x", rotation=90)
+    ax1.set_ylabel("Mean Running \nTime (secs)")
+    ax1.grid(axis='y')
+
+    ax2.set_xlim(37.5, 41.5)
+    ax2.spines["left"].set_visible(False)
+    ax2.tick_params(
+        axis="y",
+        which="both",
+        left=False,
+        right=False,
+        labelleft=False,
+        labelright=False,
+    )
+    ax2.tick_params(axis="x", rotation=90)
+    ax2.grid(axis='y')
+
+    # Plot slanted lines to show axis break
+    d = 0.9
+    kwargs = dict(
+        marker=[(-1, -d), (1, d)],
+        markersize=6,
+        linestyle="none",
+        color="k",
+        mec="k",
+        mew=1,
+        clip_on=False,
+    )
+    ax1.plot([1, 1], [1, 0], transform=ax1.transAxes, **kwargs)
+    ax2.plot([0, 0], [1, 0], transform=ax2.transAxes, **kwargs)
+
+    plt.savefig(str(EXPERIMENT_5_DIR_PATH / "mean_running_time_vs_seq_len_irfold_solver.png"))
+    plt.show()
