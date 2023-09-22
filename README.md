@@ -1,6 +1,41 @@
 I verify that I am the sole author of the programmes contained in this archive, except where explicitly stated to the contrary.
 David Hurst, 12/08/2023
 
+# Table of Contents
+
+/data:
+	Results of experiments and stored dataset (dataset omitted for sake of file size)
+	
+/experiment_scripts/experiment_1_*:
+	Scripts which run and analyse experiment to show the additive free energy vs union free energy
+/experiment_scripts/experiment_2_*:
+	Scripts which run and analyse experiment to show that validating IR pairs also vaidates IR triplets and quadruplets
+/experiment_scripts/experiment_3_*:
+	Scripts which run and analyse experiment to show the error in the free energy additivity assumption
+/experiment_scripts/experiment_4_*:
+	Scripts which run and analyse experiment to show the performance of the solver for different IRFold variants on a test set of random sequences.
+/experiment_scripts/experiment_5_*:
+	Scripts which run and analyse experiment to benchmark the performance of IRFold against other models on the bpRNA-1m dataset
+	
+/irfold/irfold_base.py:
+	Class defining the IRFoldBase model
+/irfold/irfold_val1.py:
+	Class defining the IRFoldVal1 model
+/irfold/irfold_val2.py:
+	Class defining the IRFoldVal2 model
+/irfold/irfold_corx.py:
+	Class defining the IRFoldCorX model
+/irfold/irfold_cor2.py:
+	Class used for development and testing of IRFoldCorX
+/irfold/irfold_cor3.py:
+	Class used for development and testing of IRFoldCorX
+/irfold/IUPACpal:
+	Binary exe of IUPACpal, used to find IRs
+	
+/test:
+	Unit tests for package
+
+
 # IRFold
 
 RNA Secondary Structure Prediction by optimising configurations of found inverted repeats via Constraint Programming.
