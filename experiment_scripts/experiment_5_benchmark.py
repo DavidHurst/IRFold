@@ -296,13 +296,8 @@ if __name__ == "__main__":
             print("bpSeq file and fasta file contents do not match.")
             continue
 
-        print(f"Fasta file   : {fasta_file_name}")
-        print(f"BPSeq file   : {bp_seq_file_name}")
-        print(f"DB name      : {database_name}")
-        print(f"Seq's DB num.: {sequence_number}")
         print(f"Seq. info    : {seq_info}")
         print(f"Seq. len.    : {seq_len}")
-        print(f"BPSeq max idx: {max_index_in_bp_seq_file}")
 
         # Get predicted secondary structures from models, evaluate and store evaluation metrics
         for run_fold_fn, perf_file in zip(

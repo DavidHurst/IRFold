@@ -329,12 +329,13 @@ if __name__ == "__main__":
         model_seq_len_interval_seq_counts[df_name] = seq_interval_seq_counts
         model_seq_len_interval_mean_running_times[df_name] = seq_interval_running_times
 
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(
+
+    fig, (ax1, ax2) = plt.subplots(
         2,
-        2,
+        1,
         sharey="row",
         sharex="col",
-        gridspec_kw={"height_ratios": [4, 1], "width_ratios": [3.25, 1]},
+        gridspec_kw={"height_ratios": [4, 1]},
     )
     fig.subplots_adjust(wspace=0.025, bottom=0.2)
     fig.text(0.5, 0.03, "Sequence Length (bases)", ha="center")
@@ -346,22 +347,14 @@ if __name__ == "__main__":
             label=model_name,
             marker=markers[model_name],
         )
-        ax2.plot(
-            np.arange(0, len(intervals)),
-            means,
-            label=model_name,
-            marker=markers[model_name],
-        )
 
     for model_name, counts in model_seq_len_interval_seq_counts.items():
-        ax3bar = ax3.bar(np.arange(0, len(intervals)), counts, color="grey")
-        ax4bar = ax4.bar(np.arange(0, len(intervals)), counts, color="grey")
+        ax2bar = ax2.bar(np.arange(0, len(intervals)), counts, color="grey")
 
-        ax3.bar_label(
-            ax3bar,
+        ax2.bar_label(
+            ax2bar,
             labels=[int(val) if val <= 5 else "" for val in counts],
         )
-        ax4.bar_label(ax4bar)
 
     ticks = [f"{i[0]}-{i[1]}" for i in intervals]
     ax1.set_xticks(
@@ -373,84 +366,22 @@ if __name__ == "__main__":
         ticks,
     )
 
-    ax1.set_xlim(-0.5, 18.5)
     ax1.legend()
-    ax1.spines["right"].set_visible(False)
     ax1.tick_params(axis="x", rotation=90)
     ax1.set_ylabel("Mean F1")
     ax1.grid(axis='y')
 
-    ax2.set_xlim(37.5, 41.5)
-    ax2.spines["left"].set_visible(False)
-    ax2.tick_params(
-        axis="y",
-        which="both",
-        left=False,
-        right=False,
-        labelleft=False,
-        labelright=False,
-    )
     ax2.tick_params(axis="x", rotation=90)
-    ax2.grid(axis='y')
-
-    ax3.set_xlim(-0.5, 18.5)
-    ax3.spines["right"].set_visible(False)
-    ax3.tick_params(axis="x", rotation=90)
-    ax3.set_ylabel("# Sequences")
-
-    ax4.set_xlim(37.5, 41.5)
-    ax4.spines["left"].set_visible(False)
-    ax4.tick_params(
-        axis="y",
-        which="both",
-        left=False,
-        right=False,
-        labelleft=False,
-        labelright=False,
-    )
-    ax4.tick_params(axis="x", rotation=90)
-
-    # Plot slanted lines to show axis break
-    d = 0.9
-    kwargs = dict(
-        marker=[(-1, -d), (1, d)],
-        markersize=6,
-        linestyle="none",
-        color="k",
-        mec="k",
-        mew=1,
-        clip_on=False,
-    )
-    ax1.plot([1, 1], [1, 0], transform=ax1.transAxes, **kwargs)
-    ax3.plot([1, 1], [1, 0], transform=ax3.transAxes, **kwargs)
-
-    ax2.plot([0, 0], [1, 0], transform=ax2.transAxes, **kwargs)
-    ax4.plot([0, 0], [1, 0], transform=ax4.transAxes, **kwargs)
+    ax2.set_ylabel("# Sequences")
 
     plt.savefig(str(EXPERIMENT_5_DIR_PATH / "mean_f1_vs_seq_len.png"))
     plt.show()
 
-    plt.rcParams["figure.figsize"] = (8, 3)
 
     # Plot running time as sequence length increases
-    fig, (ax1, ax2) = plt.subplots(
-        1,
-        2,
-        sharey="row",
-        sharex="col",
-        gridspec_kw={"width_ratios": [3.25, 1]},
-    )
-    fig.subplots_adjust(wspace=0.025, bottom=0.4)
-    fig.text(0.5, 0.05, "Sequence Length (bases)", ha="center")
-
+    plt.rcParams["figure.figsize"] = (8, 3)
     for model_name, means in model_seq_len_interval_mean_running_times.items():
-        ax1.plot(
-            np.arange(0, len(intervals)),
-            means,
-            label=model_name,
-            marker=markers[model_name],
-        )
-        ax2.plot(
+        plt.plot(
             np.arange(0, len(intervals)),
             means,
             label=model_name,
@@ -458,49 +389,16 @@ if __name__ == "__main__":
         )
 
     ticks = [f"{i[0]}-{i[1]}" for i in intervals]
-    ax1.set_xticks(
+    plt.xticks(
         np.arange(0, n_intervals),
         ticks,
     )
-    ax2.set_xticks(
-        np.arange(0, n_intervals),
-        ticks,
-    )
-
-    ax1.set_xlim(-0.5, 18.5)
-    ax1.legend(loc='upper left')
-    ax1.spines["right"].set_visible(False)
-    ax1.tick_params(axis="x", rotation=90)
-    ax1.set_ylabel("Mean Running \nTime (secs)")
-    ax1.grid(axis='y')
-
-    ax2.set_xlim(37.5, 41.5)
-    ax2.spines["left"].set_visible(False)
-    ax2.tick_params(
-        axis="y",
-        which="both",
-        left=False,
-        right=False,
-        labelleft=False,
-        labelright=False,
-    )
-    ax2.tick_params(axis="x", rotation=90)
-    ax2.grid(axis='y')
-
-    # Plot slanted lines to show axis break
-    d = 0.9
-    kwargs = dict(
-        marker=[(-1, -d), (1, d)],
-        markersize=6,
-        linestyle="none",
-        color="k",
-        mec="k",
-        mew=1,
-        clip_on=False,
-    )
-    ax1.plot([1, 1], [1, 0], transform=ax1.transAxes, **kwargs)
-    ax2.plot([0, 0], [1, 0], transform=ax2.transAxes, **kwargs)
-
+    plt.legend()
+    plt.tick_params(axis="x", rotation=90)
+    plt.ylabel("Mean Running \nTime (secs)")
+    plt.xlabel("Sequence Length (bases)")
+    plt.grid(axis='y')
+    plt.tight_layout()
     plt.savefig(str(EXPERIMENT_5_DIR_PATH / "mean_running_time_vs_seq_len.png"))
     plt.show()
 
@@ -519,24 +417,8 @@ if __name__ == "__main__":
     model_seq_len_interval_mean_running_times['IRFold Solver'] = seq_interval_running_times
     del model_seq_len_interval_mean_running_times['IRFold']
 
-    fig, (ax1, ax2) = plt.subplots(
-        1,
-        2,
-        sharey="row",
-        sharex="col",
-        gridspec_kw={"width_ratios": [3.25, 1]},
-    )
-    fig.subplots_adjust(wspace=0.025, bottom=0.4)
-    fig.text(0.5, 0.05, "Sequence Length (bases)", ha="center")
-
     for model_name, means in model_seq_len_interval_mean_running_times.items():
-        ax1.plot(
-            np.arange(0, len(intervals)),
-            means,
-            label=model_name,
-            marker=markers[model_name],
-        )
-        ax2.plot(
+        plt.plot(
             np.arange(0, len(intervals)),
             means,
             label=model_name,
@@ -544,48 +426,15 @@ if __name__ == "__main__":
         )
 
     ticks = [f"{i[0]}-{i[1]}" for i in intervals]
-    ax1.set_xticks(
+    plt.xticks(
         np.arange(0, n_intervals),
         ticks,
     )
-    ax2.set_xticks(
-        np.arange(0, n_intervals),
-        ticks,
-    )
-
-    ax1.set_xlim(-0.5, 18.5)
-    ax1.legend(loc='upper left')
-    ax1.spines["right"].set_visible(False)
-    ax1.tick_params(axis="x", rotation=90)
-    ax1.set_ylabel("Mean Running \nTime (secs)")
-    ax1.grid(axis='y')
-
-    ax2.set_xlim(37.5, 41.5)
-    ax2.spines["left"].set_visible(False)
-    ax2.tick_params(
-        axis="y",
-        which="both",
-        left=False,
-        right=False,
-        labelleft=False,
-        labelright=False,
-    )
-    ax2.tick_params(axis="x", rotation=90)
-    ax2.grid(axis='y')
-
-    # Plot slanted lines to show axis break
-    d = 0.9
-    kwargs = dict(
-        marker=[(-1, -d), (1, d)],
-        markersize=6,
-        linestyle="none",
-        color="k",
-        mec="k",
-        mew=1,
-        clip_on=False,
-    )
-    ax1.plot([1, 1], [1, 0], transform=ax1.transAxes, **kwargs)
-    ax2.plot([0, 0], [1, 0], transform=ax2.transAxes, **kwargs)
-
+    plt.legend()
+    plt.tick_params(axis="x", rotation=90)
+    plt.ylabel("Mean Running \nTime (secs)")
+    plt.xlabel("Sequence Length (bases)")
+    plt.grid(axis='y')
+    plt.tight_layout()
     plt.savefig(str(EXPERIMENT_5_DIR_PATH / "mean_running_time_vs_seq_len_irfold_solver.png"))
     plt.show()
