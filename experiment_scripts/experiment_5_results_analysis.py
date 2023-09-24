@@ -270,7 +270,7 @@ if __name__ == "__main__":
 
     # Plot mean F1 as sequence length increases for sequence length intervals
     min = 5  # rnafold_res_df.sequence_length.min()
-    max = 425  # rnafold_res_df.sequence_length.max()
+    max = rnafold_res_df.sequence_length.max() + 5
     interval_sz = 10
     vals = np.arange(min, max + interval_sz, interval_sz)
     intervals = [[vals[i], vals[i + 1]] for i in range(len(vals) - 1)]
