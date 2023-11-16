@@ -1,4 +1,4 @@
-__all__ = ["IRFoldCorX"]
+__all__ = ["IRfoldPB"]
 
 import re
 
@@ -16,8 +16,9 @@ from irfold.util import (
     irs_incompatible,
 )
 
+ADDITIVITY_ASSUMPTION_THRESH = 16.0
 
-class IRFoldCorX(IRFoldVal2):
+class IRfoldPB(IRFoldVal2):
     @staticmethod
     def _get_cp_model(
         ir_list: List[IR],
@@ -98,7 +99,7 @@ class IRFoldCorX(IRFoldVal2):
             (
                 correction_vars,
                 correction_var_coeffs,
-            ) = IRFoldCorX.__add_correction_variables(
+            ) = IRfoldPB.__add_correction_variables(
                 model,
                 seq_len,
                 sequence,
@@ -109,7 +110,7 @@ class IRFoldCorX(IRFoldVal2):
             )
 
             # Add constraints only activating correction variables if all variable in n-tuple are active
-            IRFoldCorX.__add_cor_var_activation_constraints(
+            IRfoldPB.__add_cor_var_activation_constraints(
                 correction_vars, ir_indicator_variables, model, tuple_sz
             )
 
@@ -143,6 +144,7 @@ class IRFoldCorX(IRFoldVal2):
         correction_vars: List[IntVar] = []
         correction_var_coeffs: List[int] = []
         # Add correction variable for each n-tuple that has additive free energy different from its true free energy
+
         for ir_idx_n_tuple, ir_n_tuple in tqdm(
             zip(valid_ir_idx_n_tuples, valid_ir_n_tuples),
             desc=f"Generating {len(valid_ir_n_tuples[0])}-tuple correction variables",
@@ -176,8 +178,8 @@ class IRFoldCorX(IRFoldVal2):
                 ir_n_tuple_additive_free_energy - ir_n_tuple_true_free_energy, 4
             )
 
-            # If additivity assumption does not hold i.e. diff > 0, add correction variable for n-tuple
-            if abs(free_energy_difference) > 0:
+            # If additivity assumption does not hold for given thresh i.e. diff > thresh, add correction variable for n-tuple
+            if abs(free_energy_difference) > ADDITIVITY_ASSUMPTION_THRESH:
                 irs_idxs_corrected_repr = "".join(
                     [f"ir_{ir_idx}_" for ir_idx in ir_idx_n_tuple]
                 )

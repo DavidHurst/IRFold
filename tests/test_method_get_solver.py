@@ -8,13 +8,13 @@ from irfold import (
     IRFoldVal2,
     IRFoldCor2,
     IRFoldCor3,
-    IRFoldCorX,
+    IRfoldPB,
 )
 
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3, IRFoldCorX],
+    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3, IRfoldPB],
 )
 def test_not_none(
     ir_fold_variant, all_irs, sequence, sequence_length, sequence_name, data_dir
@@ -54,7 +54,7 @@ def test_not_none(
                 "ir_indicator_pair_corrector_triplet_corrector_variables_names"
             ),
         ),
-        (IRFoldCorX, pytest.lazy_fixture("all_solver_variables_names")),
+        (IRfoldPB, pytest.lazy_fixture("all_solver_variables_names")),
     ],
 )
 def test_number_of_variables_generated(
@@ -92,7 +92,7 @@ def test_number_of_variables_generated(
             IRFoldCor3,
             pytest.lazy_fixture("all_solver_variables_names"),
         ),
-        (IRFoldCorX, pytest.lazy_fixture("all_solver_variables_names")),
+        (IRfoldPB, pytest.lazy_fixture("all_solver_variables_names")),
     ],
 )
 def test_variables_for_correct_variables_generated(

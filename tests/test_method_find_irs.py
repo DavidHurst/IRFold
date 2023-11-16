@@ -8,7 +8,7 @@ from irfold import (
     IRFoldVal2,
     IRFoldCor2,
     IRFoldCor3,
-    IRFoldCorX,
+    IRfoldPB,
 )
 
 
@@ -17,7 +17,7 @@ from irfold import (
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3, IRFoldCorX],
+    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3, IRfoldPB],
 )
 def test_not_none(ir_fold_variant, sequence, sequence_length, sequence_name, data_dir):
     assert (
@@ -32,7 +32,7 @@ def test_not_none(ir_fold_variant, sequence, sequence_length, sequence_name, dat
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3, IRFoldCorX],
+    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3, IRfoldPB],
 )
 def test_number_of_irs_found(
     ir_fold_variant,
@@ -53,7 +53,7 @@ def test_number_of_irs_found(
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3, IRFoldCorX],
+    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3, IRfoldPB],
 )
 def test_found_irs_output_file_created(
     ir_fold_variant, sequence, sequence_length, sequence_name, data_dir
