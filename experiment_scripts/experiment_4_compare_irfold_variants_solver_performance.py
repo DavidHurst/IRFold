@@ -10,7 +10,7 @@ EXPERIMENT_4_DATA_DIR = (DATA_DIR / "experiment_4").resolve()
 
 from irfold import (
     IRFoldVal2,
-    IRFoldCorX,
+    IRfoldPB,
 )
 
 if __name__ == "__main__":
@@ -29,10 +29,10 @@ if __name__ == "__main__":
             _, _ = IRFoldVal2.fold(**fold_params)
 
             fold_params.update({"max_n_tuple_sz_to_correct": 2})
-            _, _ = IRFoldCorX.fold(**fold_params)
+            _, _ = IRfoldPB.fold(**fold_params)
 
             fold_params.update({"max_n_tuple_sz_to_correct": 3})
-            _, _ = IRFoldCorX.fold(**fold_params)
+            _, _ = IRfoldPB.fold(**fold_params)
 
             fold_params.update({"max_n_tuple_sz_to_correct": 4})
-            _, _ = IRFoldCorX.fold(**fold_params)
+            _, _ = IRfoldPB.fold(**fold_params)

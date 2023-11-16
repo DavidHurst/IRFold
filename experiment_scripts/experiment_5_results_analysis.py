@@ -128,12 +128,18 @@ if __name__ == "__main__":
         on=["database_name", "sequence_database_number"],
     )
 
-    print(f'Num no PK seqs: {len(rnastructure_res_df_no_pk)}')
-    print(f'Num PK seqs: {len(rnastructure_res_df_pk)}')
+    print(f"Num no PK seqs: {len(rnastructure_res_df_no_pk)}")
+    print(f"Num PK seqs: {len(rnastructure_res_df_pk)}")
 
     # print(rnastructure_res_df_no_pk.sample(3))
 
-    markers = {"RNAfold": "o", "RNAstructure": "x", "IPknot": "s", "IRFold": "^", 'IRFold Solver':'^'}
+    markers = {
+        "RNAfold": "o",
+        "RNAstructure": "x",
+        "IPknot": "s",
+        "IRFold": "^",
+        "IRFold Solver": "^",
+    }
 
     # Plot PPV against Sens for all seqs
     ppv_scores = []
@@ -219,7 +225,7 @@ if __name__ == "__main__":
             mean_ppv, mean_sens, label=model_name, marker=markers[model_name], s=50
         )
 
-    plt.legend(loc='lower right')
+    plt.legend(loc="lower right")
     plt.xlabel("Positive Predictive Value")
     plt.ylabel("Sensitivity")
     plt.ylim(0.7, 0.9)
@@ -244,8 +250,8 @@ if __name__ == "__main__":
         on=["database_name", "sequence_database_number"],
     )
 
-    print(f'Num no bulge: {len(irfold_val2_res_df_bulge)}')
-    print(f'Num bulge: {len(irfold_val2_res_df_no_bulge)}')
+    print(f"Num no bulge: {len(irfold_val2_res_df_bulge)}")
+    print(f"Num bulge: {len(irfold_val2_res_df_no_bulge)}")
 
     bulge_sens = irfold_val2_res_df_bulge["sensitivity"].mean()
     bulge_ppv = irfold_val2_res_df_bulge["ppv"].mean()
@@ -277,7 +283,6 @@ if __name__ == "__main__":
     n_intervals = len(intervals)
     for range in intervals[:-1]:
         range[1] = range[1] - 1
-
 
     model_seq_len_interval_f1_means = {
         "RNAfold": [],
@@ -319,7 +324,9 @@ if __name__ == "__main__":
                     (res_df.sequence_length >= start) & (res_df.sequence_length <= end)
                 ]
             )
-            running_time_mean = avg_df[(avg_df.index >= start) & (avg_df.index <= end)].execution_wall_time_secs.mean()
+            running_time_mean = avg_df[
+                (avg_df.index >= start) & (avg_df.index <= end)
+            ].execution_wall_time_secs.mean()
 
             seq_interval_f1_means.append(f1_mean)
             seq_interval_seq_counts.append(seq_count)
@@ -328,7 +335,6 @@ if __name__ == "__main__":
         model_seq_len_interval_f1_means[df_name] = seq_interval_f1_means
         model_seq_len_interval_seq_counts[df_name] = seq_interval_seq_counts
         model_seq_len_interval_mean_running_times[df_name] = seq_interval_running_times
-
 
     fig, (ax1, ax2) = plt.subplots(
         2,
@@ -369,14 +375,13 @@ if __name__ == "__main__":
     ax1.legend()
     ax1.tick_params(axis="x", rotation=90)
     ax1.set_ylabel("Mean F1")
-    ax1.grid(axis='y')
+    ax1.grid(axis="y")
 
     ax2.tick_params(axis="x", rotation=90)
     ax2.set_ylabel("# Sequences")
 
     plt.savefig(str(EXPERIMENT_5_DIR_PATH / "mean_f1_vs_seq_len.png"))
     plt.show()
-
 
     # Plot running time as sequence length increases
     plt.rcParams["figure.figsize"] = (8, 3)
@@ -397,7 +402,7 @@ if __name__ == "__main__":
     plt.tick_params(axis="x", rotation=90)
     plt.ylabel("Mean Running \nTime (secs)")
     plt.xlabel("Sequence Length (bases)")
-    plt.grid(axis='y')
+    plt.grid(axis="y")
     plt.tight_layout()
     plt.savefig(str(EXPERIMENT_5_DIR_PATH / "mean_running_time_vs_seq_len.png"))
     plt.show()
@@ -411,11 +416,15 @@ if __name__ == "__main__":
     seq_interval_running_times = []
 
     for start, end in intervals:
-        running_time_mean = avg_df[(avg_df.index >= start) & (avg_df.index <= end)].solver_solve_time.mean()
+        running_time_mean = avg_df[
+            (avg_df.index >= start) & (avg_df.index <= end)
+        ].solver_solve_time.mean()
         seq_interval_running_times.append(running_time_mean)
 
-    model_seq_len_interval_mean_running_times['IRFold Solver'] = seq_interval_running_times
-    del model_seq_len_interval_mean_running_times['IRFold']
+    model_seq_len_interval_mean_running_times[
+        "IRFold Solver"
+    ] = seq_interval_running_times
+    del model_seq_len_interval_mean_running_times["IRFold"]
 
     for model_name, means in model_seq_len_interval_mean_running_times.items():
         plt.plot(
@@ -434,7 +443,9 @@ if __name__ == "__main__":
     plt.tick_params(axis="x", rotation=90)
     plt.ylabel("Mean Running \nTime (secs)")
     plt.xlabel("Sequence Length (bases)")
-    plt.grid(axis='y')
+    plt.grid(axis="y")
     plt.tight_layout()
-    plt.savefig(str(EXPERIMENT_5_DIR_PATH / "mean_running_time_vs_seq_len_irfold_solver.png"))
+    plt.savefig(
+        str(EXPERIMENT_5_DIR_PATH / "mean_running_time_vs_seq_len_irfold_solver.png")
+    )
     plt.show()

@@ -31,7 +31,7 @@ TEMP_CT_FILE_PATH = str(
 )
 
 
-from irfold import IRFoldVal2, IRFoldCorX
+from irfold import IRFoldVal2, IRfoldPB
 
 
 DATA_DIR = Path(__file__).parent.parent / "data"
@@ -187,6 +187,16 @@ def run_irfold_val2(seq):
     return pred, wall_time
 
 
+def run_irfoldpb(seq):
+    start_time = time.monotonic()
+    pred, _ = IRfoldPB.fold(
+        seq, max_n_tuple_sz_to_correct=2, out_dir=str(EXPERIMENT_5_DIR_PATH), save_performance=True
+    )
+    wall_time = time.monotonic() - start_time
+
+    return pred, wall_time
+
+
 if __name__ == "__main__":
     results_file_column_names = [
         "database_name",
@@ -211,12 +221,16 @@ if __name__ == "__main__":
     irfold_val2_performance_file_path = (
         EXPERIMENT_5_DIR_PATH / "IRFoldVal2_benchmarking_results.csv"
     ).resolve()
+    irfoldpb_performance_file_path = (
+        EXPERIMENT_5_DIR_PATH / "IRfoldPB_benchmarking_results.csv"
+    ).resolve()
 
     for file_path in [
         rnafold_performance_file_path,
         rnastructure_performance_file_path,
         ipknot_performance_file_path,
         irfold_val2_performance_file_path,
+        irfoldpb_performance_file_path,
     ]:
         if not file_path.exists():
             with open(str(file_path), "w") as perf_file:
@@ -296,22 +310,22 @@ if __name__ == "__main__":
             print("bpSeq file and fasta file contents do not match.")
             continue
 
+        if seq_len > 200:
+            print("Len > 150, continuing.")
+            continue
+
         print(f"Seq. info    : {seq_info}")
         print(f"Seq. len.    : {seq_len}")
 
         # Get predicted secondary structures from models, evaluate and store evaluation metrics
         for run_fold_fn, perf_file in zip(
-            [
-                run_rnastructure,
-                run_rnafold,
-                run_ipknot,
-                run_irfold_val2,
-            ],
+            [run_rnastructure, run_rnafold, run_ipknot, run_irfold_val2, run_irfoldpb],
             [
                 rnastructure_performance_file_path,
                 rnafold_performance_file_path,
                 ipknot_performance_file_path,
                 irfold_val2_performance_file_path,
+                irfoldpb_performance_file_path,
             ],
         ):
             print(run_fold_fn.__name__.center(70, "-"))
