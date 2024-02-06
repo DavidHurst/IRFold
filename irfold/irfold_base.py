@@ -1,10 +1,9 @@
 __all__ = ["IRFoldBase"]
 
-import itertools
 import re
-
 from pathlib import Path
 from typing import Tuple, List
+
 from ortools.sat.python.cp_model import (
     CpModel,
     CpSolver,
@@ -22,7 +21,6 @@ from irfold.util import (
     create_seq_file,
     write_solver_performance_to_file,
     run_cmd,
-    ir_pair_match_same_bases,
 )
 
 
