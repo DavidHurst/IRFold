@@ -138,32 +138,85 @@ def irs_wholly_nested(ir_list: List[IR]) -> bool:
 # =================== Partial nesting checks ===================
 
 
+# def ir_pair_partially_nested(ir_a: IR, ir_b: IR) -> bool:
+#     """Returns true if ir_a is partially nested with ir_b i.e. if ir_a and ir_b form a pseudoknot with each other."""
+#     ir_a_left_strand: Tuple[int, int] = ir_a[0]
+#     ir_b_left_strand: Tuple[int, int] = ir_b[0]
+#
+#     latest_left_string_base_idx: int = (
+#         ir_a_left_strand[1]
+#         if ir_a_left_strand[1] > ir_b_left_strand[1]
+#         else ir_b_left_strand[1]
+#     )
+#
+#     earliest_right_string_base_idx: int = (
+#         ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
+#     )
+#
+#     num_bases_inbetween_latest_left_and_earliest_right_bases: int = (
+#         earliest_right_string_base_idx - latest_left_string_base_idx - 1
+#     )
+#
+#     return num_bases_inbetween_latest_left_and_earliest_right_bases >= 3
+
+
 def ir_pair_partially_nested(ir_a: IR, ir_b: IR) -> bool:
-    """Returns true if ir_a is partially nested with ir_b i.e. if ir_a and ir_b form a pseudoknot with each other."""
+    """Returns true if ir_a is partially nested with ir_b."""
+    ir_a_gap_first_idx: int = ir_a[0][1] + 1
+    ir_a_gap_last_idx: int = ir_a[1][0] - 1
+    ir_a_gap: Tuple[int, int] = (ir_a_gap_first_idx, ir_a_gap_last_idx)
+
+    ir_b_gap_first_idx: int = ir_b[0][1] + 1
+    ir_b_gap_last_idx: int = ir_b[1][0] - 1
+    ir_b_gap: Tuple[int, int] = (ir_b_gap_first_idx, ir_b_gap_last_idx)
+
+    def strand_in_gap(strand: Tuple[int, int], gap: Tuple[int, int]) -> bool:
+        gap_start: int = gap[0]
+        gap_stop: int = gap[1]
+
+        if strand[0] >= gap_start and strand[1] <= gap_stop:
+            return True
+        return False
+
+    # Check if one of ir_a's strands is contained in ir_b's gap and the other is not
     ir_a_left_strand: Tuple[int, int] = ir_a[0]
+    ir_a_right_strand: Tuple[int, int] = ir_a[1]
+    if (
+        (
+            strand_in_gap(ir_a_left_strand, ir_b_gap)
+            and not strand_in_gap(ir_a_right_strand, ir_b_gap)
+        )
+    ) or (
+        (
+            strand_in_gap(ir_a_right_strand, ir_b_gap)
+            and not strand_in_gap(ir_a_left_strand, ir_b_gap)
+        )
+    ):
+        return True
+
+    # Check if one of ir_b's strands is contained in ir_a's gap and the other is not
     ir_b_left_strand: Tuple[int, int] = ir_b[0]
+    ir_b_right_strand: Tuple[int, int] = ir_b[1]
+    if (
+        (
+            strand_in_gap(ir_b_left_strand, ir_a_gap)
+            and not strand_in_gap(ir_b_right_strand, ir_a_gap)
+        )
+    ) or (
+        (
+            strand_in_gap(ir_b_right_strand, ir_a_gap)
+            and not strand_in_gap(ir_b_left_strand, ir_a_gap)
+        )
+    ):
+        return True
 
-    latest_left_string_base_idx: int = (
-        ir_a_left_strand[1]
-        if ir_a_left_strand[1] > ir_b_left_strand[1]
-        else ir_b_left_strand[1]
-    )
-
-    earliest_right_string_base_idx: int = (
-        ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
-    )
-
-    num_bases_inbetween_latest_left_and_earliest_right_bases: int = (
-        earliest_right_string_base_idx - latest_left_string_base_idx - 1
-    )
-
-    return num_bases_inbetween_latest_left_and_earliest_right_bases >= 3
+    return False
 
 
 def irs_partially_nested(ir_list: List[IR]) -> bool:
     """Returns true if any of the IRs are partially nested i.e. if any of the
     IRs form pseudoknots with each other."""
-    return all(
+    return any(
         [
             ir_pair_partially_nested(ir_a, ir_b)
             for ir_a, ir_b in list(itertools.combinations(ir_list, 2))
@@ -178,7 +231,7 @@ def ir_pair_valid_relative_pos(ir_a: IR, ir_b: IR) -> bool:
     return (
         ir_pair_wholly_nested(ir_a, ir_b)
         or ir_pair_not_nested(ir_a, ir_b)
-        or ir_pair_partially_nested(ir_a, ir_b)
+        or not ir_pair_partially_nested(ir_a, ir_b)
     )
 
 
@@ -186,5 +239,5 @@ def irs_valid_relative_pos(ir_list: List[IR]) -> bool:
     return (
         irs_not_nested(ir_list)
         or irs_wholly_nested(ir_list)
-        or irs_partially_nested(ir_list)
+        or not irs_partially_nested(ir_list)
     )
