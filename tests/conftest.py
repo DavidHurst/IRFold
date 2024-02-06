@@ -101,16 +101,12 @@ def wholly_nested_ir_pair(request):
     return request.param
 
 
-@pytest.fixture(
-    scope="module", params=SequenceA.co_located_ir_pairs.values()
-)
+@pytest.fixture(scope="module", params=SequenceA.co_located_ir_pairs.values())
 def co_located_ir_pair(request):
     return request.param
 
 
-@pytest.fixture(
-    scope="module", params=SequenceA.non_co_located_ir_pairs.values()
-)
+@pytest.fixture(scope="module", params=SequenceA.non_co_located_ir_pairs.values())
 def non_co_located_ir_pair(request):
     return request.param
 
