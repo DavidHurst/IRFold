@@ -91,7 +91,7 @@ def invalid_gap_size_ir(request):
     return request.param
 
 
-@pytest.fixture(scope="module", params=SequenceA.disjoint_ir_pairs.values())
+@pytest.fixture(scope="module", params=SequenceA.not_nested_ir_pairs.values())
 def disjoint_ir_pair(request):
     return request.param
 
@@ -102,16 +102,16 @@ def wholly_nested_ir_pair(request):
 
 
 @pytest.fixture(
-    scope="module", params=SequenceA.matching_the_same_bases_ir_pairs.values()
+    scope="module", params=SequenceA.co_located_ir_pairs.values()
 )
-def matching_the_same_bases_ir_pair(request):
+def co_located_ir_pair(request):
     return request.param
 
 
 @pytest.fixture(
-    scope="module", params=SequenceA.not_matching_the_same_bases_ir_pairs.values()
+    scope="module", params=SequenceA.non_co_located_ir_pairs.values()
 )
-def not_matching_the_same_bases_ir_pair(request):
+def non_co_located_ir_pair(request):
     return request.param
 
 
