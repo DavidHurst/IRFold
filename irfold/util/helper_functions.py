@@ -65,7 +65,7 @@ def calc_free_energy(
 
     # RNAlib requires a file passed as parameter even if not writing to it
     with open(out_file, "a") as file:
-        free_energy = RNA.eval_structure_simple(sequence, dot_brk_repr, -1, file)
+        free_energy = RNA.eval_structure_simple(sequence, dot_brk_repr, 1, file)
 
     return free_energy
 
