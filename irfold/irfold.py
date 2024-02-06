@@ -4,8 +4,8 @@ import re
 
 from ortools.sat.python.cp_model import CpModel, IntVar, LinearExpr
 from typing import Tuple, List
-from irfold import IRFoldVal1
-from irfold.util import (
+from . import IRFoldVal1
+from .util import (
     ir_has_valid_gap_size,
     IR,
     irs_to_dot_bracket,
