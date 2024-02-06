@@ -6,7 +6,7 @@ import re
 
 from tqdm import tqdm
 
-from irfold import IRFoldVal2
+from irfold import IRfold
 from typing import Tuple, List
 from ortools.sat.python.cp_model import CpModel, IntVar, LinearExpr
 from irfold.util import (
@@ -18,7 +18,7 @@ from irfold.util import (
 )
 
 
-class IRFoldCor3(IRFoldVal2):
+class IRFoldCor3(IRfold):
     """Extends IRFold2 by adding solver variables to correct for the additivity of free energy IR pairs and triplets
     not holding consistently"""
 

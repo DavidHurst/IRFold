@@ -1,4 +1,4 @@
-__all__ = ["IRFoldVal2"]
+__all__ = ["IRfold"]
 
 import re
 
@@ -15,7 +15,7 @@ from irfold.util import (
 )
 
 
-class IRFoldVal2(IRFoldVal1):
+class IRfold(IRFoldVal1):
     """Extends IRFold model by validating found IRs and IRs in pairs before passing them to the solver."""
 
     @staticmethod

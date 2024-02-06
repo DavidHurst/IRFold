@@ -1,7 +1,7 @@
 from irfold import (
     IRFoldBase,
     IRFoldVal1,
-    IRFoldVal2,
+    IRfold,
     IRFoldCor2,
     IRFoldCor3,
 )
@@ -20,7 +20,7 @@ def test_objective_function_more_correct_with_increasing_model_version(
         for ir_fold_variant in [
             IRFoldBase,
             IRFoldVal1,
-            IRFoldVal2,
+            IRfold,
             IRFoldCor2,
             IRFoldCor3,
         ]

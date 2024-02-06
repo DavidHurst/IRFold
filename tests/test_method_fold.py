@@ -6,7 +6,7 @@ from pathlib import Path
 from irfold import (
     IRFoldBase,
     IRFoldVal1,
-    IRFoldVal2,
+    IRfold,
     IRFoldCor2,
     IRFoldCor3,
 )
@@ -17,7 +17,7 @@ from irfold import (
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3],
+    [IRFoldBase, IRFoldVal1, IRfold, IRFoldCor2, IRFoldCor3],
 )
 def test_output_not_none(
     ir_fold_variant,
@@ -37,7 +37,7 @@ def test_output_not_none(
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3],
+    [IRFoldBase, IRFoldVal1, IRfold, IRFoldCor2, IRFoldCor3],
 )
 def test_output_type_correct(
     ir_fold_variant,
@@ -57,7 +57,7 @@ def test_output_type_correct(
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldVal2, IRFoldCor2, IRFoldCor3],
+    [IRfold, IRFoldCor2, IRFoldCor3],
 )
 def test_balanced_brackets(ir_fold_variant, data_dir):
     seq_len = 40
@@ -73,7 +73,7 @@ def test_balanced_brackets(ir_fold_variant, data_dir):
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRFoldVal2, IRFoldCor2, IRFoldCor3],
+    [IRFoldBase, IRFoldVal1, IRfold, IRFoldCor2, IRFoldCor3],
 )
 def test_ir_fold_variant_performance_written_to_file(
     ir_fold_variant,
