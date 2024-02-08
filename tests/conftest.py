@@ -2,7 +2,7 @@ import sys
 import pytest
 from pathlib import Path
 
-from sequences import SequenceA
+from sequence_fixtures import SequenceA
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
@@ -24,7 +24,7 @@ def all_irs_names(request):
     return request.param
 
 
-@pytest.fixture(scope="module", params=[SequenceA.dot_bracket_repr_irs.values()])
+@pytest.fixture(scope="module", params=[SequenceA.all_irs_dot_bracket.values()])
 def all_ir_dot_bracket_reprs(request):
     return request.param
 
@@ -51,7 +51,7 @@ def ir(request):
 
 @pytest.fixture(
     scope="module",
-    params=[db_repr for db_repr in SequenceA.dot_bracket_repr_irs.values()],
+    params=[db_repr for db_repr in SequenceA.all_irs_dot_bracket.values()],
 )
 def ir_dot_bracket_repr(request):
     return request.param
@@ -63,21 +63,9 @@ def ir_pair(request):
 
 
 @pytest.fixture(
-    scope="module", params=list(SequenceA.dot_bracket_repr_ir_pairs.values())
+    scope="module", params=list(SequenceA.all_ir_pairs_dot_bracket.values())
 )
 def ir_pair_dot_bracket_repr(request):
-    return request.param
-
-
-@pytest.fixture(scope="module", params=list(SequenceA.all_ir_triplets.values()))
-def ir_triplet(request):
-    return request.param
-
-
-@pytest.fixture(
-    scope="module", params=list(SequenceA.dot_bracket_repr_ir_triplets.values())
-)
-def ir_triplet_dot_bracket_repr(request):
     return request.param
 
 
@@ -111,38 +99,6 @@ def non_co_located_ir_pair(request):
     return request.param
 
 
-@pytest.fixture(
-    scope="module",
-    params=SequenceA.valid_number_of_bases_in_intersection_ir_pairs.values(),
-)
-def valid_number_of_bases_in_intersection_ir_pair(request):
-    return request.param
-
-
-@pytest.fixture(
-    scope="module",
-    params=SequenceA.invalid_number_of_bases_in_intersection_ir_pairs.values(),
-)
-def invalid_number_of_bases_in_intersection_ir_pair(request):
-    return request.param
-
-
-@pytest.fixture(
-    scope="module",
-    params=SequenceA.forms_valid_loop_ir_pairs.values(),
-)
-def forms_valid_loop_ir_pair(request):
-    return request.param
-
-
-@pytest.fixture(
-    scope="module",
-    params=SequenceA.forms_invalid_loop_ir_pairs.values(),
-)
-def forms_invalid_loop_ir_pair(request):
-    return request.param
-
-
 @pytest.fixture(scope="module", params=[SequenceA.all_solver_variables_names])
 def all_solver_variables_names(request):
     return request.param
@@ -151,39 +107,6 @@ def all_solver_variables_names(request):
 @pytest.fixture(scope="module", params=[SequenceA.ir_indicator_variables_names])
 def ir_indicator_variables_names(request):
     return request.param
-
-
-@pytest.fixture(scope="module", params=[SequenceA.ir_pair_corrector_variables_names])
-def ir_pair_corrector_variables_names(request):
-    return request.param
-
-
-@pytest.fixture(scope="module")
-def ir_indicator_pair_corrector_variables_names(
-    ir_indicator_variables_names, ir_pair_corrector_variables_names
-):
-    return ir_indicator_variables_names + ir_pair_corrector_variables_names
-
-
-@pytest.fixture(
-    scope="module",
-    params=[SequenceA.ir_triplet_corrector_indicator_variables_names],
-)
-def ir_triplet_corrector_variables_names(request):
-    return request.param
-
-
-@pytest.fixture(scope="module")
-def ir_indicator_pair_corrector_triplet_corrector_variables_names(
-    ir_indicator_variables_names,
-    ir_pair_corrector_variables_names,
-    ir_triplet_corrector_variables_names,
-):
-    return (
-        ir_indicator_variables_names
-        + ir_pair_corrector_variables_names
-        + ir_triplet_corrector_variables_names
-    )
 
 
 # Clear tests_data dir out for clean test environment
