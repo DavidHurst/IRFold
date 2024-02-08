@@ -34,15 +34,11 @@ class IRfold:
     def fold(
         cls,
         sequence: str,
-        max_n_tuple_sz_to_correct: int = 3,
         out_dir: str = ".",
         *,
         seq_name: str = "seq",
         save_performance: bool = False,
     ) -> Tuple[str, float]:
-        # Rename parametrised IRFoldCorX class s.t. the class name can be used to identify the correction level
-        if "X" in cls.__name__:
-            cls.__name__ = f"IRFoldCorX{str(max_n_tuple_sz_to_correct)}"
 
         # Find IRs in sequence
         found_irs: List[IR] = cls._find_irs(
@@ -63,7 +59,7 @@ class IRfold:
 
         # Define constraint programming problem and solve
         model, variables = cls._get_cp_model(
-            found_irs, seq_len, sequence, out_dir, seq_name, max_n_tuple_sz_to_correct
+            found_irs, seq_len, sequence, out_dir, seq_name
         )
 
         solver: CpSolver = CpSolver()
@@ -97,7 +93,7 @@ class IRfold:
                     out_dir,
                     cls.__name__,
                     n_irs_found,
-                    solver.NumBooleans(),
+                    len(variables),
                     solver.WallTime(),
                     solver.NumBranches(),
                     solver.NumConflicts(),
@@ -187,7 +183,6 @@ class IRfold:
         sequence: str,
         out_dir: str,
         seq_name: str,
-        max_n_tuple_sz_to_correct: int = 3,
     ) -> Tuple[CpModel, List[IntVar]]:
         model: CpModel = CpModel()
         n_irs: int = len(ir_list)
