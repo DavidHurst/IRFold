@@ -6,14 +6,16 @@ from irfold import (
     IRFoldBase,
     IRFoldVal1,
     IRfold,
-    IRFoldCor2,
-    IRFoldCor3,
 )
 
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRfold, IRFoldCor2, IRFoldCor3],
+    [
+        IRFoldBase,
+        IRFoldVal1,
+        IRfold,
+    ],
 )
 def test_not_none(
     ir_fold_variant, all_irs, sequence, sequence_length, sequence_name, data_dir
@@ -43,16 +45,6 @@ def test_not_none(
         (IRFoldBase, pytest.lazy_fixture("all_irs_names")),
         (IRFoldVal1, pytest.lazy_fixture("ir_indicator_variables_names")),
         (IRfold, pytest.lazy_fixture("ir_indicator_variables_names")),
-        (
-            IRFoldCor2,
-            pytest.lazy_fixture("ir_indicator_pair_corrector_variables_names"),
-        ),
-        (
-            IRFoldCor3,
-            pytest.lazy_fixture(
-                "ir_indicator_pair_corrector_triplet_corrector_variables_names"
-            ),
-        ),
     ],
 )
 def test_number_of_variables_generated(
@@ -82,14 +74,6 @@ def test_number_of_variables_generated(
         (IRFoldBase, pytest.lazy_fixture("all_irs_names")),
         (IRFoldVal1, pytest.lazy_fixture("ir_indicator_variables_names")),
         (IRfold, pytest.lazy_fixture("ir_indicator_variables_names")),
-        (
-            IRFoldCor2,
-            pytest.lazy_fixture("ir_indicator_pair_corrector_variables_names"),
-        ),
-        (
-            IRFoldCor3,
-            pytest.lazy_fixture("all_solver_variables_names"),
-        ),
     ],
 )
 def test_variables_for_correct_variables_generated(

@@ -7,8 +7,6 @@ from irfold import (
     IRFoldBase,
     IRFoldVal1,
     IRfold,
-    IRFoldCor2,
-    IRFoldCor3,
 )
 
 
@@ -17,7 +15,7 @@ from irfold import (
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRfold, IRFoldCor2, IRFoldCor3],
+    [IRFoldBase, IRFoldVal1, IRfold],
 )
 def test_output_not_none(
     ir_fold_variant,
@@ -37,7 +35,7 @@ def test_output_not_none(
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRfold, IRFoldCor2, IRFoldCor3],
+    [IRFoldBase, IRFoldVal1, IRfold],
 )
 def test_output_type_correct(
     ir_fold_variant,
@@ -57,11 +55,11 @@ def test_output_type_correct(
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRfold, IRFoldCor2, IRFoldCor3],
+    [IRfold],
 )
 def test_balanced_brackets(ir_fold_variant, data_dir):
     seq_len = 40
-    # ToDo: This shouldn't be randomised, find sequences that produce overlapping IRs and use as fixtures
+    # ToDo: This shouldn't be randomised, find sequence_fixtures that produce overlapping IRs and use as fixtures
     for _ in range(10):
         seq = "".join(random.choice("ACGU") for _ in range(seq_len))
         secondary_structure_pred, _ = ir_fold_variant.fold(seq, out_dir=data_dir)
@@ -73,7 +71,7 @@ def test_balanced_brackets(ir_fold_variant, data_dir):
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRFoldVal1, IRfold, IRFoldCor2, IRFoldCor3],
+    [IRFoldBase, IRFoldVal1, IRfold],
 )
 def test_ir_fold_variant_performance_written_to_file(
     ir_fold_variant,
