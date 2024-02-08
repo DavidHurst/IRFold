@@ -1,3 +1,5 @@
 __pycache__*
 .coverage
 .idea/
+.data/
+.experiment_scripts/
