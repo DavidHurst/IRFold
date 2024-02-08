@@ -4,7 +4,6 @@ import pytest
 from pathlib import Path
 
 from irfold import (
-    IRFoldBase,
     IRfold,
 )
 
@@ -14,7 +13,7 @@ from irfold import (
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRfold],
+    [IRfold],
 )
 def test_output_not_none(
     ir_fold_variant,
@@ -34,7 +33,7 @@ def test_output_not_none(
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRfold],
+    [IRfold],
 )
 def test_output_type_correct(
     ir_fold_variant,
@@ -70,7 +69,7 @@ def test_balanced_brackets(ir_fold_variant, data_dir):
 
 @pytest.mark.parametrize(
     "ir_fold_variant",
-    [IRFoldBase, IRfold],
+    [IRfold],
 )
 def test_ir_fold_variant_performance_written_to_file(
     ir_fold_variant,

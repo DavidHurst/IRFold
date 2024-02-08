@@ -3,7 +3,6 @@ from ortools.sat.python.cp_model import CpModel, IntVar
 import pytest
 
 from irfold import (
-    IRFoldBase,
     IRfold,
 )
 
@@ -11,7 +10,6 @@ from irfold import (
 @pytest.mark.parametrize(
     "ir_fold_variant",
     [
-        IRFoldBase,
         IRfold,
     ],
 )
@@ -40,7 +38,6 @@ def test_not_none(
 @pytest.mark.parametrize(
     "ir_fold_variant, variable_names",
     [
-        (IRFoldBase, pytest.lazy_fixture("all_irs_names")),
         (IRfold, pytest.lazy_fixture("ir_indicator_variables_names")),
     ],
 )
@@ -68,7 +65,6 @@ def test_number_of_variables_generated(
 @pytest.mark.parametrize(
     "ir_fold_variant, variable_names",
     [
-        (IRFoldBase, pytest.lazy_fixture("all_irs_names")),
         (IRfold, pytest.lazy_fixture("ir_indicator_variables_names")),
     ],
 )

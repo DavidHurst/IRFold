@@ -3,7 +3,6 @@ from pathlib import Path
 import pytest
 
 from irfold import (
-    IRFoldBase,
     IRfold,
 )
 
@@ -14,7 +13,6 @@ from irfold import (
 @pytest.mark.parametrize(
     "ir_fold_variant",
     [
-        IRFoldBase,
         IRfold,
     ],
 )
@@ -32,7 +30,6 @@ def test_not_none(ir_fold_variant, sequence, sequence_length, sequence_name, dat
 @pytest.mark.parametrize(
     "ir_fold_variant",
     [
-        IRFoldBase,
         IRfold,
     ],
 )
@@ -56,7 +53,6 @@ def test_number_of_irs_found(
 @pytest.mark.parametrize(
     "ir_fold_variant",
     [
-        IRFoldBase,
         IRfold,
     ],
 )
