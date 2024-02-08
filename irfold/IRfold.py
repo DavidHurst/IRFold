@@ -10,7 +10,7 @@ from .util import (
     IR,
     irs_to_dot_bracket,
     calc_free_energy,
-    irs_incompatible,
+    ir_pair_invalid_relative_pos,
     get_valid_gap_sz_ir_n_tuples,
     write_solver_performance_to_file,
     create_seq_file,
@@ -208,7 +208,7 @@ class IRfold:
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
             for ir_pair, idx_pair in zip(valid_ir_pairs, valid_idx_pairs)
-            if irs_incompatible([ir_pair[0], ir_pair[1]])
+            if ir_pair_invalid_relative_pos(ir_pair[0], ir_pair[1])
         ]
 
         for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:

@@ -1,1 +1,1 @@
-from .irfold import *
+from .IRfold import *
