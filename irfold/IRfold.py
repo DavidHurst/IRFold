@@ -226,14 +226,13 @@ class IRfold:
         # All constraints and the objective must have integer coefficients for CP-SAT solver
 
         # Obtain free energies of the IRs that are valid, they comprise the coefficients for ir vars
-        variable_coefficients: List[int] = []
+        variable_coefficients: List[float] = []
         for var in ir_indicator_variables:
             ir_idx: int = int(re.findall(r"-?\d+\.?\d*", var.Name())[0])
             ir_db_repr: str = irs_to_dot_bracket([ir_list[ir_idx]], seq_len)
-            ir_free_energy: float = calc_free_energy(
-                ir_db_repr, sequence, out_dir, seq_name
+            variable_coefficients.append(
+                calc_free_energy(ir_db_repr, sequence, out_dir, seq_name)
             )
-            variable_coefficients.append(round(ir_free_energy))
 
         # Define objective function
         obj_fn_expr = LinearExpr.WeightedSum(
