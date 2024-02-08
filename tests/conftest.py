@@ -99,11 +99,6 @@ def non_co_located_ir_pair(request):
     return request.param
 
 
-@pytest.fixture(scope="module", params=[SequenceA.all_solver_variables_names])
-def all_solver_variables_names(request):
-    return request.param
-
-
 @pytest.fixture(scope="module", params=[SequenceA.ir_indicator_variables_names])
 def ir_indicator_variables_names(request):
     return request.param
