@@ -1,3 +1,0 @@
->ENERGY = -96.8  Tetr.rost._SDB-5909
-GCCAGGGUAGCAAUGCCUGUGACCUCGUGUGGCAUAAACAAUGUAGUUAGAAUAGUCAGAGUAUGAGAGUUUGAUGAGACAGUUUGCUAAGAGUGUGCCCGUUCCAAACAGUGAGUUGCUAUGGUGGAAACCUAGUAAUAGGACUUCACCAGGGCAUUAAAGAGCUGAGGAACCGCCUCAGGCUGGCAACAGAACAGGGAAAACUUGCCGCUUAUUGUGGUGGAAGGAUAACAUACUCAUUAACUGUCAAGCUAAUCGGUUCUGCUAUUCUGAUCAGACACU
-((((((((.(((.....))).))))....))))........(((.((((((((((.(((((..(((.(((((.....(((((((......(((((((.((.(((((.(((((((((.(((.(((((((..((((....))))..))))))).))).........((((((.....)))))).(((....)))..((((.....))))..)))))))))..)))))))....)))))))...))))))))))))..))).)))))))))))))))...)))..

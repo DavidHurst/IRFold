@@ -1,1 +1,0 @@
-Download dataset from https://bprna.cgrb.oregonstate.edu/download.php. Place the fasta files, st files and bpseq files in this directory. Remove any files matching "allFasta_*.fasta" from downloaded fasta files.
