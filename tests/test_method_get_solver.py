@@ -4,7 +4,6 @@ import pytest
 
 from irfold import (
     IRFoldBase,
-    IRFoldVal1,
     IRfold,
 )
 
@@ -13,7 +12,6 @@ from irfold import (
     "ir_fold_variant",
     [
         IRFoldBase,
-        IRFoldVal1,
         IRfold,
     ],
 )
@@ -43,7 +41,6 @@ def test_not_none(
     "ir_fold_variant, variable_names",
     [
         (IRFoldBase, pytest.lazy_fixture("all_irs_names")),
-        (IRFoldVal1, pytest.lazy_fixture("ir_indicator_variables_names")),
         (IRfold, pytest.lazy_fixture("ir_indicator_variables_names")),
     ],
 )
@@ -72,7 +69,6 @@ def test_number_of_variables_generated(
     "ir_fold_variant, variable_names",
     [
         (IRFoldBase, pytest.lazy_fixture("all_irs_names")),
-        (IRFoldVal1, pytest.lazy_fixture("ir_indicator_variables_names")),
         (IRfold, pytest.lazy_fixture("ir_indicator_variables_names")),
     ],
 )
