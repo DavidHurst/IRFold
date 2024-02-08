@@ -80,7 +80,7 @@ def invalid_gap_size_ir(request):
 
 
 @pytest.fixture(scope="module", params=SequenceA.not_nested_ir_pairs.values())
-def disjoint_ir_pair(request):
+def not_nested_ir_pair(request):
     return request.param
 
 
@@ -96,6 +96,11 @@ def co_located_ir_pair(request):
 
 @pytest.fixture(scope="module", params=SequenceA.non_co_located_ir_pairs.values())
 def non_co_located_ir_pair(request):
+    return request.param
+
+
+@pytest.fixture(scope="module", params=SequenceA.partially_nested_ir_pairs.values())
+def partially_nested_ir_pair(request):
     return request.param
 
 
