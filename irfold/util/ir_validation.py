@@ -11,10 +11,6 @@ def ir_has_valid_gap_size(ir: IR):
     return right_strand_start_idx - left_strand_end_idx - 1 >= 3
 
 
-def irs_incompatible(ir_list: List[IR]) -> bool:
-    return irs_co_located(ir_list) or not irs_valid_relative_pos(ir_list)
-
-
 # =================== Co-location checks ===================
 
 
@@ -137,29 +133,6 @@ def irs_wholly_nested(ir_list: List[IR]) -> bool:
 
 # =================== Partial nesting checks ===================
 
-
-# def ir_pair_partially_nested(ir_a: IR, ir_b: IR) -> bool:
-#     """Returns true if ir_a is partially nested with ir_b i.e. if ir_a and ir_b form a pseudoknot with each other."""
-#     ir_a_left_strand: Tuple[int, int] = ir_a[0]
-#     ir_b_left_strand: Tuple[int, int] = ir_b[0]
-#
-#     latest_left_string_base_idx: int = (
-#         ir_a_left_strand[1]
-#         if ir_a_left_strand[1] > ir_b_left_strand[1]
-#         else ir_b_left_strand[1]
-#     )
-#
-#     earliest_right_string_base_idx: int = (
-#         ir_a[1][0] if ir_a[1][0] < ir_b[1][0] else ir_b[1][0]
-#     )
-#
-#     num_bases_inbetween_latest_left_and_earliest_right_bases: int = (
-#         earliest_right_string_base_idx - latest_left_string_base_idx - 1
-#     )
-#
-#     return num_bases_inbetween_latest_left_and_earliest_right_bases >= 3
-
-
 def ir_pair_partially_nested(ir_a: IR, ir_b: IR) -> bool:
     """Returns true if ir_a is partially nested with ir_b."""
     ir_a_gap_first_idx: int = ir_a[0][1] + 1
@@ -227,17 +200,10 @@ def irs_partially_nested(ir_list: List[IR]) -> bool:
 # =================== Combined relative positioning checks ===================
 
 
-def ir_pair_valid_relative_pos(ir_a: IR, ir_b: IR) -> bool:
+def ir_pair_invalid_relative_pos(ir_a: IR, ir_b: IR) -> bool:
     return (
-        ir_pair_wholly_nested(ir_a, ir_b)
-        or ir_pair_not_nested(ir_a, ir_b)
-        or not ir_pair_partially_nested(ir_a, ir_b)
-    )
-
-
-def irs_valid_relative_pos(ir_list: List[IR]) -> bool:
-    return (
-        irs_not_nested(ir_list)
-        or irs_wholly_nested(ir_list)
-        or not irs_partially_nested(ir_list)
+        ir_pair_co_located(ir_a, ir_b)
+        or not ir_pair_wholly_nested(ir_a, ir_b)
+        or not ir_pair_not_nested(ir_a, ir_b)
+        or ir_pair_partially_nested(ir_a, ir_b)
     )
