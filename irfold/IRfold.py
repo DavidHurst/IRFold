@@ -16,14 +16,9 @@ from .util import (
     create_seq_file,
     run_cmd,
 )
-from ortools.sat.python.cp_model import (
-    CpModel,
-    CpSolver,
-    IntVar,
-    LinearExpr,
-    OPTIMAL,
-    FEASIBLE,
-)
+from ortools.linear_solver import pywraplp
+from ortools.linear_solver.pywraplp import Solver as MIPSolver
+
 from tqdm import tqdm
 
 
@@ -58,28 +53,28 @@ class IRfold:
             return db_repr, obj_fn_value
 
         # Define constraint programming problem and solve
-        model, variables = cls._get_cp_model(
+        solver, variables = cls._get_ilp_model(
             found_irs, seq_len, sequence, out_dir, seq_name
         )
 
-        solver: CpSolver = CpSolver()
+        # solver: CpSolver = CpSolver()
 
         with tqdm(
             desc=f"{cls.__name__} - Running solver ({len(variables)} variables)"
         ) as _:
-            status = solver.Solve(model)
+            status = solver.Solve()
 
-        if status == OPTIMAL or status == FEASIBLE:
+        if status == pywraplp.Solver.OPTIMAL or status == pywraplp.Solver.FEASIBLE:
             # Return dot bracket repr and objective function's final value
             active_ir_idxs: List[int] = [
-                int(re.findall(r"-?\d+\.?\d*", v.Name())[0])
+                int(re.findall(r"-?\d+\.?\d*", v.name())[0])
                 for v in variables
-                if solver.Value(v) == 1 and "corrector" not in v.Name()
+                if v.solution_value() == 1
             ]
             db_repr: str = irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
-            obj_fn_value: float = solver.ObjectiveValue()
+            obj_fn_value: float = solver.Objective().Value()
 
             if save_performance:
                 dot_bracket_repr_mfe: float = calc_free_energy(
@@ -95,12 +90,12 @@ class IRfold:
                     n_irs_found,
                     len(variables),
                     solver.WallTime(),
-                    solver.NumBranches(),
-                    solver.NumConflicts(),
+                    solver.nodes(),
+                    solver.iterations(),
                 )
             return db_repr, obj_fn_value
         else:
-            # The optimisation problem does not have an optimal solution
+            # The optimisation problem does not have a solution
             db_repr, obj_fn_value = "".join(["." for _ in range(seq_len)]), 0
             if save_performance:
                 write_solver_performance_to_file(
@@ -177,14 +172,19 @@ class IRfold:
             return []
 
     @staticmethod
-    def _get_cp_model(
+    def _get_ilp_model(
         ir_list: List[IR],
         seq_len: int,
         sequence: str,
         out_dir: str,
         seq_name: str,
-    ) -> Tuple[CpModel, List[IntVar]]:
-        model: CpModel = CpModel()
+    )-> Tuple[MIPSolver, List[MIPSolver.IntVar]]:
+
+        solver: MIPSolver = MIPSolver.CreateSolver("SCIP")
+        infinity = solver.infinity()
+
+        if not solver:
+            raise Exception("Failed to create MIP solver")
         n_irs: int = len(ir_list)
 
         # Create binary indicator variables for IRs
@@ -192,14 +192,14 @@ class IRfold:
             i for i in range(n_irs) if not ir_has_valid_gap_size(ir_list[i])
         ]
         ir_indicator_variables = [
-            model.NewIntVar(0, 1, f"ir_{i}")
+            solver.IntVar(0.0, infinity, f"ir_{i}")
             for i in range(n_irs)
             if i not in invalid_gap_sz_ir_idxs
         ]
 
         # If 1 or fewer variables, trivial or impossible optimisation problem, will be trivially handled by solver
         if len(ir_indicator_variables) <= 1:
-            return model, ir_indicator_variables
+            return solver, ir_indicator_variables
 
         # Add XOR between IRs that are incompatible
         valid_ir_pairs, valid_idx_pairs = get_valid_gap_sz_ir_n_tuples(
@@ -207,37 +207,43 @@ class IRfold:
         )
         incompatible_ir_pair_idxs: List[Tuple[int, int]] = [
             idx_pair
-            for ir_pair, idx_pair in zip(valid_ir_pairs, valid_idx_pairs)
+            for ir_pair, idx_pair in tqdm(
+                zip(valid_ir_pairs, valid_idx_pairs),
+                desc="Comparing IR pairs",
+                total=len(valid_ir_pairs),
+            )
             if ir_pair_invalid_relative_pos(ir_pair[0], ir_pair[1])
         ]
 
-        for ir_a_idx, ir_b_idx in incompatible_ir_pair_idxs:
-            # Search required as some IR variables might not have had variables created as they were invalid so
-            # list ordering of variables cannot be relied upon
-            ir_a_var: IntVar = [
-                var for var in ir_indicator_variables if str(ir_a_idx) in var.Name()
-            ][0]
-            ir_b_var: IntVar = [
-                var for var in ir_indicator_variables if str(ir_b_idx) in var.Name()
-            ][0]
-
-            model.Add(ir_a_var + ir_b_var <= 1)
-
-        # All constraints and the objective must have integer coefficients for CP-SAT solver
-
-        # Obtain free energies of the IRs that are valid, they comprise the coefficients for ir vars
-        variable_coefficients: List[float] = []
-        for var in ir_indicator_variables:
-            ir_idx: int = int(re.findall(r"-?\d+\.?\d*", var.Name())[0])
-            ir_db_repr: str = irs_to_dot_bracket([ir_list[ir_idx]], seq_len)
-            variable_coefficients.append(
-                calc_free_energy(ir_db_repr, sequence, out_dir, seq_name)
+        # List comprehension for speed over for-loop.
+        # Search for variables required as discarding invalid gap sized IRs changes IR variable ordering in list
+        [
+            solver.Add(
+                [var for var in ir_indicator_variables if str(ir_a_idx) in var.name()][
+                    0
+                ]
+                + [
+                    var for var in ir_indicator_variables if str(ir_b_idx) in var.name()
+                ][0]
+                <= 1
             )
+            for ir_a_idx, ir_b_idx in tqdm(
+                incompatible_ir_pair_idxs,
+                desc="Adding XOR constraints",
+                total=len(incompatible_ir_pair_idxs),
+            )
+        ]
 
         # Define objective function
-        obj_fn_expr = LinearExpr.WeightedSum(
-            ir_indicator_variables, variable_coefficients
-        )
-        model.Minimize(obj_fn_expr)
+        obj_fn = solver.Objective()
+        for var in ir_indicator_variables:
+            ir_idx: int = int(re.findall(r"-?\d+\.?\d*", var.name())[0])
+            ir_db_repr: str = irs_to_dot_bracket([ir_list[ir_idx]], seq_len)
 
-        return model, ir_indicator_variables
+            obj_fn.SetCoefficient(
+                var, calc_free_energy(ir_db_repr, sequence, out_dir, seq_name)
+            )
+
+        obj_fn.SetMinimization()
+
+        return solver, ir_indicator_variables
