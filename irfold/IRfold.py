@@ -229,7 +229,7 @@ class IRfold:
                     var for var in ir_indicator_variables if str(ir_b_idx) in var.name()
                 ][0]
                 <= 1,
-                f"{ir_a_idx}_XOR_{ir_b_idx}",
+                f"ir_{ir_a_idx}_XOR_ir_{ir_b_idx}",
             )
             for ir_a_idx, ir_b_idx in tqdm(
                 incompatible_ir_pair_idxs,
