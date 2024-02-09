@@ -52,18 +52,15 @@ class IRfold:
             return db_repr, obj_fn_value
 
         # Define constraint programming problem and solve
-        solver, variables = cls._get_ilp_model(
+        ilp_model, variables = cls._get_ilp_model(
             found_irs, seq_len, sequence, out_dir, seq_name, show_prog
         )
-
-        # for const in solver.constraints():
-        #     print(const.name())
 
         with tqdm(
             desc=f"Running solver ({len(variables)} variables)",
             disable=not show_prog,
         ) as _:
-            status = solver.Solve()
+            status = ilp_model.Solve()
 
         if status == pywraplp.Solver.OPTIMAL or status == pywraplp.Solver.FEASIBLE:
             # Return dot bracket repr and objective function's final value
@@ -75,7 +72,7 @@ class IRfold:
             db_repr: str = irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
-            obj_fn_value: float = solver.Objective().Value()
+            obj_fn_value: float = ilp_model.Objective().Value()
 
             if save_performance:
                 dot_bracket_repr_mfe: float = calc_free_energy(
@@ -90,9 +87,9 @@ class IRfold:
                     cls.__name__,
                     n_irs_found,
                     len(variables),
-                    solver.WallTime(),
-                    solver.nodes(),
-                    solver.iterations(),
+                    ilp_model.WallTime(),
+                    ilp_model.nodes(),
+                    ilp_model.iterations(),
                 )
             return db_repr, obj_fn_value
         else:
@@ -181,12 +178,12 @@ class IRfold:
         seq_name: str,
         show_prog: bool = False,
     ) -> Tuple[MIPSolver, List[MIPSolver.IntVar]]:
+        ilp_model: MIPSolver = MIPSolver.CreateSolver("SCIP")
+        infinity = ilp_model.infinity()
 
-        solver: MIPSolver = MIPSolver.CreateSolver("SCIP")
-        infinity = solver.infinity()
-
-        if not solver:
+        if not ilp_model:
             raise Exception("Failed to create MIP solver")
+
         n_irs: int = len(ir_list)
 
         # Create binary indicator variables for IRs
@@ -194,14 +191,14 @@ class IRfold:
             i for i in range(n_irs) if not ir_has_valid_gap_size(ir_list[i])
         ]
         ir_indicator_variables = [
-            solver.IntVar(0.0, infinity, f"ir_{i}")
+            ilp_model.IntVar(0.0, infinity, f"ir_{i}")
             for i in range(n_irs)
             if i not in invalid_gap_sz_ir_idxs
         ]
 
         # If 1 or fewer variables, trivial or impossible optimisation problem, will be trivially handled by solver
         if len(ir_indicator_variables) <= 1:
-            return solver, ir_indicator_variables
+            return ilp_model, ir_indicator_variables
 
         # Add XOR between IRs that are incompatible
         valid_ir_pairs, valid_idx_pairs = get_valid_gap_sz_ir_n_tuples(
@@ -221,7 +218,7 @@ class IRfold:
         # List comprehension for speed over for-loop.
         # Search for variables required as discarding invalid gap sized IRs changes IR variable ordering in list
         [
-            solver.Add(
+            ilp_model.Add(
                 [var for var in ir_indicator_variables if str(ir_a_idx) in var.name()][
                     0
                 ]
@@ -240,7 +237,7 @@ class IRfold:
         ]
 
         # Define objective function
-        obj_fn = solver.Objective()
+        obj_fn = ilp_model.Objective()
         for var in ir_indicator_variables:
             ir_idx: int = int(re.findall(r"-?\d+\.?\d*", var.name())[0])
             ir_db_repr: str = irs_to_dot_bracket([ir_list[ir_idx]], seq_len)
@@ -251,4 +248,4 @@ class IRfold:
 
         obj_fn.SetMinimization()
 
-        return solver, ir_indicator_variables
+        return ilp_model, ir_indicator_variables
