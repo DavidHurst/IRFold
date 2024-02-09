@@ -23,8 +23,6 @@ from tqdm import tqdm
 
 
 class IRfold:
-    """Extends IRFold model by validating found IRs and IRs in pairs before passing them to the solver."""
-
     @classmethod
     def fold(
         cls,
@@ -33,6 +31,7 @@ class IRfold:
         *,
         seq_name: str = "seq",
         save_performance: bool = False,
+        show_prog: bool = False,
     ) -> Tuple[str, float]:
 
         # Find IRs in sequence
@@ -54,13 +53,15 @@ class IRfold:
 
         # Define constraint programming problem and solve
         solver, variables = cls._get_ilp_model(
-            found_irs, seq_len, sequence, out_dir, seq_name
+            found_irs, seq_len, sequence, out_dir, seq_name, show_prog
         )
 
-        # solver: CpSolver = CpSolver()
+        # for const in solver.constraints():
+        #     print(const.name())
 
         with tqdm(
-            desc=f"{cls.__name__} - Running solver ({len(variables)} variables)"
+            desc=f"Running solver ({len(variables)} variables)",
+            disable=not show_prog,
         ) as _:
             status = solver.Solve()
 
@@ -178,7 +179,8 @@ class IRfold:
         sequence: str,
         out_dir: str,
         seq_name: str,
-    )-> Tuple[MIPSolver, List[MIPSolver.IntVar]]:
+        show_prog: bool = False,
+    ) -> Tuple[MIPSolver, List[MIPSolver.IntVar]]:
 
         solver: MIPSolver = MIPSolver.CreateSolver("SCIP")
         infinity = solver.infinity()
@@ -211,6 +213,7 @@ class IRfold:
                 zip(valid_ir_pairs, valid_idx_pairs),
                 desc="Comparing IR pairs",
                 total=len(valid_ir_pairs),
+                disable=not show_prog,
             )
             if ir_pair_invalid_relative_pos(ir_pair[0], ir_pair[1])
         ]
@@ -225,12 +228,14 @@ class IRfold:
                 + [
                     var for var in ir_indicator_variables if str(ir_b_idx) in var.name()
                 ][0]
-                <= 1
+                <= 1,
+                f"{ir_a_idx}_XOR_{ir_b_idx}",
             )
             for ir_a_idx, ir_b_idx in tqdm(
                 incompatible_ir_pair_idxs,
                 desc="Adding XOR constraints",
                 total=len(incompatible_ir_pair_idxs),
+                disable=not show_prog,
             )
         ]
 
