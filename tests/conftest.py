@@ -62,10 +62,13 @@ def ir_pair(request):
     return request.param
 
 
-@pytest.fixture(
-    scope="module", params=list(SequenceA.all_ir_pairs_dot_bracket.values())
-)
-def ir_pair_dot_bracket_repr(request):
+@pytest.fixture(scope="module", params=[SequenceA.all_ir_pairs.values()])
+def all_ir_pairs(request):
+    return request.param
+
+
+@pytest.fixture(scope="module", params=[SequenceA.invalid_gap_size_irs.values()])
+def all_invalid_gap_size_irs(request):
     return request.param
 
 
@@ -94,6 +97,11 @@ def co_located_ir_pair(request):
     return request.param
 
 
+@pytest.fixture(scope="module", params=[SequenceA.co_located_ir_pairs.values()])
+def all_co_located_ir_pairs(request):
+    return request.param
+
+
 @pytest.fixture(scope="module", params=SequenceA.non_co_located_ir_pairs.values())
 def non_co_located_ir_pair(request):
     return request.param
@@ -101,6 +109,11 @@ def non_co_located_ir_pair(request):
 
 @pytest.fixture(scope="module", params=SequenceA.partially_nested_ir_pairs.values())
 def partially_nested_ir_pair(request):
+    return request.param
+
+
+@pytest.fixture(scope="module", params=[SequenceA.partially_nested_ir_pairs.values()])
+def all_partially_nested_ir_pairs(request):
     return request.param
 
 
