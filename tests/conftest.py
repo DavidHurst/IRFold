@@ -14,6 +14,11 @@ def data_dir():
     return DATA_DIR
 
 
+@pytest.fixture(scope="module", params=[SequenceA.all_irs.items()])
+def all_irs_with_names(request):
+    return request.param
+
+
 @pytest.fixture(scope="module", params=[SequenceA.all_irs.values()])
 def all_irs(request):
     return request.param
