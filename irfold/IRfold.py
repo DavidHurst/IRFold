@@ -166,8 +166,7 @@ class IRfold:
 
             return found_irs
         else:
-            print(str(out.decode("utf-8")))
-            return []
+            raise Exception(str(out.decode("utf-8")))
 
     @staticmethod
     def _get_ilp_model(
@@ -235,6 +234,9 @@ class IRfold:
                 disable=not show_prog,
             )
         ]
+
+        # Set constraints to only be considered if the current solution violates the constraint
+        [const.set_is_lazy(True) for const in ilp_model.constraints()]
 
         # Define objective function
         obj_fn = ilp_model.Objective()
