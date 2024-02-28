@@ -1,6 +1,7 @@
 __all__ = ["IRfold"]
 
 import re
+import multiprocessing as mp
 from pathlib import Path
 from typing import Tuple, List
 
@@ -16,10 +17,19 @@ from .util import (
     create_seq_file,
     run_cmd,
 )
-from ortools.linear_solver import pywraplp
-from ortools.linear_solver.pywraplp import Solver as MIPSolver
+from ortools.sat.python.cp_model import (
+    CpModel,
+    CpSolver,
+    IntVar,
+    LinearExpr,
+    OPTIMAL,
+    FEASIBLE,
+)
 
 from tqdm import tqdm
+
+IUPACPAL_LOCK = mp.Lock()
+FE_CALC_LOCK = mp.Lock()
 
 
 class IRfold:
@@ -32,13 +42,13 @@ class IRfold:
         seq_name: str = "seq",
         save_performance: bool = False,
         show_prog: bool = False,
+        max_mismatches: int = 0,
+        show_warnings: bool = False,
     ) -> Tuple[str, float]:
 
         # Find IRs in sequence
         found_irs: List[IR] = cls._find_irs(
-            sequence,
-            out_dir,
-            seq_name=seq_name,
+            sequence, out_dir, seq_name=seq_name, max_mismatches=max_mismatches
         )
 
         n_irs_found: int = len(found_irs)
@@ -53,30 +63,38 @@ class IRfold:
 
         # Define constraint programming problem and solve
         ilp_model, variables = cls._get_ilp_model(
-            found_irs, seq_len, sequence, out_dir, seq_name, show_prog
+            found_irs,
+            seq_len,
+            sequence,
+            out_dir,
+            seq_name,
+            show_prog=show_prog,
+            show_warnings=show_warnings,
         )
+
+        solver: CpSolver = CpSolver()
 
         with tqdm(
             desc=f"Running solver ({len(variables)} variables)",
             disable=not show_prog,
         ) as _:
-            status = ilp_model.Solve()
+            status = solver.Solve(ilp_model)
 
-        if status == pywraplp.Solver.OPTIMAL or status == pywraplp.Solver.FEASIBLE:
+        if status == OPTIMAL or status == FEASIBLE:
             # Return dot bracket repr and objective function's final value
             active_ir_idxs: List[int] = [
-                int(re.findall(r"-?\d+\.?\d*", v.name())[0])
+                int(re.findall(r"-?\d+\.?\d*", v.Name())[0])
                 for v in variables
-                if v.solution_value() == 1
+                if solver.Value(v) == 1
             ]
             db_repr: str = irs_to_dot_bracket(
                 [found_irs[i] for i in active_ir_idxs], seq_len
             )
-            obj_fn_value: float = ilp_model.Objective().Value()
+            obj_fn_value: float = solver.ObjectiveValue()
 
             if save_performance:
                 dot_bracket_repr_mfe: float = calc_free_energy(
-                    db_repr, sequence, out_dir, seq_name
+                    db_repr, sequence, out_dir, seq_name, show_warnings=show_warnings
                 )
                 write_solver_performance_to_file(
                     db_repr,
@@ -87,9 +105,9 @@ class IRfold:
                     cls.__name__,
                     n_irs_found,
                     len(variables),
-                    ilp_model.WallTime(),
-                    ilp_model.nodes(),
-                    ilp_model.iterations(),
+                    solver.WallTime(),
+                    solver.NumBranches(),
+                    solver.NumConflicts(),
                 )
             return db_repr, obj_fn_value
         else:
@@ -107,66 +125,68 @@ class IRfold:
         out_dir: str = ".",
         *,
         seq_name: str = "seq",
+        max_mismatches: int = 0,
     ) -> List[IR]:
-        out_dir_path: Path = Path(out_dir).resolve()
-        if not out_dir_path.exists():
-            out_dir_path = Path.cwd().resolve()
+        with IUPACPAL_LOCK:
+            out_dir_path: Path = Path(out_dir).resolve()
+            if not out_dir_path.exists():
+                out_dir_path = Path.cwd().resolve()
 
-        # Check IUPACpal has been compiled to this cwd
-        iupacpal_exe: Path = Path(__file__).parent / "IUPACpal"
-        if not iupacpal_exe.exists():
-            raise FileNotFoundError("Could not find IUPACpal executable.")
+            # Check IUPACpal has been compiled to this cwd
+            iupacpal_exe: Path = Path(__file__).parent / "IUPACpal"
+            if not iupacpal_exe.exists():
+                raise FileNotFoundError("Could not find IUPACpal executable.")
 
-        # Write sequence to file for IUPACpal
-        seq_file: str = str(out_dir_path / f"{seq_name}.fasta")
-        create_seq_file(sequence, seq_name, seq_file)
-        irs_output_file: str = str(out_dir_path / f"{seq_name}_found_irs.txt")
+            # Write sequence to file for IUPACpal
+            seq_file: str = str(out_dir_path / f"{seq_name}.fasta")
+            create_seq_file(sequence, seq_name, seq_file)
+            irs_output_file: str = str(out_dir_path / f"{seq_name}_found_irs.txt")
 
-        # ToDo: Refactor this to capture stdout of running IUPACpal instead of writing to file then extracting
-        _, out, _ = run_cmd(
-            [
-                str(iupacpal_exe),
-                "-f",
-                seq_file,
-                "-s",
-                seq_name,
-                "-m",
-                str(2),
-                "-M",
-                str(len(sequence)),
-                "-g",
-                str(len(sequence) - 1),
-                "-x",
-                str(0),
-                "-o",
-                str(out_dir_path / f"{seq_name}_found_irs.txt"),
-            ]
-        )
+            # ToDo: Refactor this to capture stdout of running IUPACpal instead of writing to file then extracting
+            _, out, _ = run_cmd(
+                [
+                    str(iupacpal_exe),
+                    "-f",
+                    seq_file,
+                    "-s",
+                    seq_name,
+                    "-m",
+                    str(2),
+                    "-M",
+                    str(len(sequence)),
+                    "-g",
+                    str(len(sequence) - 1),
+                    "-x",
+                    str(max_mismatches),
+                    "-o",
+                    str(out_dir_path / f"{seq_name}_found_irs.txt"),
+                ]
+            )
 
-        if "Error" not in str(out):
-            # Extract IR indices from format IUPACpal outputs
-            found_irs: List[IR] = []
+            if "Error" not in str(out):
+                # Extract IR indices from format IUPACpal outputs
+                found_irs: List[IR] = []
 
-            with open(irs_output_file) as f_in:
-                lines: List[str] = list(
-                    line for line in (l.strip() for l in f_in) if line
-                )
+                with open(irs_output_file) as f_in:
+                    lines: List[str] = list(
+                        line for line in (l.strip() for l in f_in) if line
+                    )
 
-            ir_lines: List[str] = lines[lines.index("Palindromes:") + 1 :]
-            formatted_irs: List[List[str]] = [
-                ir_lines[i : i + 3] for i in range(0, len(ir_lines), 3)
-            ]
+                ir_lines: List[str] = lines[lines.index("Palindromes:") + 1 :]
+                formatted_irs: List[List[str]] = [
+                    ir_lines[i : i + 3] for i in range(0, len(ir_lines), 3)
+                ]
 
-            for f_ir in formatted_irs:
-                ir_idxs: List[int] = re.findall(r"-?\d+\.?\d*", "".join(f_ir))
+                for f_ir in formatted_irs:
+                    ir_idxs: List[int] = re.findall(r"-?\d+\.?\d*", "".join(f_ir))
 
-                left_start, left_end = int(ir_idxs[0]) - 1, int(ir_idxs[1]) - 1
-                right_start, right_end = int(ir_idxs[3]) - 1, int(ir_idxs[2]) - 1
-                found_irs.append(((left_start, left_end), (right_start, right_end)))
+                    left_start, left_end = int(ir_idxs[0]) - 1, int(ir_idxs[1]) - 1
+                    right_start, right_end = int(ir_idxs[3]) - 1, int(ir_idxs[2]) - 1
+                    found_irs.append(((left_start, left_end), (right_start, right_end)))
 
-            return found_irs
-        else:
-            raise Exception(str(out.decode("utf-8")))
+                return found_irs
+            else:
+                raise Exception(str(out.decode("utf-8")))
 
     @staticmethod
     def _get_ilp_model(
@@ -175,10 +195,11 @@ class IRfold:
         sequence: str,
         out_dir: str,
         seq_name: str,
+        *,
         show_prog: bool = False,
-    ) -> Tuple[MIPSolver, List[MIPSolver.IntVar]]:
-        ilp_model: MIPSolver = MIPSolver.CreateSolver("SCIP")
-        infinity = ilp_model.infinity()
+        show_warnings: bool = False,
+    ) -> Tuple[CpModel, List[IntVar]]:
+        ilp_model: CpModel = CpModel()
 
         if not ilp_model:
             raise Exception("Failed to create MIP solver")
@@ -190,7 +211,7 @@ class IRfold:
             i for i in range(n_irs) if not ir_has_valid_gap_size(ir_list[i])
         ]
         ir_indicator_variables = [
-            ilp_model.IntVar(0.0, infinity, f"ir_{i}")
+            ilp_model.NewBoolVar(f"ir_{i}")
             for i in range(n_irs)
             if i not in invalid_gap_sz_ir_idxs
         ]
@@ -217,15 +238,19 @@ class IRfold:
         # List comprehension for speed over for-loop.
         # Search for variables required as discarding invalid gap sized IRs changes IR variable ordering in list
         [
-            ilp_model.Add(
-                [var for var in ir_indicator_variables if str(ir_a_idx) in var.name()][
-                    0
+            ilp_model.AddAtMostOne(
+                [
+                    [
+                        var
+                        for var in ir_indicator_variables
+                        if str(ir_a_idx) in var.Name()
+                    ][0],
+                    [
+                        var
+                        for var in ir_indicator_variables
+                        if str(ir_b_idx) in var.Name()
+                    ][0],
                 ]
-                + [
-                    var for var in ir_indicator_variables if str(ir_b_idx) in var.name()
-                ][0]
-                <= 1,
-                f"ir_{ir_a_idx}_XOR_ir_{ir_b_idx}",
             )
             for ir_a_idx, ir_b_idx in tqdm(
                 incompatible_ir_pair_idxs,
@@ -235,19 +260,20 @@ class IRfold:
             )
         ]
 
-        # Set constraints to only be considered if the current solution violates the constraint
-        [const.set_is_lazy(True) for const in ilp_model.constraints()]
-
-        # Define objective function
-        obj_fn = ilp_model.Objective()
+        # All constraints and the objective must have integer coefficients for CP-SAT solver
+        # Obtain free energies of the IRs that are valid, they comprise the coefficients for ir vars
+        variable_coefficients: List[int] = []
         for var in ir_indicator_variables:
-            ir_idx: int = int(re.findall(r"-?\d+\.?\d*", var.name())[0])
+            ir_idx: int = int(re.findall(r"-?\d+\.?\d*", var.Name())[0])
             ir_db_repr: str = irs_to_dot_bracket([ir_list[ir_idx]], seq_len)
-
-            obj_fn.SetCoefficient(
-                var, calc_free_energy(ir_db_repr, sequence, out_dir, seq_name)
+            ir_free_energy: float = calc_free_energy(
+                ir_db_repr, sequence, out_dir, seq_name, show_warnings=show_warnings
             )
-
-        obj_fn.SetMinimization()
+            variable_coefficients.append(round(ir_free_energy))
+        # Define objective function
+        obj_fn_expr = LinearExpr.WeightedSum(
+            ir_indicator_variables, variable_coefficients
+        )
+        ilp_model.Minimize(obj_fn_expr)
 
         return ilp_model, ir_indicator_variables

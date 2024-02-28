@@ -55,7 +55,12 @@ def get_valid_gap_sz_ir_n_tuples(
 
 
 def calc_free_energy(
-    dot_brk_repr: str, sequence: str, out_dir: str, seq_name: str = "seq"
+    dot_brk_repr: str,
+    sequence: str,
+    out_dir: str,
+    seq_name: str = "seq",
+    *,
+    show_warnings: bool = True,
 ) -> float:
     out_dir_path: Path = Path(out_dir).resolve()
     if not out_dir_path.exists():
@@ -65,7 +70,10 @@ def calc_free_energy(
 
     # RNAlib requires a file passed as parameter even if not writing to it
     with open(out_file, "a") as file:
-        free_energy = RNA.eval_structure_simple(sequence, dot_brk_repr, 1, file)
+        if show_warnings:
+            free_energy = RNA.eval_structure_simple(sequence, dot_brk_repr, 1, file)
+        else:
+            free_energy = RNA.eval_structure_simple(sequence, dot_brk_repr, -1, file)
 
     return free_energy
 

@@ -117,12 +117,3 @@ def ir_pair_partially_nested(ir_a: IR, ir_b: IR) -> bool:
 def ir_pair_invalid_relative_pos(ir_a: IR, ir_b: IR) -> bool:
     if ir_pair_co_located(ir_a, ir_b) or ir_pair_partially_nested(ir_a, ir_b):
         return True
-
-    # return (
-    #     ir_pair_co_located(ir_a, ir_b)
-    #     or not (
-    #         ir_pair_wholly_nested(ir_a, ir_b)
-    #         or ir_pair_not_nested(ir_a, ir_b)
-    #         or ir_pair_partially_nested(ir_a, ir_b)
-    #     )
-    # )
